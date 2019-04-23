@@ -118,9 +118,19 @@
 		<view-id value="/faces/Configuracion/modoPago.xhtml" />
 	</url-mapping>
 	
+	<url-mapping id="proveedor">
+		<pattern value="/proveedor" />
+		<view-id value="/faces/Configuracion/proveedor.xhtml" />
+	</url-mapping>
+	
 	<url-mapping id="comprobante">
 		<pattern value="/comprobante" />
 		<view-id value="/faces/Gestion_Venta/comprobante.xhtml" />
+	</url-mapping>
+	
+	<url-mapping id="comprobanteCompra">
+		<pattern value="/comprobanteCompra" />
+		<view-id value="/faces/Gestion_Venta/comprobanteCompra.xhtml" />
 	</url-mapping>
 	
 	<url-mapping id="comunicacionBaja">

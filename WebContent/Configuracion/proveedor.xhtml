@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+<ui:composition template="/WEB-INF/plantillas/plantilla.xhtml">
+	<ui:define name="contenido">
+	
+		<p:panel>
+			
+			<h:form>
+				<p:breadCrumb>  
+    				<p:menuitem value="Home" url="#" />  
+    				<p:menuitem value="Configuracion" url="#" />
+    				<p:menuitem value="Gestion de Proveedor" url="proveedor" />   
+				</p:breadCrumb>	
+			</h:form>
+			
+			
+			<br/>
+			<!-- growl general -->			
+			<p:messages  id="msgGeneral" showDetail="false" showSummary="true" closable="true" />		
+			
+			<h:form style="margin-bottom: 8px">
+				<h:panelGrid columns="4">						
+					<p:commandButton value="Nuevo Proveedor" icon="icon-add" update=":dlgDetNuevoProveedor" oncomplete="PF('dlgNuevoProveedor').show();"
+						actionListener="#{proveedorMB.nuevoProveedor()}"/>
+				</h:panelGrid>
+			</h:form>
+			
+			
+				<!-- listado de Planes -->
+			<h:form id="formLista">
+				<p:dataTable id="dataProveedor" var="p" value="#{proveedorMB.listaProveedores}" filteredValue="#{proveedorMB.listaProveedoresFilter}" 
+					widgetVar="dtProveedor" 
+					emptyMessage="No hay Proveedors Disponibles." rowIndexVar="nro" paginator="true" rows="10" paginatorPosition="bottom" 
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,30"
+					 style="FONT-SIZE: 10px; ">
+					<f:facet name="header">Lista Proveedor</f:facet>
+										
+					<p:column headerText="Orden" width="25" style="width:3%" >
+						#{nro+1}
+					</p:column>		
+					
+					<p:column style="width:70px" headerText="Tipo de Documento">
+						<h:outputText value="#{p.desTipoDocumento}"/>
+					</p:column>
+					
+					<p:column style="width:50px" headerText="Número de Documento" filterBy="#{p.numero_docu_iden_cab}"  filterStyle="width:95%;"  filterMatchMode="contains">
+						<h:outputText value="#{p.numero_documento}"/>
+					</p:column>
+					
+					<p:column style="width:100px" headerText="Nombre" filterBy="#{p.nombre_cab}"  filterStyle="width:95%;"  filterMatchMode="contains">
+						<h:outputText value="#{p.nombre_proveedor}"/>
+					</p:column>
+					
+					<p:column style="width:70px" headerText="Dirección">
+						<h:outputText value="#{p.direccion}"/>
+					</p:column>
+					
+					<p:column style="width:50px" headerText="Teléfono">
+						<h:outputText value="#{p.numero_telefono}"/>
+					</p:column>
+					
+					<p:column style="width:70px" headerText="Email">
+						<h:outputText value="#{p.correo}"/>
+					</p:column>
+								        
+			        <p:column headerText="Editar/Elim." style="width:5%;text-align: center">
+					
+						<p:commandButton title="Editar"  update=":dlgDetNuevoProveedor" actionListener="#{proveedorMB.editarProveedor(p)}"
+										 oncomplete="PF('dlgNuevoProveedor').show();" icon="icon-edit">
+						</p:commandButton> 
+
+						<p:commandButton title="Eliminar" oncomplete="PF('dlgEliminarProveedor').show();" actionListener="#{proveedorMB.eliminarProveedor(p)}" update=":dlgDetEliminarProveedor" icon="icon-delete">
+	
+						</p:commandButton>
+								
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+			
+			<!-- #############    Dialogos      ################ -->
+			
+			<!-- #############    TABLA MAESTRA      ################ -->
+			
+			<!-- dialogo nuevo/editar perfil -->
+			
+			<p:dialog header="Registrar Proveedor" widgetVar="dlgNuevoProveedor" appendTo="@(body)"
+					resizable="false" id="dlgDetNuevoProveedor" modal="true">
+					
+					<h:form id="formProveedor" enctype="multipart/form-data">
+					<p:messages showDetail="false" showSummary="true" id="msgNuevo" closable="true"/>
+					<h:panelGrid columns="2">
+							#{"Tipo de Documento:"}	 					        
+							<p:selectOneMenu style="width:200px" value="#{proveedorMB.proveedorSelec.tipo_documento}"  required="true" requiredMessage="Se necesita un domicilio fiscal" >
+								<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
+								<f:selectItems value="#{proveedorMB.listTablaTablasDetalles}" var="p" itemLabel="#{p.descripcion_largo}" itemValue="#{p.codigo_catalogo}" />
+							</p:selectOneMenu>
+							
+							#{"Número de Documento:"} 
+							<p:inputText value="#{proveedorMB.proveedorSelec.numero_documento}" id="ruc"
+								required="true" label="ruc" requiredMessage="Se necesita un ruc"
+								style="width:200px;" />
+								
+							#{"Nombre:"} 
+							<p:inputText value="#{proveedorMB.proveedorSelec.nombre_proveedor}" id="razon_social"
+								required="true" label="razon_social" requiredMessage="Se necesita una nombre"
+								style="width:200px;" />
+								
+							#{"Dirección:"} 
+							<p:inputText value="#{proveedorMB.proveedorSelec.direccion}" id="direccion"
+								 label="direccion" 
+								style="width:200px;" />
+								
+							#{"Teléfono:"} 
+							<p:inputText value="#{proveedorMB.proveedorSelec.numero_telefono}" id="telefono"
+								 label="telefono" 
+								style="width:200px;" />
+								
+							#{"Email:"} 
+							<p:inputText value="#{proveedorMB.proveedorSelec.correo}" id="email"
+								 label="email" 
+								style="width:200px;" /> 
+					</h:panelGrid>
+					<br/>
+					<p:commandButton value="Guardar" actionListener="#{proveedorMB.guardarProveedor()}"
+						update=":formLista msgNuevo" oncomplete="validarProveedor(xhr, status, args)" icon="icon-disk" />
+					
+					<p:commandButton value="Cancelar" type="button" onclick="PF('dlgNuevoProveedor').hide()" icon="icon-cancel" />
+					</h:form>	
+			</p:dialog>
+			
+
+			<!-- dialogo eliminar -->	
+			<p:confirmDialog id="dlgDetEliminarProveedor" appendTo="@(body)"
+					message="¿Desea eliminar este Proveedor " header="Eliminar Proveedor"
+					severity="alert" widgetVar="dlgEliminarProveedor">
+				<h:form>
+					<p:commandButton value="Eliminar"
+						update=":formLista :msgGeneral" 
+						actionListener="#{proveedorMB.confirmaEliminarProveedor}"
+						oncomplete="PF('dlgEliminarProveedor').hide();" icon="icon-delete" />
+
+					<p:commandButton value="Cancelar" type="button"
+						onclick="PF('dlgEliminarProveedor').hide()" icon="icon-cancel" />
+
+				</h:form>
+			</p:confirmDialog>
+		</p:panel>
+		
+		<script>
+			
+		function validarProveedor(xhr, status, args) {
+			if (!args.esValido) {
+				jQuery('#dlgDetNuevoProveedor').effect("shake", {
+					times : 1
+				}, 100);
+			} else {
+				//limpiando
+				PF('dlgNuevoProveedor').hide();
+				console.log("cerro")
+			}
+		}
+
+		</script>
+		
+	</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+<ui:composition template="/WEB-INF/plantillas/plantilla.xhtml">
+	<ui:define name="contenido">
+	
+		<p:panel>
+			
+			<h:form>
+				<p:breadCrumb>  
+    				<p:menuitem value="Home" url="#" />  
+    				<p:menuitem value="Comprobantes" url="#" />
+    				<p:menuitem value="Generar Compra" url="comprobanteCompra" />   
+				</p:breadCrumb>	
+			</h:form>
+			
+			
+			<br/>
+			<!-- growl general -->			
+			<p:messages  id="msgGeneral" showDetail="false" showSummary="true" closable="true" />		
+			
+			<!-- tootlbar -->
+			<h:form style="margin-bottom: 8px" id="formPN"> 
+				<h:panelGrid columns="4">	
+					#{"Tipo de Documento:"}						        
+					<p:selectOneMenu style="width:200px" value="#{comprobanteCompraMB.comprobanteCompraSelec.tipo_comprobante}"  required="true" requiredMessage="Se necesita un tipo de comprobante" >
+						<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>						
+						<f:selectItem itemLabel="Factura" itemValue="01" />
+						<f:selectItem itemLabel="Boleta de venta" itemValue="03" />
+						<p:ajax event="itemSelect" listener="#{comprobanteCompraMB.obtenerAbreviatura()}" update="idValoresCabecera"/>
+					</p:selectOneMenu>												
+				</h:panelGrid>
+				
+				<p:panel>
+					<h:panelGrid id="idValoresCabecera">
+						<h:panelGrid columns="2">
+						
+							#{"Proveedor:"} 
+							<p:autoComplete id="proveedorPojo" value="#{comprobanteCompraMB.proveedorEncontrado.nombre_proveedor}" completeMethod="#{comprobanteCompraMB.consultarProveedor}" 
+	                        var="proveedor" itemLabel="#{proveedor.nombre_proveedor}" itemValue="#{proveedor.nombre_proveedor}" forceSelection="true" disabled="#{comprobanteCompraMB.ingresarProveedor}">
+	                         
+	                        	<p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemProveedor}" update="id_nombre formAccion"/>
+	                        	
+	                        </p:autoComplete>
+	                        
+	                        
+							
+						</h:panelGrid>
+						
+						<h:panelGrid columns="4">
+						
+							#{"Nro Serie:"}
+	                        <p:outputLabel value=" #{comprobanteCompraMB.comprobanteCompraSelec.nroserie_documento}" id="id_nombre"
+								style="width:200px ;font-size:15px; color:blue" />	
+								
+							#{"Fecha de Emisión:"}
+							<p:calendar style="width:200px" readonlyInput="true" value="#{comprobanteCompraMB.comprobanteCompraSelec.fecha_emision}" pattern="dd/MM/yyyy" locale="es" maxdate="#{cicloMB.fechaActual}"
+								  navigator="true"  required="true" requiredMessage="Seleccione una fecha de inicio" disabled="#{comprobanteCompraMB.ingresarProveedor}">
+								  <p:ajax event="dateSelect" />
+							</p:calendar>
+							
+							#{"Tipo Operación:"}						        
+							<p:selectOneMenu style="width:200px" value="#{comprobanteCompraMB.comprobanteCompraSelec.tipo_operacion}" required="true" requiredMessage="Se necesita un domicilio fiscal"  disabled="#{comprobanteCompraMB.ingresarProveedor}">
+								<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
+								<f:selectItems value="#{comprobanteCompraMB.listTablaTablasDetallesOperacion}" var="p" itemLabel="#{p.descripcion_largo}" itemValue="#{p.codigo_catalogo}" />
+								<p:ajax event="change"/>
+							</p:selectOneMenu>
+								
+						</h:panelGrid>
+						
+					</h:panelGrid>
+				</p:panel>
+			
+			</h:form>
+			
+			<h:form id="formAccion">
+			
+				<p:panel id="id_adicionar">
+				</p:panel>
+			
+			</h:form>
+
+				
+			<!-- #############    TABLA MAESTRA      ################ -->
+			
+			<!-- dialogo nuevo/editar perfil -->
+			
+			
+		</p:panel>
+		
+		<script>
+		<!--vega.com-->
+		
+		function actualizar(){
+			location.reload(true);
+			 alert('xxxx');
+		}
+		
+		function oneventFunction(data) {
+		    if (data.status === "success") {
+		    	location.reload();
+		    }
+		}
+		function validarNuevoProducto(xhr, status, args) {
+			if (!args.esValido) {
+				jQuery('#dlgDetNuevoProducto').effect("shake", {
+					times : 1
+				}, 100);
+			} else {
+				//limpiando
+				PF('dlgNuevoProducto').hide();
+				console.log("cerro")
+			}
+		}
+		
+		function validar(xhr, status, args) {
+			if (args.validationFailed) {
+				
+			} else {
+				PF('dlgNuevo').hide();
+			}
+		}
+
+		function validarGuardar(xhr, status, args) {
+			if (!args.esValido) {
+				jQuery('#dlgDetNuevo').effect("shake", {
+					times : 1
+				}, 100);
+			} else {
+				
+			}
+		}
+		
+		function start() {
+		    PF('statusDialog').show();
+		}
+		 
+		function stop() {
+		    PF('statusDialog').hide();
+		}
+		
+		
+		</script>
+		
+	</ui:define>
+</ui:composition>
+</html>

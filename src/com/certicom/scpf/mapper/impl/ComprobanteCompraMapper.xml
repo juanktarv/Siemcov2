@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.certicom.scpf.mapper.ComprobanteCompraMapper">
+
+<resultMap id="comprobanteCompraResult" type="com.certicom.scpf.domain.ComprobanteCompra">
+	<id column="id_comprobante_compra" property="id_comprobante_compra"/>
+	<result column="id_proveedor" property="id_proveedor"/>
+	<result column="tipo_comprobante" property="tipo_comprobante"/>
+	<result column="nroserie_documento" property="nroserie_documento"/>
+	<result column="tipo_operacion" property="tipo_operacion"/>
+	<result column="fecha_emision" property="fecha_emision"/>
+	<result column="hora_emision" property="hora_emision"/>
+	<result column="fecha_vencimiento" property="fecha_vencimiento"/>
+	<result column="tipo_moneda_cab" property="tipo_moneda_cab"/>
+	<result column="suma_tributos" property="suma_tributos"/>
+	<result column="total_valor_compra" property="total_valor_compra"/>
+	<result column="total_precio_compra" property="total_precio_compra"/>
+	<result column="suma_otros_cargos" property="suma_otros_cargos"/>
+	<result column="importe_total_compra" property="importe_total_compra"/>
+	<result column="estado_sunat" property="estado_sunat"/>
+	<result column="estado_pago" property="estado_pago"/>
+	
+
+</resultMap>
+
+
+</mapper>	

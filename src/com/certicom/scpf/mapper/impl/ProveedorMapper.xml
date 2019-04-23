@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.certicom.scpf.mapper.ProveedorMapper">
+
+<resultMap id="proveedorResult" type="com.certicom.scpf.domain.Proveedores">
+	<id column="id_proveedor" property="id_proveedor"/>
+	<result column="tipo_documento" property="tipo_documento"/>
+	<result column="numero_documento" property="numero_documento"/>
+	<result column="nombre_proveedor" property="nombre_proveedor"/>
+	<result column="direccion" property="direccion"/>
+	<result column="numero_telefono" property="numero_telefono"/>
+	<result column="correo" property="correo"/>
+
+</resultMap>
+
+
+</mapper>	
