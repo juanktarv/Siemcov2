@@ -38,6 +38,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <mapper resource="com/certicom/scpf/mapper/impl/VendedorMapper.xml"/> 
         <mapper resource="com/certicom/scpf/mapper/impl/ProveedorMapper.xml"/>
         <mapper resource="com/certicom/scpf/mapper/impl/ComprobanteCompraMapper.xml"/> 
+        <mapper resource="com/certicom/scpf/mapper/impl/ComprobanteCompraDetalleMapper.xml"/>
         
             
 	</mappers>
