@@ -16,6 +16,8 @@ import org.primefaces.event.SelectEvent;
 
 import com.certicom.scpf.domain.Cliente;
 import com.certicom.scpf.domain.ComprobanteCompra;
+import com.certicom.scpf.domain.ComprobanteCompraDetalle;
+import com.certicom.scpf.domain.ComprobanteDetalle;
 import com.certicom.scpf.domain.DomicilioFiscal;
 import com.certicom.scpf.domain.Emisor;
 import com.certicom.scpf.domain.Log;
@@ -43,6 +45,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	private ComprobanteCompra comprobanteCompraSelec;
+	private ComprobanteCompraDetalle comprobanteCompraDetalleSelec;
 	private List<ComprobanteCompra> listaComprobanteCompra;
 	private Boolean editarCliente;
 	private MenuServices menuServices;
@@ -50,6 +53,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	private ProveedorService proveedorService;
 	private ModoPagoService modoPagoService;
 	private List<ModoPago> listModoPagos;
+	private Integer id_modo_pago = 0;
 	
 	private TablaTablasDetalle tablaTablasDetalleTipoComprobante;
 	
@@ -63,6 +67,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	private DomicilioFiscal domicilioFiscalSelec;
 	private DomicilioFiscalService domicilioFiscalService;
 	private TablaTablasDetalleService tablaTablasDetalleService;
+	private Date fechaActual;
 	//private EmisorService emisorService;
 	
 	private boolean adicionar; /*Jesus*/
@@ -84,8 +89,18 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		this.comprobanteCompraService = new ComprobanteCompraService();
 		this.proveedorService = new ProveedorService();
 		this.proveedorEncontrado = new Proveedores();
+		this.modoPagoService = new ModoPagoService();
 		this.menuServices=new MenuServices();
 		this.tablaTablasDetalleService = new TablaTablasDetalleService();
+		this.ingresarProveedor = Boolean.TRUE;
+		this.comprobanteCompraSelec.setFecha_emision(new Date()); /*Jesus*/
+		this.comprobanteCompraSelec.setFecha_vencimiento(new Date()); /*Jesus*/
+		this.comprobanteCompraSelec.setHora_emision(new Date());/*Jesus*/
+		//this.comprobanteCompraSelec.setId_modo_pago(4); /* Jesus contado*/
+		this.comprobanteCompraSelec.setTipo_operacion("0101"); /* Jesus Tipo Operacion*/
+		this.comprobanteCompraSelec.setTipo_moneda_cab("PEN"); /* Jesus Tipo Moneda*/
+		this.adicionar = Boolean.TRUE;
+		//this.comprobanteCompraSelec.setId_vendedor(2);
 		
 		this.editarCliente = Boolean.FALSE;
 
@@ -99,6 +114,8 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 			this.listTablaTablasDetallesProducto = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_PRODUCTO);
 			this.listaComprobanteCompra = this.comprobanteCompraService.findAll();
 			this.listModoPagos = this.modoPagoService.findAll();
+			this.fechaActual = new Date();
+			System.out.println("CANTIDAD DE MODO PAGOS: "+this.listModoPagos.size());
 			Menu codMenu = menuServices.opcionMenuByPretty("pretty:comprobanteCompra");
 			log.setCod_menu(codMenu.getCod_menu().intValue());
 		} catch (Exception e) {
@@ -462,6 +479,31 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 
 	public void setListModoPagos(List<ModoPago> listModoPagos) {
 		this.listModoPagos = listModoPagos;
+	}
+
+	public Integer getId_modo_pago() {
+		return id_modo_pago;
+	}
+
+	public void setId_modo_pago(Integer id_modo_pago) {
+		this.id_modo_pago = id_modo_pago;
+	}
+
+	public Date getFechaActual() {
+		return fechaActual;
+	}
+
+	public void setFechaActual(Date fechaActual) {
+		this.fechaActual = fechaActual;
+	}
+
+	public ComprobanteCompraDetalle getComprobanteCompraDetalleSelec() {
+		return comprobanteCompraDetalleSelec;
+	}
+
+	public void setComprobanteCompraDetalleSelec(
+			ComprobanteCompraDetalle comprobanteCompraDetalleSelec) {
+		this.comprobanteCompraDetalleSelec = comprobanteCompraDetalleSelec;
 	}
 	
 }
