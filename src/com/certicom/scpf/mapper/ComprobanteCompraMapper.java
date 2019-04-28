@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import com.certicom.scpf.domain.Comprobante;
 import com.certicom.scpf.domain.ComprobanteCompra;
 
 
@@ -40,6 +41,23 @@ public interface ComprobanteCompraMapper {
 	@Select("SELECT (coalesce(MAX(correlativo), 0)+1) AS maxmcorrelativo "
 			+ " from t_comprobante_compra where tipo_comprobante=#{tipo_comprobante}")
 	public int getCorrelativoComprobante(@Param("tipo_comprobante") String tipo_comprobante)throws Exception;
+
+	@Select("select e.* from t_comprobante_compra e where e.nroserie_documento = #{nroserie_documento}")
+	public List<Comprobante> findByNumeroSerie(String nroserie_documento);
+
+	@Insert("insert into t_comprobante_compra ("
+			+ "id_proveedor, nroserie_documento, tipo_operacion, fecha_emision,"
+			+ "hora_emision, fecha_vencimiento, tipo_moneda_cab, suma_tributos, "
+			+ "total_valor_compra, total_precio_compra, suma_otros_cargos, "
+			+ "importe_total_compra, estado_sunat, estado_pago, tipo_comprobante, correlativo) values "			
+			+ "(#{id_proveedor}, #{nroserie_documento}, #{tipo_operacion}, #{fecha_emision},"
+			+ " #{hora_emision}, #{fecha_vencimiento}, #{tipo_moneda_cab}, #{suma_tributos}, "
+			+ " #{total_valor_compra}, #{total_precio_compra}, #{suma_otros_cargos}, "
+			+ "#{importe_total_compra}, #{estado_sunat}, #{estado_pago}, #{tipo_comprobante},#{correlativo})")
+	public void crearComprobanteCompraSec(ComprobanteCompra comprobanteCompraSelec);
+
+	@Select("SELECT nextval('sec_comprobante_compra')")
+	public int getSecIdComprobante();
 	
 	
 }

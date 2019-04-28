@@ -7,7 +7,7 @@ public class ComprobanteCompraDetalle {
 	private Integer id_comprobante_compra;
 	private Integer id_proveedor;
 	private Integer id_producto;
-	private Integer tipo_comprobante;
+	private String  tipo_comprobante;
 	private Integer id_tipo_producto;
 	private Integer id_almacen;
 	private Integer tipo_unidad_medida;
@@ -23,6 +23,21 @@ public class ComprobanteCompraDetalle {
 	private BigDecimal precio_venta_unitario_costo;
 	private BigDecimal valor_venta_item;
 	private BigDecimal valor_referencial_unit;
+	private Integer cant_unidades_item_det;
+	private String numeroSerie;
+	private Producto producto;
+	private TributoProducto tpISC;
+	private TributoProducto tpIGV;
+	private TributoProducto tpOtros;
+	private BigDecimal montoISC;
+	private BigDecimal montoIGV;
+	private BigDecimal montoOtros;
+	private Integer id_emisor;
+	private BigDecimal suma_tributos_det;
+	private BigDecimal precio_venta_unitario_det;
+	private BigDecimal valor_venta_item_det;
+	private Integer id_domicilio_fiscal_cab;
+	private Integer id_modo_pago;
 	
 	public Integer getId_comprobante_compra() {
 		return id_comprobante_compra;
@@ -48,11 +63,11 @@ public class ComprobanteCompraDetalle {
 		this.id_producto = id_producto;
 	}
 	
-	public Integer getTipo_comprobante() {
+	public String getTipo_comprobante() {
 		return tipo_comprobante;
 	}
 	
-	public void setTipo_comprobante(Integer tipo_comprobante) {
+	public void setTipo_comprobante(String tipo_comprobante) {
 		this.tipo_comprobante = tipo_comprobante;
 	}
 	
@@ -175,6 +190,127 @@ public class ComprobanteCompraDetalle {
 	
 	public void setValor_referencial_unit(BigDecimal valor_referencial_unit) {
 		this.valor_referencial_unit = valor_referencial_unit;
+	}
+
+	public Producto getProducto() {
+		return producto;
+	}
+
+	public void setProducto(Producto producto) {
+		this.producto = producto;
+	}
+
+	public Integer getCant_unidades_item_det() {
+		return cant_unidades_item_det;
+	}
+
+	public void setCant_unidades_item_det(Integer cant_unidades_item_det) {
+		this.cant_unidades_item_det = cant_unidades_item_det;
+	}
+
+	public String getNumeroSerie() {
+		return numeroSerie;
+	}
+
+	public void setNumeroSerie(String numeroSerie) {
+		this.numeroSerie = numeroSerie;
+	}
+
+	public TributoProducto getTpISC() {
+		return tpISC;
+	}
+
+	public void setTpISC(TributoProducto tpISC) {
+		this.tpISC = tpISC;
+	}
+
+	public TributoProducto getTpIGV() {
+		return tpIGV;
+	}
+
+	public void setTpIGV(TributoProducto tpIGV) {
+		this.tpIGV = tpIGV;
+	}
+
+	public TributoProducto getTpOtros() {
+		return tpOtros;
+	}
+
+	public void setTpOtros(TributoProducto tpOtros) {
+		this.tpOtros = tpOtros;
+	}
+
+	public BigDecimal getMontoISC() {
+		return montoISC;
+	}
+
+	public void setMontoISC(BigDecimal montoISC) {
+		this.montoISC = montoISC;
+	}
+
+	public BigDecimal getMontoIGV() {
+		return montoIGV;
+	}
+
+	public void setMontoIGV(BigDecimal montoIGV) {
+		this.montoIGV = montoIGV;
+	}
+
+	public BigDecimal getMontoOtros() {
+		return montoOtros;
+	}
+
+	public void setMontoOtros(BigDecimal montoOtros) {
+		this.montoOtros = montoOtros;
+	}
+
+	public BigDecimal getSuma_tributos_det() {
+		return suma_tributos_det;
+	}
+
+	public void setSuma_tributos_det(BigDecimal suma_tributos_det) {
+		this.suma_tributos_det = suma_tributos_det;
+	}
+
+	public BigDecimal getPrecio_venta_unitario_det() {
+		return precio_venta_unitario_det;
+	}
+
+	public void setPrecio_venta_unitario_det(BigDecimal precio_venta_unitario_det) {
+		this.precio_venta_unitario_det = precio_venta_unitario_det;
+	}
+
+	public BigDecimal getValor_venta_item_det() {
+		return valor_venta_item_det;
+	}
+
+	public void setValor_venta_item_det(BigDecimal valor_venta_item_det) {
+		this.valor_venta_item_det = valor_venta_item_det;
+	}
+
+	public Integer getId_emisor() {
+		return id_emisor;
+	}
+
+	public void setId_emisor(Integer id_emisor) {
+		this.id_emisor = id_emisor;
+	}
+
+	public Integer getId_domicilio_fiscal_cab() {
+		return id_domicilio_fiscal_cab;
+	}
+
+	public void setId_domicilio_fiscal_cab(Integer id_domicilio_fiscal_cab) {
+		this.id_domicilio_fiscal_cab = id_domicilio_fiscal_cab;
+	}
+
+	public Integer getId_modo_pago() {
+		return id_modo_pago;
+	}
+
+	public void setId_modo_pago(Integer id_modo_pago) {
+		this.id_modo_pago = id_modo_pago;
 	}	
+	
 	
 }

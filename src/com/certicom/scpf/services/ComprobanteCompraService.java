@@ -2,6 +2,7 @@ package com.certicom.scpf.services;
 
 import java.util.List;
 
+import com.certicom.scpf.domain.Comprobante;
 import com.certicom.scpf.domain.ComprobanteCompra;
 import com.certicom.scpf.mapper.ComprobanteCompraMapper;
 import com.pe.certicom.scpf.commons.ServiceFinder;
@@ -42,6 +43,21 @@ public class ComprobanteCompraService implements ComprobanteCompraMapper{
 			throws Exception {
 		// TODO Auto-generated method stub
 		return comprobanteCompraMapper.getCorrelativoComprobante(tipo_comprobante);
+	}
+
+	public void crearComprobanteCompraSec(ComprobanteCompra comprobanteCompraSelec) {
+		// TODO Auto-generated method stub
+		this.comprobanteCompraMapper.crearComprobanteCompraSec(comprobanteCompraSelec);
+	}
+
+	public int getSecIdComprobante() {
+		// TODO Auto-generated method stub
+		return this.comprobanteCompraMapper.getSecIdComprobante();
+	}
+
+	public List<Comprobante> findByNumeroSerie(String numero_serie_documento_cab) {
+		// TODO Auto-generated method stub
+		return comprobanteCompraMapper.findByNumeroSerie(numero_serie_documento_cab);
 	}
 
 	

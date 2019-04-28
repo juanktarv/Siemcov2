@@ -2,19 +2,23 @@ package com.certicom.scpf.managedBeans;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 
 import com.certicom.scpf.domain.Cliente;
+import com.certicom.scpf.domain.Comprobante;
 import com.certicom.scpf.domain.ComprobanteCompra;
 import com.certicom.scpf.domain.ComprobanteCompraDetalle;
 import com.certicom.scpf.domain.ComprobanteDetalle;
@@ -23,15 +27,22 @@ import com.certicom.scpf.domain.Emisor;
 import com.certicom.scpf.domain.Log;
 import com.certicom.scpf.domain.Menu;
 import com.certicom.scpf.domain.ModoPago;
+import com.certicom.scpf.domain.Producto;
 import com.certicom.scpf.domain.Proveedores;
 import com.certicom.scpf.domain.TablaTablasDetalle;
+import com.certicom.scpf.domain.TributoProducto;
+import com.certicom.scpf.services.ComprobanteCompraDetalleService;
 import com.certicom.scpf.services.ComprobanteCompraService;
+import com.certicom.scpf.services.ComprobanteDetalleService;
 import com.certicom.scpf.services.DomicilioFiscalService;
+import com.certicom.scpf.services.EmisorService;
 //import com.certicom.scpf.services.EmisorService;
 import com.certicom.scpf.services.MenuServices;
 import com.certicom.scpf.services.ModoPagoService;
+import com.certicom.scpf.services.ProductoService;
 import com.certicom.scpf.services.ProveedorService;
 import com.certicom.scpf.services.TablaTablasDetalleService;
+import com.certicom.scpf.services.TributoProductoService;
 import com.pe.certicom.scpf.commons.Constante;
 import com.pe.certicom.scpf.commons.FacesUtils;
 import com.pe.certicom.scpf.commons.GenericBeans;
@@ -54,16 +65,23 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	private ModoPagoService modoPagoService;
 	private List<ModoPago> listModoPagos;
 	private Integer id_modo_pago = 0;
-	
+	private List<TributoProducto> listTributoProductos;
+	private TributoProductoService tributoProductoService;
 	private TablaTablasDetalle tablaTablasDetalleTipoComprobante;
-	
+	private List<ComprobanteCompraDetalle> listaComprobanteCompraDetalle;
 	private Proveedores proveedorEncontrado;
+	private Producto productoEncontrado;
+	private Producto productoSelec;
+	private ProductoService productoService;
+	private ComprobanteCompraDetalleService comprobanteCompraDetalleService;
+	private String nroserie_documento;
 	
 	private List<TablaTablasDetalle> listTablaTablasDetallesComprobante;
 	private List<TablaTablasDetalle> listTablaTablasDetallesOperacion;
 	private List<TablaTablasDetalle> listTablaTablasDetallesMoneda;
 	private List<TablaTablasDetalle> listTablaTablasDetallesProducto;
 	private Emisor emisorSelec;
+	private EmisorService emisorService;
 	private DomicilioFiscal domicilioFiscalSelec;
 	private DomicilioFiscalService domicilioFiscalService;
 	private TablaTablasDetalleService tablaTablasDetalleService;
@@ -101,12 +119,17 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		this.comprobanteCompraSelec.setTipo_moneda_cab("PEN"); /* Jesus Tipo Moneda*/
 		this.adicionar = Boolean.TRUE;
 		//this.comprobanteCompraSelec.setId_vendedor(2);
-		
+		this.productoEncontrado= new Producto();
+		this.productoSelec= new Producto();
+		this.productoService= new ProductoService();
 		this.editarCliente = Boolean.FALSE;
-
+		this.tributoProductoService= new TributoProductoService();
+		this.listaComprobanteCompraDetalle= new ArrayList<ComprobanteCompraDetalle>();
 		log = (Log)getSpringBean(Constante.SESSION_LOG);
 		logmb = new LogMB();	
-		
+		this.comprobanteCompraDetalleService= new ComprobanteCompraDetalleService();
+		this.emisorService= new EmisorService();
+		this.nroserie_documento="";
 		try {
 			this.listTablaTablasDetallesComprobante = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_DOCUMENTOS);
 			this.listTablaTablasDetallesOperacion = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPO_OPERACION);
@@ -124,11 +147,102 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		
 	}	
 	
+	public void setNumeroSerie(){
+		System.out.println(" nroserie_documento -----> "+this.nroserie_documento);
+		this.comprobanteCompraSelec.setNroserie_documento(this.nroserie_documento);
+	}
+	
+	public void onItemSelect(SelectEvent event)  throws Exception{
+		
+		String s = event.getObject().toString();
+		List<Producto> allProducts = this.productoService.findAll();
+        List<Producto> filteredProducts = new ArrayList<Producto>();
+				
+		for (int i = 0; i < allProducts.size(); i++) {
+        	Producto skin = allProducts.get(i);
+            if(skin.getDescripcion_prod_det().equals(s)) {
+            	//filteredProducts.add(skin);
+            	this.productoSelec = skin;           	
+            	break;
+            	
+            }
+        }
+				
+		if(this.productoSelec.isValor_unit_incluye_impuestos()== Boolean.FALSE){			
+			  System.out.println("false : " + this.productoSelec.isValor_unit_incluye_impuestos());
+			  this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); 		
+			  this.comprobanteCompraDetalleSelec.setId_producto(this.productoSelec.getId_producto());
+			  this.comprobanteCompraDetalleSelec.setProducto(this.productoSelec);
+		
+		
+		this.listTributoProductos = this.tributoProductoService.findByIdProducto(this.productoSelec.getId_producto());
+		
+		for (TributoProducto tp : this.listTributoProductos) {
+			
+			if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
+				TablaTablasDetalle ttd = this.tablaTablasDetalleService.findById(tp.getTipo_sistema_isc_det());
+				tp.setDescTT(ttd.getDescripcion_largo());
+				this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
+				this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
+				this.comprobanteCompraDetalleSelec.setTpISC(tp);
+			}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
+				TablaTablasDetalle ttd = this.tablaTablasDetalleService.findById(tp.getTipo_afectacion_igv_det());
+				tp.setDescTT(ttd.getDescripcion_largo());
+				this.comprobanteCompraDetalleSelec.setMontoIGV(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
+				this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().divide(new BigDecimal("100.00")));
+				this.comprobanteCompraDetalleSelec.setTpIGV(tp);
+			}else{
+				this.comprobanteCompraDetalleSelec.setTpOtros(tp);
+			}
+		}
+				
+					this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det().add((this.comprobanteCompraDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"):this.comprobanteCompraDetalleSelec.getMontoIGV()).add((this.comprobanteCompraDetalleSelec.getMontoISC() == null ? new BigDecimal("0.00"):this.comprobanteCompraDetalleSelec.getMontoISC()))));					
+			
+		}else{
+			
+			        System.out.println("Everd es  true : " + this.productoSelec.isValor_unit_incluye_impuestos());
+			        this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); /*Jesus*/			
+					this.comprobanteCompraDetalleSelec.setId_producto(this.productoSelec.getId_producto());
+					this.comprobanteCompraDetalleSelec.setProducto(this.productoSelec);
+					
+					
+					this.listTributoProductos = this.tributoProductoService.findByIdProducto(this.productoSelec.getId_producto());
+					
+					for (TributoProducto tp : this.listTributoProductos) {
+						
+						if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
+							TablaTablasDetalle ttd = this.tablaTablasDetalleService.findById(tp.getTipo_sistema_isc_det());
+							tp.setDescTT(ttd.getDescripcion_largo());
+							this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
+							this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
+							this.comprobanteCompraDetalleSelec.setTpISC(tp);
+						}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
+							TablaTablasDetalle ttd = this.tablaTablasDetalleService.findById(tp.getTipo_afectacion_igv_det());
+							tp.setDescTT(ttd.getDescripcion_largo());
+							this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente());
+							this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().multiply(new BigDecimal("18.00")));
+							this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().divide(new BigDecimal("118.00"), RoundingMode.HALF_UP));
+							this.productoSelec.setValor_unitario_prod_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().subtract(this.comprobanteCompraDetalleSelec.getMontoIGV()));
+							this.comprobanteCompraDetalleSelec.setTpIGV(tp);
+						}else{
+							this.comprobanteCompraDetalleSelec.setTpOtros(tp);
+						}
+					}
+					
+					
+					//this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det().add((this.comprobanteDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"):this.comprobanteDetalleSelec.getMontoIGV()).add((this.comprobanteDetalleSelec.getMontoISC() == null ? new BigDecimal("0.00"):this.comprobanteDetalleSelec.getMontoISC()))));					
+					
+		}
+		
+		
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
+    }
+	
 	public List<Proveedores> consultarProveedor(String query) throws Exception {
 		System.out.println("entrando autocomplete");
         List<Proveedores> allProveedores = this.proveedorService.findAll();
         List<Proveedores> filteredProveedores = new ArrayList<Proveedores>();
-         
+        System.out.println("allProveedores --->"+allProveedores.size()); 
         for (int i = 0; i < allProveedores.size(); i++) {
         	Proveedores skin = allProveedores.get(i);
             if(skin.getNombre_proveedor().toLowerCase().startsWith(query.toLowerCase())) {
@@ -140,6 +254,372 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
          
         return filteredProveedores;
     }
+	
+	public void adicionarProducto(){
+		this.productoEncontrado = new Producto();
+		this.comprobanteCompraDetalleSelec = new ComprobanteCompraDetalle();
+		
+	}
+	
+	public void onItemSelectCod(SelectEvent event)  throws Exception{
+		
+		String s = event.getObject().toString();
+		
+		
+		
+		List<Producto> allProducts = this.productoService.findAll();
+        List<Producto> filteredProducts = new ArrayList<Producto>();
+		
+		
+		for (int i = 0; i < allProducts.size(); i++) {
+        	Producto skin = allProducts.get(i);
+            if(skin.getCod_prod_det().equals(s)) {
+            	//filteredProducts.add(skin);
+            	this.productoSelec = skin;
+            	
+            	break;
+            	
+            }
+        }
+		
+		
+		if(this.productoSelec.isValor_unit_incluye_impuestos()== Boolean.FALSE){
+			
+			        System.out.println("Everd es  false : " + this.productoSelec.isValor_unit_incluye_impuestos());
+			        
+			        this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); /*Jesus*/
+			
+		this.comprobanteCompraDetalleSelec.setId_producto(this.productoSelec.getId_producto());
+		this.comprobanteCompraDetalleSelec.setProducto(this.productoSelec);
+		
+		
+		this.listTributoProductos = this.tributoProductoService.findByIdProducto(this.productoSelec.getId_producto());
+		
+		for (TributoProducto tp : this.listTributoProductos) {
+			
+			if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
+				TablaTablasDetalle ttd = this.tablaTablasDetalleService.findById(tp.getTipo_sistema_isc_det());
+				tp.setDescTT(ttd.getDescripcion_largo());
+				this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
+				this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
+				this.comprobanteCompraDetalleSelec.setTpISC(tp);
+			}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
+				TablaTablasDetalle ttd = this.tablaTablasDetalleService.findById(tp.getTipo_afectacion_igv_det());
+				tp.setDescTT(ttd.getDescripcion_largo());
+				this.comprobanteCompraDetalleSelec.setMontoIGV(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
+				this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().divide(new BigDecimal("100.00")));
+				this.comprobanteCompraDetalleSelec.setTpIGV(tp);
+			}else{
+				this.comprobanteCompraDetalleSelec.setTpOtros(tp);
+			}
+		}
+		
+		
+					this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det().add((this.comprobanteCompraDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"):this.comprobanteCompraDetalleSelec.getMontoIGV()).add((this.comprobanteCompraDetalleSelec.getMontoISC() == null ? new BigDecimal("0.00"):this.comprobanteCompraDetalleSelec.getMontoISC()))));					
+			
+		}else{
+			
+			        System.out.println("Everd es  true : " + this.productoSelec.isValor_unit_incluye_impuestos());
+			        this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); /*Jesus*/
+			
+					this.comprobanteCompraDetalleSelec.setId_producto(this.productoSelec.getId_producto());
+					this.comprobanteCompraDetalleSelec.setProducto(this.productoSelec);
+					
+					
+					this.listTributoProductos = this.tributoProductoService.findByIdProducto(this.productoSelec.getId_producto());
+					
+					for (TributoProducto tp : this.listTributoProductos) {
+						
+						if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
+							TablaTablasDetalle ttd = this.tablaTablasDetalleService.findById(tp.getTipo_sistema_isc_det());
+							tp.setDescTT(ttd.getDescripcion_largo());
+							this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
+							this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
+							this.comprobanteCompraDetalleSelec.setTpISC(tp);
+						}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
+							TablaTablasDetalle ttd = this.tablaTablasDetalleService.findById(tp.getTipo_afectacion_igv_det());
+							tp.setDescTT(ttd.getDescripcion_largo());
+							this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente());
+							this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().multiply(new BigDecimal("18.00")));
+							this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().divide(new BigDecimal("118.00"), RoundingMode.HALF_UP));
+							this.productoSelec.setValor_unitario_prod_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().subtract(this.comprobanteCompraDetalleSelec.getMontoIGV()));
+							this.comprobanteCompraDetalleSelec.setTpIGV(tp);
+						}else{
+							this.comprobanteCompraDetalleSelec.setTpOtros(tp);
+						}
+					}
+					
+					
+					//this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det().add((this.comprobanteDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"):this.comprobanteDetalleSelec.getMontoIGV()).add((this.comprobanteDetalleSelec.getMontoISC() == null ? new BigDecimal("0.00"):this.comprobanteDetalleSelec.getMontoISC()))));					
+					
+		}
+		
+		
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
+    }
+	
+	public void calcularMonto(){
+		Producto p=new Producto();
+		try {
+			p = this.productoService.findById(this.comprobanteCompraDetalleSelec.getId_producto());
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		for (TributoProducto tp : this.listTributoProductos) {
+									
+			if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
+				
+				if(p.isValor_unit_incluye_impuestos()){
+					this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
+				}else{
+					this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.productoSelec.getPrecio_final_editado_cliente().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+					this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.comprobanteCompraDetalleSelec.getValor_venta_item_det()));
+				}
+				
+				this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+				this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
+				this.comprobanteCompraDetalleSelec.setTpISC(tp);
+			}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
+				if(p.isValor_unit_incluye_impuestos()){
+					
+					this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente()
+							.multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()
+													)
+									)
+						  );
+					
+//					System.out.println("TOTAL:---->"+this.comprobanteDetalleSelec.getPrecio_venta_unitario_det());
+					BigDecimal per=(tp.getPorcentaje_det().add(new BigDecimal("100.00"))).divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
+							
+							
+					
+//					System.out.println(" DIVE ENTRE IGV ---->"+per+" % "+tp.getPorcentaje_det());
+					
+					this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det()
+										 								.divide(per,2, RoundingMode.HALF_UP));
+//					System.out.println("SUB TOTAL ---------->"+this.comprobanteDetalleSelec.getValor_venta_item_det());
+					
+					this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det()
+															.subtract(this.comprobanteCompraDetalleSelec.getValor_venta_item_det()));
+
+//					System.out.println(" IGV ------->"+this.comprobanteDetalleSelec.getMontoIGV());
+				}else{
+					
+					this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.productoSelec.getPrecio_final_editado_cliente()
+												.multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+					
+					BigDecimal per=(tp.getPorcentaje_det().divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP));
+					
+					this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getValor_venta_item_det()
+							                    .multiply(per));
+					
+					this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.comprobanteCompraDetalleSelec.getValor_venta_item_det()
+							                    .add(this.comprobanteCompraDetalleSelec.getMontoIGV()));
+					
+				}
+				
+				this.comprobanteCompraDetalleSelec.setSuma_tributos_det((this.comprobanteCompraDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"): this.comprobanteCompraDetalleSelec.getMontoIGV()).add(this.comprobanteCompraDetalleSelec.getMontoISC() == null? new BigDecimal("0.00"):this.comprobanteCompraDetalleSelec.getMontoISC()));
+				this.comprobanteCompraDetalleSelec.setTpIGV(tp);
+			}else{
+				this.comprobanteCompraDetalleSelec.setTpOtros(tp);
+			}
+			
+		}
+		
+	}
+	
+	public boolean buscarComprobante(String numero_serie_documento_cab){
+		List<Comprobante> lista= new ArrayList<>();
+		boolean respuesta=false;
+		try {
+			lista=this.comprobanteCompraService.findByNumeroSerie(numero_serie_documento_cab);
+			if(!lista.isEmpty()){
+				respuesta= true;
+			}else{
+				respuesta= false;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return respuesta;
+	}
+	
+	public void guardarComprobante(){
+		RequestContext context = RequestContext.getCurrentInstance(); 
+		try {
+			System.out.println(" this.comprobanteCompraSelec.getNroserie_documento() ------->"+this.comprobanteCompraSelec.getNroserie_documento());
+			System.out.println("this.nroserie_documento ============> "+this.nroserie_documento);
+			if(buscarComprobante(this.comprobanteCompraSelec.getNroserie_documento())){
+				FacesUtils.showFacesMessage("Ya existe el comprobante " + this.comprobanteCompraSelec.getNroserie_documento(), 3);
+			}else{
+			
+					System.out.println("  id_comprobante :"+this.comprobanteCompraSelec.getId_comprobante_compra());
+					this.comprobanteCompraSelec.setVersion_ubl(Constante.VERSION_UBL_SUNAT);
+					this.comprobanteCompraSelec.setEstado_comunicacion_baja(Boolean.FALSE);
+					this.comprobanteCompraSelec.setCorrelativo(this.comprobanteCompraService.getCorrelativoComprobante(this.comprobanteCompraSelec.getTipo_comprobante()));
+					this.comprobanteCompraSelec.setEstado_sunat(Constante.ESTADO_PENDIENTE);
+					this.comprobanteCompraService.crearComprobanteCompraSec(this.comprobanteCompraSelec);
+					int id = this.comprobanteCompraService.getSecIdComprobante();
+					System.out.println("ID: "+id);
+					
+					this.comprobanteCompraDetalleService.insertBatchComprobanteDetalle(this.listaComprobanteCompraDetalle, id-1);
+
+					context.update("msgGeneral");
+					context.update("formAction");
+					FacesUtils.showFacesMessage("Se registro el comprobante " + this.comprobanteCompraSelec.getNroserie_documento(), 3);
+			}
+			
+			this.comprobanteCompraSelec= new ComprobanteCompra();
+			this.listaComprobanteCompraDetalle= new ArrayList<ComprobanteCompraDetalle>();
+			
+			
+			this.listTablaTablasDetallesComprobante = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_DOCUMENTOS);
+			this.listTablaTablasDetallesOperacion = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPO_OPERACION);
+			this.listTablaTablasDetallesMoneda = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPO_DE_MONEDA);
+			this.listTablaTablasDetallesProducto = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_PRODUCTO);
+			this.listModoPagos = this.modoPagoService.findAll();
+			this.emisorSelec = this.emisorService.findAll().get(0);
+			this.comprobanteCompraSelec.setId_emisor(this.emisorSelec.getId_emisor());
+			this.proveedorEncontrado= new Proveedores();
+			this.productoEncontrado=new Producto();
+			this.productoEncontrado.setDescripcion_prod_det("");
+			this.productoEncontrado.setCod_prod_det("");
+			
+			this.comprobanteCompraSelec.setFecha_emision_cab(new Date()); 
+			this.comprobanteCompraSelec.setFecha_vencimiento_cab(new Date()); 
+			this.comprobanteCompraSelec.setHora_emision_cab(new Date());
+			this.comprobanteCompraSelec.setId_modo_pago(4); 
+			this.comprobanteCompraSelec.setTipo_operacion_cab("0101"); 
+			this.comprobanteCompraSelec.setTipo_moneda_cab("PEN"); 
+			this.adicionar = Boolean.TRUE; 
+			this.generarComprobante = Boolean.TRUE;
+			this.nroserie_documento="";
+			
+//			this.ingresarCliente = Boolean.TRUE; 
+			
+			
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void adicionarCompra(){
+		
+		/*vega.com*/
+		Boolean valido=Boolean.TRUE;
+   	       	    
+   	    try {
+   	    	
+		   	    	System.out.println("Entra a adicionarCompra");
+		   	    	
+		   	    	if(this.comprobanteCompraDetalleSelec.getProducto().getTipo_articulo().equals("Producto")){
+		   	    		if( this.comprobanteCompraDetalleSelec.getProducto().getStock() >= this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()  ){
+		   	    		    
+		   	    		    valido=Boolean.TRUE;
+				   	 		RequestContext context = RequestContext.getCurrentInstance();  
+				   	   	    context.addCallbackParam("esValido", valido);
+		   	    		
+				   			this.comprobanteCompraDetalleSelec.setTipo_comprobante(this.comprobanteCompraSelec.getTipo_comprobante());
+				   			this.comprobanteCompraDetalleSelec.setId_proveedor(this.comprobanteCompraSelec.getId_proveedor());
+				   			this.comprobanteCompraDetalleSelec.setId_emisor(this.comprobanteCompraSelec.getId_emisor());
+				   			this.comprobanteCompraDetalleSelec.setId_domicilio_fiscal_cab(this.comprobanteCompraSelec.getId_domicilio_fiscal_cab());
+				   			this.comprobanteCompraDetalleSelec.setId_modo_pago(this.comprobanteCompraSelec.getId_modo_pago());
+				   			System.out.println("MODO PAGO :"+this.comprobanteCompraSelec.getId_modo_pago());
+				   			this.listaComprobanteCompraDetalle.add(this.comprobanteCompraDetalleSelec);
+				   			
+				   			this.comprobanteCompraSelec.setSuma_tributos_cab(new BigDecimal("0.00"));
+				   			this.comprobanteCompraSelec.setTotal_precio_venta_cab(new BigDecimal("0.00"));
+				   			this.comprobanteCompraSelec.setTotal_valor_venta_cab(new BigDecimal("0.00"));
+				   			this.comprobanteCompraSelec.setImporte_total_venta_cab(new BigDecimal("0.00"));
+				   			
+				   			for (ComprobanteCompraDetalle comprobanteDetalle : this.listaComprobanteCompraDetalle) {
+				   				this.comprobanteCompraSelec.setSuma_tributos_cab(this.comprobanteCompraSelec.getSuma_tributos_cab().add(comprobanteDetalle.getSuma_tributos_det()));
+				   				this.comprobanteCompraSelec.setTotal_precio_venta_cab(this.comprobanteCompraSelec.getTotal_precio_venta_cab().add(comprobanteDetalle.getPrecio_venta_unitario_det()));
+				   				this.comprobanteCompraSelec.setTotal_valor_venta_cab(this.comprobanteCompraSelec.getTotal_valor_venta_cab().add(comprobanteDetalle.getValor_venta_item_det()));
+				   				this.comprobanteCompraSelec.setImporte_total_venta_cab(this.comprobanteCompraSelec.getImporte_total_venta_cab().add(comprobanteDetalle.getPrecio_venta_unitario_det()));
+				   			}
+				   			
+				   			this.generarComprobante = Boolean.FALSE; /*Jesus*/
+				   			
+				   			FacesUtils.showFacesMessage("Se adiciono "+this.comprobanteCompraDetalleSelec.getProducto().getDescripcion_prod_det(), 3); /*vega.com*/
+				   			context.update("msgGeneral"); /*vega.com*/
+		   	    		   
+			   	    	}else{
+			   	    		 
+			   	    		valido=Boolean.FALSE;
+				   	 		RequestContext context = RequestContext.getCurrentInstance();  
+				   	   	    context.addCallbackParam("esValido", valido);
+				     	   	FacesUtils.showFacesMessage("La cantidad excede el stock", Constante.FATAL); /*vega.com*/
+				   	   	    context.update("msgNuevo"); /*vega.com*/
+			   	    	}
+		   	    	}else{
+		   	    		
+		   	    	 valido=Boolean.TRUE;
+			   	 		RequestContext context = RequestContext.getCurrentInstance();  
+			   	   	    context.addCallbackParam("esValido", valido);
+	   	    		
+			   			this.comprobanteCompraDetalleSelec.setTipo_comprobante(this.comprobanteCompraSelec.getTipo_comprobante());
+			   			this.comprobanteCompraDetalleSelec.setId_proveedor(this.comprobanteCompraSelec.getId_proveedor());
+			   			this.comprobanteCompraDetalleSelec.setId_emisor(this.comprobanteCompraSelec.getId_emisor());
+			   			this.comprobanteCompraDetalleSelec.setId_domicilio_fiscal_cab(this.comprobanteCompraSelec.getId_domicilio_fiscal_cab());
+			   			this.comprobanteCompraDetalleSelec.setId_modo_pago(this.comprobanteCompraSelec.getId_modo_pago());
+			   			System.out.println("MODO PAGO :"+this.comprobanteCompraSelec.getId_modo_pago());
+			   			this.listaComprobanteCompraDetalle.add(this.comprobanteCompraDetalleSelec);
+			   			
+			   			this.comprobanteCompraSelec.setSuma_tributos_cab(new BigDecimal("0.00"));
+			   			this.comprobanteCompraSelec.setTotal_precio_venta_cab(new BigDecimal("0.00"));
+			   			this.comprobanteCompraSelec.setTotal_valor_venta_cab(new BigDecimal("0.00"));
+			   			this.comprobanteCompraSelec.setImporte_total_venta_cab(new BigDecimal("0.00"));
+			   			
+			   			for (ComprobanteCompraDetalle comprobanteDetalle : this.listaComprobanteCompraDetalle) {
+			   				this.comprobanteCompraSelec.setSuma_tributos_cab(this.comprobanteCompraSelec.getSuma_tributos_cab().add(comprobanteDetalle.getSuma_tributos_det()));
+			   				this.comprobanteCompraSelec.setTotal_precio_venta_cab(this.comprobanteCompraSelec.getTotal_precio_venta_cab().add(comprobanteDetalle.getPrecio_venta_unitario_det()));
+			   				this.comprobanteCompraSelec.setTotal_valor_venta_cab(this.comprobanteCompraSelec.getTotal_valor_venta_cab().add(comprobanteDetalle.getValor_venta_item_det()));
+			   				this.comprobanteCompraSelec.setImporte_total_venta_cab(this.comprobanteCompraSelec.getImporte_total_venta_cab().add(comprobanteDetalle.getPrecio_venta_unitario_det()));
+			   			}
+			   			
+			   			this.generarComprobante = Boolean.FALSE; /*Jesus*/
+			   			
+			   			FacesUtils.showFacesMessage("Se adiciono Item", 3); /*vega.com*/
+			   			context.update("msgGeneral"); /*vega.com*/
+		   	    		
+		   	    	}
+		   	    	
+		   	    	
+		   	    	
+
+   	    	
+   	    } catch (Exception e) {
+			e.printStackTrace(); /*vega.com*/
+		}
+		
+		
+	}
+	
+public List<Producto> consultarProducto(String query) throws Exception{
+		
+		System.out.println("entrando autocomplete");
+        List<Producto> allProducts = this.productoService.findAll();
+        List<Producto> filteredProducts = new ArrayList<Producto>();
+         
+        for (int i = 0; i < allProducts.size(); i++) {
+        	Producto skin = allProducts.get(i);
+            if(skin.getDescripcion_prod_det().toLowerCase().startsWith(query.toLowerCase())) {
+            	filteredProducts.add(skin);
+            }
+        }
+        
+        System.out.println("Cantidad: "+filteredProducts.size());
+		
+		return filteredProducts;
+		
+	}
 	
 	public void onItemProveedor(SelectEvent event)  throws Exception{
 		
@@ -167,68 +647,8 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	
 	public void obtenerAbreviatura() throws Exception{
 		
-		System.out.println("Estoy aqui");
-		
-		String sTexto = "";
-		
-		System.out.println(sTexto);
-		
-		String sValor = "";
-		
-		for (TablaTablasDetalle tablaTablasDetalle : listTablaTablasDetallesComprobante) {
-			System.out.println("codigo_catalogo : "+tablaTablasDetalle.getCodigo_catalogo());
-			System.out.println("tipo_comprobante "+this.comprobanteCompraSelec.getTipo_comprobante());
-			if(tablaTablasDetalle.getCodigo_catalogo().equals(this.comprobanteCompraSelec.getTipo_comprobante())){
-				sTexto = tablaTablasDetalle.getDescripcion_largo();
-				sValor = tablaTablasDetalle.getCodigo_catalogo();
-				this.tablaTablasDetalleTipoComprobante = tablaTablasDetalle;
-			}
-			
-		}
-		System.out.println("sTexto " + sTexto);
-		System.out.println("sValor " + sValor);
-		
-		StringTokenizer stPalabras = new StringTokenizer(sTexto);
-		
-		
-		
-		
-		String sPalabra = "";
-		switch(sValor){
-		case "01": sPalabra="F";
-		break;
-		case "03": sPalabra="B";
-			break;
-		case "07": sPalabra="F";
-			break;
-		case "08": sPalabra="F";
-			break;
-		
-		}
-	
-				
-		int cantComprobante = 8;
-		
-		String com = "";
-		
-		Integer valor = Integer.parseInt(sValor);
-		valor = valor + 1;
-		
-//		String sValue = String.valueOf(valor);
-		String sValue = String.valueOf(this.comprobanteCompraService.getCorrelativoComprobante(this.comprobanteCompraSelec.getTipo_comprobante()));
-		System.out.println("sValue ===> "+sValue);
-		for (int i = 0; i < (cantComprobante - sValue.length()); i++) {
-			
-			com = com + "0";
-			
-		}	
-		
-		com = com + sValue;
-		
-		this.comprobanteCompraSelec.setNroserie_documento(sPalabra+"-"+com);
-		
-		//this.comprobanteCompraSelec.setId_domicilio_fiscal(this.domicilioFiscalSelec.getId_domicilio_fiscal_cab());
-		
+		System.out.println("obtenerAbreviatura");
+		//this.comprobanteCompraSelec.setId_domicilio_fiscal(this.domicilioFiscalSelec.getId_domicilio_fiscal_cab());		
 		this.proveedorEncontrado = new Proveedores();
 		this.comprobanteCompraSelec.setFecha_emision(new Date()); /*Jesus*/
 		this.comprobanteCompraSelec.setFecha_vencimiento(new Date()); /*Jesus*/
@@ -244,9 +664,135 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		this.adicionar = Boolean.TRUE; /*Jesus*/
 		this.generarComprobante=  Boolean.TRUE; /*Jesus*/
 		this.ingresarProveedor = Boolean.FALSE; /*Jesus*/
-		this.listaComprobanteCompra = new ArrayList<ComprobanteCompra>();/*Jesus*/
+		this.listaComprobanteCompra = new ArrayList<ComprobanteCompra>();/*Jesus*/		
+		System.out.println("CÃ³digo de Documento: "+this.comprobanteCompraSelec.getNroserie_documento());
 		
-		System.out.println("Código de Documento: "+this.comprobanteCompraSelec.getNroserie_documento());
+	}
+	
+	public List<Producto> consultarProductoCod(String query) throws Exception{
+		
+		System.out.println("entrando autocomplete");
+        List<Producto> allProducts = this.productoService.findAll();
+        List<Producto> filteredProducts = new ArrayList<Producto>();
+         
+        for (int i = 0; i < allProducts.size(); i++) {
+        	Producto skin = allProducts.get(i);
+            if(skin.getCod_prod_det().toLowerCase().startsWith(query.toLowerCase())) {
+            	filteredProducts.add(skin);
+            }
+        }
+        
+        System.out.println("Cantidad: "+filteredProducts.size());
+		
+		return filteredProducts;
+		
+	}
+	
+public void calcularMontoPrecio(){
+		
+		
+		try{   
+			       if(this.productoSelec.isValor_unit_incluye_impuestos()== Boolean.FALSE){   
+			    	   
+			    	   System.out.println(" INCLUYE IMPUESTO FALSE ");
+				
+									for (TributoProducto tp : this.listTributoProductos) {
+										
+										if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
+											this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
+											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
+											this.comprobanteCompraDetalleSelec.setTpISC(tp);
+										}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
+											
+											
+											this.comprobanteCompraDetalleSelec.setMontoIGV(tp.getPorcentaje_det().multiply(this.productoSelec.getPrecio_final_editado_cliente()));
+											
+											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().divide(new BigDecimal("100.00")));
+											this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente().add(this.comprobanteCompraDetalleSelec.getMontoIGV()));
+											this.productoSelec.setValor_unitario_prod_det(this.productoSelec.getPrecio_final_editado_cliente());
+											this.comprobanteCompraDetalleSelec.setProducto(this.productoSelec);
+											int unidades=1;
+											if(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()>0){
+												unidades =this.comprobanteCompraDetalleSelec.getCant_unidades_item_det();
+											}
+											
+//											System.out.println(" IGV===========LINEA 3 >"+unidades);
+											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().multiply(new BigDecimal( unidades)));											
+											this.comprobanteCompraDetalleSelec.setTpIGV(tp);
+											
+											
+											
+										}else{
+											this.comprobanteCompraDetalleSelec.setTpOtros(tp);
+										}
+									}
+									
+									this.productoSelec.setValor_unitario_prod_det(this.productoSelec.getPrecio_final_editado_cliente());
+									this.comprobanteCompraDetalleSelec.setProducto(this.productoSelec);
+									this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+									this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().add(this.comprobanteCompraDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"): this.comprobanteCompraDetalleSelec.getMontoIGV()));
+									this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().add(this.comprobanteCompraDetalleSelec.getMontoISC() == null? new BigDecimal("0.00"): this.comprobanteCompraDetalleSelec.getMontoISC()));
+									this.comprobanteCompraDetalleSelec.setSuma_tributos_det((this.comprobanteCompraDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"): this.comprobanteCompraDetalleSelec.getMontoIGV()).add(this.comprobanteCompraDetalleSelec.getMontoISC() == null? new BigDecimal("0.00"):this.comprobanteCompraDetalleSelec.getMontoISC()));
+									this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.productoSelec.getValor_unitario_prod_det().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+									
+					}else{
+						System.out.println(" INCLUYE IMPUESTOS ----------> TRUE");
+									for (TributoProducto tp : this.listTributoProductos) {
+										
+										if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
+											this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
+											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
+											this.comprobanteCompraDetalleSelec.setTpISC(tp);
+										}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
+											
+											System.out.println(" IGV------------>");
+											this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente());
+											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().multiply(new BigDecimal("18.00")));
+											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().divide(new BigDecimal("118.00"), RoundingMode.HALF_UP));	
+											this.productoSelec.setValor_unitario_prod_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().subtract(this.comprobanteCompraDetalleSelec.getMontoIGV()));
+											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+											
+											
+											
+											this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente()
+																										.multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()
+																																)
+																												)
+																									  );
+											
+											BigDecimal per=(tp.getPorcentaje_det().add(new BigDecimal("100.00"))).divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
+											
+											this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det()
+																								 .divide(per, 2, RoundingMode.HALF_UP));
+											
+											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().subtract(this.comprobanteCompraDetalleSelec.getValor_venta_item_det()));
+											
+											this.comprobanteCompraDetalleSelec.setTpIGV(tp);
+										}else{
+											this.comprobanteCompraDetalleSelec.setTpOtros(tp);
+										}
+									}
+									
+//									this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.comprobanteDetalleSelec.getPrecio_venta_unitario_det().multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det())));
+								    this.comprobanteCompraDetalleSelec.setSuma_tributos_det((this.comprobanteCompraDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"): this.comprobanteCompraDetalleSelec.getMontoIGV()).add(this.comprobanteCompraDetalleSelec.getMontoISC() == null? new BigDecimal("0.00"):this.comprobanteCompraDetalleSelec.getMontoISC()));
+//									this.comprobanteDetalleSelec.setValor_venta_item_det(this.comprobanteDetalleSelec.getPrecio_venta_unitario_det().subtract(this.comprobanteDetalleSelec.getSuma_tributos_det()));
+									
+//					System.out.println(" SUB TOTAL----------->"+this.comprobanteDetalleSelec.getPrecio_venta_unitario_det());
+//					System.out.println(" IGV----------------->"+this.comprobanteDetalleSelec.getMontoIGV());
+//					System.out.println(" TOTAL -------------->"+this.comprobanteDetalleSelec.getValor_venta_item_det());
+					
+					}
+								
+		}catch (Exception e) { 
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			
+		}
+		
+		
+		
 		
 	}
 	
@@ -298,7 +844,6 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	public void eliminarComprobanteCompra(ComprobanteCompra comprobanteCompra){
 		this.comprobanteCompraSelec = comprobanteCompra;
 	}
-	
 	
 	public void confirmaEliminarCliente(){
 		try {
@@ -504,6 +1049,122 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	public void setComprobanteCompraDetalleSelec(
 			ComprobanteCompraDetalle comprobanteCompraDetalleSelec) {
 		this.comprobanteCompraDetalleSelec = comprobanteCompraDetalleSelec;
+	}
+
+	public ComprobanteCompraService getComprobanteCompraService() {
+		return comprobanteCompraService;
+	}
+
+	public void setComprobanteCompraService(ComprobanteCompraService comprobanteCompraService) {
+		this.comprobanteCompraService = comprobanteCompraService;
+	}
+
+	public ProveedorService getProveedorService() {
+		return proveedorService;
+	}
+
+	public void setProveedorService(ProveedorService proveedorService) {
+		this.proveedorService = proveedorService;
+	}
+
+	public ModoPagoService getModoPagoService() {
+		return modoPagoService;
+	}
+
+	public void setModoPagoService(ModoPagoService modoPagoService) {
+		this.modoPagoService = modoPagoService;
+	}
+
+	public Producto getProductoEncontrado() {
+		return productoEncontrado;
+	}
+
+	public void setProductoEncontrado(Producto productoEncontrado) {
+		this.productoEncontrado = productoEncontrado;
+	}
+
+	public DomicilioFiscalService getDomicilioFiscalService() {
+		return domicilioFiscalService;
+	}
+
+	public void setDomicilioFiscalService(DomicilioFiscalService domicilioFiscalService) {
+		this.domicilioFiscalService = domicilioFiscalService;
+	}
+
+	public TablaTablasDetalleService getTablaTablasDetalleService() {
+		return tablaTablasDetalleService;
+	}
+
+	public void setTablaTablasDetalleService(TablaTablasDetalleService tablaTablasDetalleService) {
+		this.tablaTablasDetalleService = tablaTablasDetalleService;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public List<TributoProducto> getListTributoProductos() {
+		return listTributoProductos;
+	}
+
+	public void setListTributoProductos(List<TributoProducto> listTributoProductos) {
+		this.listTributoProductos = listTributoProductos;
+	}
+
+	public TributoProductoService getTributoProductoService() {
+		return tributoProductoService;
+	}
+
+	public void setTributoProductoService(TributoProductoService tributoProductoService) {
+		this.tributoProductoService = tributoProductoService;
+	}
+
+	public List<ComprobanteCompraDetalle> getListaComprobanteCompraDetalle() {
+		return listaComprobanteCompraDetalle;
+	}
+
+	public void setListaComprobanteCompraDetalle(List<ComprobanteCompraDetalle> listaComprobanteCompraDetalle) {
+		this.listaComprobanteCompraDetalle = listaComprobanteCompraDetalle;
+	}
+
+	public Producto getProductoSelec() {
+		return productoSelec;
+	}
+
+	public void setProductoSelec(Producto productoSelec) {
+		this.productoSelec = productoSelec;
+	}
+
+	public ProductoService getProductoService() {
+		return productoService;
+	}
+
+	public void setProductoService(ProductoService productoService) {
+		this.productoService = productoService;
+	}
+
+	public ComprobanteCompraDetalleService getComprobanteCompraDetalleService() {
+		return comprobanteCompraDetalleService;
+	}
+
+	public void setComprobanteCompraDetalleService(ComprobanteCompraDetalleService comprobanteCompraDetalleService) {
+		this.comprobanteCompraDetalleService = comprobanteCompraDetalleService;
+	}
+
+	public EmisorService getEmisorService() {
+		return emisorService;
+	}
+
+	public void setEmisorService(EmisorService emisorService) {
+		this.emisorService = emisorService;
+	}
+
+	public String getNroserie_documento() {
+		return nroserie_documento;
+	}
+
+	public void setNroserie_documento(String nroserie_documento) {
+		this.nroserie_documento = nroserie_documento;
 	}
 	
 }

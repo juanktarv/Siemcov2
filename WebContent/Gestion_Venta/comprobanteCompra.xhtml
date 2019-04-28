@@ -43,22 +43,24 @@
 						<h:panelGrid columns="2">
 						
 							#{"Proveedor:"} 
-							<p:autoComplete id="proveedorPojo" value="#{comprobanteCompraMB.proveedorEncontrado.nombre_proveedor}" completeMethod="#{comprobanteCompraMB.consultarProveedor}" 
-	                        var="proveedor" itemLabel="#{proveedor.nombre_proveedor}" itemValue="#{proveedor.nombre_proveedor}" forceSelection="true" disabled="#{comprobanteCompraMB.ingresarProveedor}">
-	                         
-	                        	<p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemProveedor}" update="id_nombre formAccion"/>
+							<p:autoComplete id="proveedorPojo" value="#{comprobanteCompraMB.proveedorEncontrado.nombre_proveedor}" 
+											completeMethod="#{comprobanteCompraMB.consultarProveedor}" 
+	                        				var="proveedor" itemLabel="#{proveedor.nombre_proveedor}" 
+	                        				itemValue="#{proveedor.nombre_proveedor}" 
+	                        				forceSelection="true" 
+	                        				disabled="#{comprobanteCompraMB.ingresarProveedor}">
+	                        	<p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemProveedor}" update="id_nro_serie formAccion"/>
 	                        	
 	                        </p:autoComplete>
-	                        
-	                        
-							
 						</h:panelGrid>
 						
 						<h:panelGrid columns="6">
 						
 							#{"Nro Serie:"}
-	                        <p:outputLabel value=" #{comprobanteCompraMB.comprobanteCompraSelec.nroserie_documento}" id="id_nombre"
-								style="width:200px ;font-size:15px; color:blue" />	
+	                        <p:inputText value="#{comprobanteCompraMB.nroserie_documento}" id="id_nro_serie"
+								style="width:200px ;font-size:15px; color:blue">
+								<p:ajax listener="#{comprobanteCompraMB.setNumeroSerie()}" ></p:ajax>		
+							</p:inputText>	
 								
 							#{"Fecha de Emisión:"}
 							<p:calendar style="width:200px" readonlyInput="true" value="#{comprobanteCompraMB.comprobanteCompraSelec.fecha_emision}" pattern="dd/MM/yyyy" locale="es" maxdate="#{comprobanteCompraMB.fechaActual}"
@@ -109,8 +111,7 @@
 			
 			</h:form>
 			
-			<h:form id="formAccion">
-			
+			<h:form id="formAccion">			
 				<p:panel id="id_adicionar">
 					<ui:remove>
 					<p:commandButton  title="Adicionar Producto" value="Adicionar"  update=":dlgDetNuevoProducto :formProducto" actionListener="#{comprobanteCompraMB.adicionarProducto()}" 
@@ -118,12 +119,87 @@
 							
 					</p:commandButton>
 					</ui:remove>
-					<p:commandButton  title="Adicionar Producto" value="Adicionar" actionListener="#{comprobanteCompraMB.adicionarProducto()}" 
-									  icon="icon-edit"  disabled="#{comprobanteCompraMB.adicionar}">
+					<p:commandButton  title="Adicionar Producto" value="Adicionar" 
+										update=":dlgDetNuevoProducto :formProducto"
+										actionListener="#{comprobanteCompraMB.adicionarProducto()}" 
+									  	icon="icon-edit"  oncomplete="PF('dlgNuevoProducto').show();"
+									  	disabled="#{comprobanteCompraMB.adicionar}">
 							
-					</p:commandButton>
+					</p:commandButton>					
 				</p:panel>
-			
+				
+				<p:panel>
+					<p:dataTable id="dataComprobante" var="p" value="#{comprobanteCompraMB.listaComprobanteCompraDetalle}" widgetVar="dtComprobante" 
+						emptyMessage="No hay Compras Disponibles." rowIndexVar="nro" 
+						 style="FONT-SIZE: 10px; ">
+						<f:facet name="header">Detalle de Comprobante</f:facet>
+						<p:column headerText="Orden" width="25" style="width:3%" >
+							#{nro+1}
+						</p:column>
+						<p:column style="width:70px" headerText="Código de Producto">
+							<h:outputText value="#{p.producto.cod_prod_det}"/>
+						</p:column>
+						<p:column style="width:70px" headerText="Nombre Producto">
+							<h:outputText value="#{p.producto.descripcion_prod_det}"/>
+						</p:column>
+						<p:column style="width:70px" headerText="Serie">
+							<h:outputText value="#{p.numeroSerie}"  />  <!-- Vega.com -->
+						</p:column>						
+						<p:column style="width:70px" headerText="Cantidad">
+							<h:outputText value="#{p.cant_unidades_item_det}" converter="montoDefaultConverter" />
+						</p:column>						
+						<p:column style="width:70px" headerText="Valor Unitario">
+							<h:outputText value="#{p.producto.valor_unitario_prod_det}" converter="montoDefaultConverter" />
+						</p:column>
+						<p:column style="width:70px" headerText="Sub Total">
+							<h:outputText value="#{p.valor_venta_item_det}" converter="montoDefaultConverter" />
+						</p:column>
+						<p:column style="width:70px" headerText="Tributo">
+							<h:outputText value="#{p.suma_tributos_det}" converter="montoDefaultConverter"/>
+						</p:column>
+						<p:column style="width:70px" headerText="Total">
+							<h:outputText value="#{p.precio_venta_unitario_det}" converter="montoDefaultConverter"/>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+				
+				<p:panel>
+				
+					<h:panelGrid columns="2" border="1" >
+					
+						#{"Sumatoria Tributos:"}
+						<h:outputLabel value="#{comprobanteCompraMB.comprobanteCompraSelec.suma_tributos_cab}" id="sumatoria_tributos"
+								style="width:200px;" converter="montoDefaultConverter" />
+						#{"Sub Total venta:"}
+						<h:outputLabel value="#{comprobanteCompraMB.comprobanteCompraSelec.total_valor_venta_cab}" id="valor_venta"
+								style="width:200px;" converter="montoDefaultConverter" />
+						#{"Total venta:"}
+						<h:outputLabel value="#{comprobanteCompraMB.comprobanteCompraSelec.total_precio_venta_cab}" id="precio_venta"
+								style="width:200px;" converter="montoDefaultConverter" />
+						#{"Total descuentos:"}
+						<h:outputLabel value="0" id="total_descuentos"
+								style="width:200px;" converter="montoDefaultConverter"/>
+						#{"Sumatoria otros Cargos:"}
+						<h:outputLabel value="0" id="otros_cargos"
+								style="width:200px;" converter="montoDefaultConverter" />
+						#{"Total Anticipos:"}
+						<h:outputLabel value="0" id="total_anticipos"
+								style="width:200px;" converter="montoDefaultConverter"  />
+						#{"Importe total:"}
+						<h:outputLabel value="#{comprobanteCompraMB.comprobanteCompraSelec.importe_total_venta_cab}" id="importe_total"
+								style="width:200px;" converter="montoDefaultConverter" />
+					
+					</h:panelGrid>
+					        
+                     <h:panelGrid columns="2">
+				         <p:commandButton value="Guardar Compra" actionListener="#{comprobanteCompraMB.guardarComprobante()}" process="@this" 
+				         				  update=":formAccion: :formPN" disabled="#{comprobanteCompraMB.generarComprobante}" >
+						 </p:commandButton>
+					
+				 	</h:panelGrid>
+
+				</p:panel>
+							
 			</h:form>
 			
 			<p:dialog header="Adicionar Producto" widgetVar="dlgNuevoProducto" appendTo="@(body)"
@@ -134,10 +210,14 @@
 					<p:panel border="0" header="Buscar producto:">			
 					<h:panelGrid columns="2" border="0">
 						<p:outputLabel value="Código Producto:"></p:outputLabel>
+						
 						<p:autoComplete id="codigoProd" inputStyle="width:300px" 
-							value="#{comprobanteCompraMB.productoEncontrado.cod_prod_det}" completeMethod="#{comprobanteCompraMB.consultarProductoCod}" 
-							var="codprd" itemLabel="#{codprd.cod_prod_det}" itemValue="#{codprd.cod_prod_det}" forceSelection="true">
-	                        <p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemSelectCod}" update=":formProducto:pnOtros productoPojo"/>
+							value="#{comprobanteCompraMB.productoEncontrado.cod_prod_det}" 
+							completeMethod="#{comprobanteCompraMB.consultarProductoCod}" 
+							var="codprd" itemLabel="#{codprd.cod_prod_det}" 
+							itemValue="#{codprd.cod_prod_det}" forceSelection="true">
+	                        <p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemSelectCod}" 
+	                        		update=":formProducto:pnOtros productoPojo"/>
 	                    </p:autoComplete>
 	                    
 						<p:outputLabel value="Producto:"></p:outputLabel>						        
@@ -225,7 +305,7 @@
 							<h:outputLabel value="#{comprobanteCompraMB.comprobanteCompraDetalleSelec.montoIGV}" id="monto_igv" converter="montoDefaultConverter"
 								style="width:200px;" />
 							
-							#{"Total Venta:"}
+							#{"Total Compra:"}
 							<h:outputLabel value="#{comprobanteCompraMB.comprobanteCompraDetalleSelec.precio_venta_unitario_det}" id="precio_venta_unitario" converter="montoDefaultConverter"
 								style="width:200px;" />
 								
