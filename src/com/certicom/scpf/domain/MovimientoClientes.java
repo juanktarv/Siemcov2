@@ -7,7 +7,7 @@ public class MovimientoClientes {
 
 	private Integer id_comprobante;
 	private Integer id_cliente;
-	private Integer tipo_comprobante;
+	private String tipo_comprobante;
 	private Integer id_modo_pago;
 	private Integer id_emisor;
 	private Date fecha_movimiento;
@@ -35,11 +35,11 @@ public class MovimientoClientes {
 		this.id_cliente = id_cliente;
 	}
 	
-	public Integer getTipo_comprobante() {
+	public String getTipo_comprobante() {
 		return tipo_comprobante;
 	}
 	
-	public void setTipo_comprobante(Integer tipo_comprobante) {
+	public void setTipo_comprobante(String tipo_comprobante) {
 		this.tipo_comprobante = tipo_comprobante;
 	}
 	

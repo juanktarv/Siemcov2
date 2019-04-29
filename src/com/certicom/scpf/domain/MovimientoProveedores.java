@@ -6,11 +6,11 @@ import java.util.Date;
 public class MovimientoProveedores {
 
 	private Integer id_comprobante_compra;
-	private Integer tipo_comprobante;
+	private String tipo_comprobante;
 	private Integer id_proveedor;
 	private Date fecha_movimiento;
 	private Date fecha_vencimiento;
-	private Integer tipo_documento;
+	private String tipo_documento;
 	private BigDecimal importe;
 	private Integer forma_pago;
 	private String nroserie_documento;
@@ -23,11 +23,11 @@ public class MovimientoProveedores {
 		this.id_comprobante_compra = id_comprobante_compra;
 	}
 	
-	public Integer getTipo_comprobante() {
+	public String getTipo_comprobante() {
 		return tipo_comprobante;
 	}
 	
-	public void setTipo_comprobante(Integer tipo_comprobante) {
+	public void setTipo_comprobante(String tipo_comprobante) {
 		this.tipo_comprobante = tipo_comprobante;
 	}
 	
@@ -55,11 +55,11 @@ public class MovimientoProveedores {
 		this.fecha_vencimiento = fecha_vencimiento;
 	}
 	
-	public Integer getTipo_documento() {
+	public String getTipo_documento() {
 		return tipo_documento;
 	}
 	
-	public void setTipo_documento(Integer tipo_documento) {
+	public void setTipo_documento(String tipo_documento) {
 		this.tipo_documento = tipo_documento;
 	}
 	

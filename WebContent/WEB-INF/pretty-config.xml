@@ -143,4 +143,8 @@
 		<view-id value="/faces/Gestion_Venta/correccion.xhtml" />
 	</url-mapping>
 
+	<url-mapping id="cobranza">
+		<pattern value="/cobranza" />
+		<view-id value="/faces/gestion_cobranza/cobranza.xhtml" />
+	</url-mapping>
 </pretty-config>

@@ -27,6 +27,7 @@ import com.certicom.scpf.domain.Emisor;
 import com.certicom.scpf.domain.Log;
 import com.certicom.scpf.domain.Menu;
 import com.certicom.scpf.domain.ModoPago;
+import com.certicom.scpf.domain.MovimientoProveedores;
 import com.certicom.scpf.domain.Producto;
 import com.certicom.scpf.domain.Proveedores;
 import com.certicom.scpf.domain.TablaTablasDetalle;
@@ -39,6 +40,7 @@ import com.certicom.scpf.services.EmisorService;
 //import com.certicom.scpf.services.EmisorService;
 import com.certicom.scpf.services.MenuServices;
 import com.certicom.scpf.services.ModoPagoService;
+import com.certicom.scpf.services.MovimientoProveedorService;
 import com.certicom.scpf.services.ProductoService;
 import com.certicom.scpf.services.ProveedorService;
 import com.certicom.scpf.services.TablaTablasDetalleService;
@@ -87,6 +89,8 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	private TablaTablasDetalleService tablaTablasDetalleService;
 	private Date fechaActual;
 	//private EmisorService emisorService;
+	private MovimientoProveedores movimientoProveedores;
+	private MovimientoProveedorService movimientoProveedorService; 
 	
 	private boolean adicionar; /*Jesus*/
     private boolean generarComprobante; /*Jesus*/
@@ -128,6 +132,8 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		log = (Log)getSpringBean(Constante.SESSION_LOG);
 		logmb = new LogMB();	
 		this.comprobanteCompraDetalleService= new ComprobanteCompraDetalleService();
+		this.movimientoProveedores=new MovimientoProveedores();
+		this.movimientoProveedorService=new MovimientoProveedorService();
 		this.emisorService= new EmisorService();
 		this.nroserie_documento="";
 		try {
@@ -450,13 +456,18 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	public void guardarComprobante(){
 		RequestContext context = RequestContext.getCurrentInstance(); 
 		try {
-			System.out.println(" this.comprobanteCompraSelec.getNroserie_documento() ------->"+this.comprobanteCompraSelec.getNroserie_documento());
-			System.out.println("this.nroserie_documento ============> "+this.nroserie_documento);
+//			System.out.println(" this.comprobanteCompraSelec.getNroserie_documento() ------->"+this.comprobanteCompraSelec.getNroserie_documento());
+//			System.out.println("this.nroserie_documento ============> "+this.nroserie_documento);
 			if(buscarComprobante(this.comprobanteCompraSelec.getNroserie_documento())){
 				FacesUtils.showFacesMessage("Ya existe el comprobante " + this.comprobanteCompraSelec.getNroserie_documento(), 3);
 			}else{
-			
-					System.out.println("  id_comprobante :"+this.comprobanteCompraSelec.getId_comprobante_compra());
+				  
+				  	this.comprobanteCompraSelec.setSuma_tributos(this.comprobanteCompraSelec.getSuma_tributos_cab());
+				  	this.comprobanteCompraSelec.setTotal_valor_compra(this.comprobanteCompraSelec.getTotal_valor_venta_cab());
+					this.comprobanteCompraSelec.setTotal_precio_compra(this.comprobanteCompraSelec.getTotal_precio_venta_cab());
+					this.comprobanteCompraSelec.setSuma_otros_cargos(this.comprobanteCompraSelec.getSuma_otros_cargos_cab());
+					this.comprobanteCompraSelec.setImporte_total_compra(this.comprobanteCompraSelec.getImporte_total_venta_cab());
+					
 					this.comprobanteCompraSelec.setVersion_ubl(Constante.VERSION_UBL_SUNAT);
 					this.comprobanteCompraSelec.setEstado_comunicacion_baja(Boolean.FALSE);
 					this.comprobanteCompraSelec.setCorrelativo(this.comprobanteCompraService.getCorrelativoComprobante(this.comprobanteCompraSelec.getTipo_comprobante()));
@@ -466,6 +477,8 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 					System.out.println("ID: "+id);
 					
 					this.comprobanteCompraDetalleService.insertBatchComprobanteDetalle(this.listaComprobanteCompraDetalle, id-1);
+					this.comprobanteCompraSelec.setId_comprobante_compra(id-1);
+					registrarMovimentoProveedor(this.comprobanteCompraSelec);
 
 					context.update("msgGeneral");
 					context.update("formAction");
@@ -509,6 +522,22 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		
 	}
 	
+	public void registrarMovimentoProveedor(ComprobanteCompra compra) {
+		// TODO Auto-generated method stub
+		MovimientoProveedores movimiento=new MovimientoProveedores();
+		movimiento.setFecha_movimiento(compra.getFecha_emision());
+		movimiento.setFecha_vencimiento(compra.getFecha_vencimiento());
+		movimiento.setForma_pago(compra.getId_modo_pago());
+		movimiento.setId_comprobante_compra(compra.getId_comprobante_compra());
+		movimiento.setId_proveedor(compra.getId_proveedor());
+		movimiento.setImporte(compra.getImporte_total_compra());
+		movimiento.setNroserie_documento(compra.getNroserie_documento());
+		movimiento.setTipo_comprobante(compra.getTipo_comprobante());
+		
+		
+		this.movimientoProveedorService.crearMovimiento(movimiento);
+	}
+
 	public void adicionarCompra(){
 		
 		/*vega.com*/
@@ -1165,6 +1194,22 @@ public void calcularMontoPrecio(){
 
 	public void setNroserie_documento(String nroserie_documento) {
 		this.nroserie_documento = nroserie_documento;
+	}
+
+	public MovimientoProveedores getMovimientoProveedores() {
+		return movimientoProveedores;
+	}
+
+	public void setMovimientoProveedores(MovimientoProveedores movimientoProveedores) {
+		this.movimientoProveedores = movimientoProveedores;
+	}
+
+	public MovimientoProveedorService getMovimientoProveedorService() {
+		return movimientoProveedorService;
+	}
+
+	public void setMovimientoProveedorService(MovimientoProveedorService movimientoProveedorService) {
+		this.movimientoProveedorService = movimientoProveedorService;
 	}
 	
 }

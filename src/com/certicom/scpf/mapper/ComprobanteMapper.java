@@ -86,9 +86,14 @@ public interface ComprobanteMapper {
     public void actualizarEstadoRespuestaSunatComprobante(Comprobante comprobante) throws Exception;
 	
 	
-	public Integer countCompByAnioMesTipoPAGINATOR(@Param("anio") Integer annio, @Param("mes") Integer mes,@Param("tipo_comprobante") String tipo_comprobante, @Param("filters") Map<String,Object> filters)throws Exception;
+	public Integer countCompByAnioMesTipoPAGINATOR(@Param("anio") Integer annio, @Param("mes") Integer mes,
+												   @Param("tipo_comprobante") String tipo_comprobante, 
+												   @Param("filters") Map<String,Object> filters)throws Exception;
 
-	public List<Comprobante> listComprobantesByAnioMesTipoPAGINATOR(@Param("anio") Integer annio, @Param("mes") Integer mes,@Param("tipo_comprobante") String tipo_comprobante, @Param("first") Integer  first, @Param("pageSize") Integer pageSize,  @Param("filters") Map<String,Object> filters, @Param("sortField") String sortField, @Param("sortOrder") String sortOrder) throws Exception;
+	public List<Comprobante> listComprobantesByAnioMesTipoPAGINATOR(
+			@Param("anio") Integer annio, @Param("mes") Integer mes,@Param("tipo_comprobante") String tipo_comprobante, 
+			@Param("first") Integer  first, @Param("pageSize") Integer pageSize,  @Param("filters") Map<String,Object> filters, 
+			@Param("sortField") String sortField, @Param("sortOrder") String sortOrder) throws Exception;
 
 	public Comprobante getByNumeroSerieComprobante(@Param("numero_serie_documento_cab") String numero_serie_documento_cab);
 	

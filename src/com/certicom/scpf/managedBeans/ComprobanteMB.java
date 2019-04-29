@@ -53,6 +53,8 @@ import com.certicom.scpf.domain.Emisor;
 import com.certicom.scpf.domain.Log;
 import com.certicom.scpf.domain.Menu;
 import com.certicom.scpf.domain.ModoPago;
+import com.certicom.scpf.domain.MovimientoClientes;
+import com.certicom.scpf.domain.MovimientoProveedores;
 import com.certicom.scpf.domain.Producto;
 import com.certicom.scpf.domain.TablaTablasDetalle;
 import com.certicom.scpf.domain.TributoProducto;
@@ -64,6 +66,7 @@ import com.certicom.scpf.services.DomicilioFiscalService;
 import com.certicom.scpf.services.EmisorService;
 import com.certicom.scpf.services.MenuServices;
 import com.certicom.scpf.services.ModoPagoService;
+import com.certicom.scpf.services.MovimientoClienteService;
 import com.certicom.scpf.services.ProductoService;
 import com.certicom.scpf.services.TablaTablasDetalleService;
 import com.certicom.scpf.services.TributoProductoService;
@@ -111,6 +114,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
     private boolean adicionar; /*Jesus*/
     private boolean generarComprobante; /*Jesus*/
     private boolean ingresarCliente; /*Jesus*/
+    
+    private MovimientoClienteService movimientoClienteService;
 	
 	//datos Log
     private Log log;
@@ -156,7 +161,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		this.comprobanteSelec.setImporte_total_venta_cab(new BigDecimal("0.00"));
 
 		
-		
+		this.movimientoClienteService= new MovimientoClienteService();
 
 		log = (Log)getSpringBean(Constante.SESSION_LOG);
 		logmb = new LogMB();	
@@ -891,6 +896,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 					
 					this.comprobanteDetalleService.insertBatchComprobanteDetalle(this.listaComprobanteDetalle, id-1);
 					this.productoService.actualizarBatchStockProducto(this.listaComprobanteDetalle); /*Actualizar stock*/
+					comprobanteSelec.setId_comprobante(id-1);
+					registrarMovimientoCliente(comprobanteSelec);
 					
 					context.update("msgGeneral");
 					context.update("formAction");
@@ -949,6 +956,21 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 	}
 	
 	
+	public void registrarMovimientoCliente(Comprobante venta) {
+		// TODO Auto-generated method stub
+		MovimientoClientes movimiento=new MovimientoClientes();
+		movimiento.setFecha_movimiento(venta.getFecha_emision_cab());
+		movimiento.setFecha_vencimiento(venta.getFecha_vencimiento_cab());
+		movimiento.setId_modo_pago(venta.getId_modo_pago());
+		movimiento.setId_comprobante(venta.getId_comprobante());
+		movimiento.setId_cliente(venta.getId_cliente());
+		movimiento.setImporte(venta.getImporte_total_venta_cab());
+		movimiento.setNroserie_documento(venta.getNumero_serie_documento_cab());
+		movimiento.setTipo_documento(venta.getTipo_docu_iden_cab());
+		
+		this.movimientoClienteService.crearMovimiento(movimiento);
+	}
+
 	public void generarComprobanteTicket(){
 		RequestContext context = RequestContext.getCurrentInstance(); 
 		try {
@@ -965,7 +987,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 					this.comprobanteService.crearComprobanteSec(this.comprobanteSelec);
 					int id = this.comprobanteService.getSecIdComprobante();
 					System.out.println("ID: "+id);
-					
+					comprobanteSelec.setId_comprobante(id-1);
+					registrarMovimientoCliente(comprobanteSelec);
 					this.comprobanteDetalleService.insertBatchComprobanteDetalle(this.listaComprobanteDetalle, id-1);
 					imprimirTicket();
 					

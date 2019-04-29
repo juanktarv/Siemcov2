@@ -178,5 +178,15 @@
 		<property name="mapperInterface" value="com.certicom.scpf.mapper.ComprobanteCompraDetalleMapper"/>
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
+	
+	<bean id="movimientoProveedorMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.certicom.scpf.mapper.MovimientoProveedorMapper"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+	
+	<bean id="movimientoClienteMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.certicom.scpf.mapper.MovimientoClienteMapper"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
 
 </beans>

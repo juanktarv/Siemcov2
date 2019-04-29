@@ -40,6 +40,7 @@ public class ComprobanteCompra {
 	private Date hora_emision_cab;
 	private Date fecha_vencimiento_cab;
 	private String tipo_operacion_cab;
+	private String tipo_documento;
 	
 	
 	public String getTipo_operacion_cab() {
@@ -320,6 +321,14 @@ public class ComprobanteCompra {
 
 	public void setVersion_ubl(String version_ubl) {
 		this.version_ubl = version_ubl;
+	}
+
+	public String getTipo_documento() {
+		return tipo_documento;
+	}
+
+	public void setTipo_documento(String tipo_documento) {
+		this.tipo_documento = tipo_documento;
 	}	
 	
 }
