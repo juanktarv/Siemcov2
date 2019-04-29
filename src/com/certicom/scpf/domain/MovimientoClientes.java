@@ -18,6 +18,7 @@ public class MovimientoClientes {
 	private String flag_regularizado;
 	private String formapago;
 	private BigDecimal saldopagado;
+	private Cliente cliente;
 	
 	public Integer getId_comprobante() {
 		return id_comprobante;
@@ -121,6 +122,14 @@ public class MovimientoClientes {
 	
 	public void setSaldopagado(BigDecimal saldopagado) {
 		this.saldopagado = saldopagado;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}	
 	
 }

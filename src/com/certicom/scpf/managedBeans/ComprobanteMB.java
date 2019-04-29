@@ -805,7 +805,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 				   			
 				   			this.generarComprobante = Boolean.FALSE; /*Jesus*/
 				   			
-				   			FacesUtils.showFacesMessage("Se adiciono Item", 3); /*vega.com*/
+				   			FacesUtils.showFacesMessage("Se adiciono "+productoSelec.getDescripcion_prod_det(), 3); /*vega.com*/
 				   			context.update("msgGeneral"); /*vega.com*/
 		   	    		   
 			   	    	}else{
@@ -844,7 +844,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			   			
 			   			this.generarComprobante = Boolean.FALSE; /*Jesus*/
 			   			
-			   			FacesUtils.showFacesMessage("Se adiciono Item", 3); /*vega.com*/
+			   			FacesUtils.showFacesMessage("Se adiciono "+productoSelec.getDescripcion_prod_det(), 3); /*vega.com*/
 			   			context.update("msgGeneral"); /*vega.com*/
 		   	    		
 		   	    	}
@@ -967,7 +967,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		movimiento.setImporte(venta.getImporte_total_venta_cab());
 		movimiento.setNroserie_documento(venta.getNumero_serie_documento_cab());
 		movimiento.setTipo_documento(venta.getTipo_docu_iden_cab());
-		
+		movimiento.setTipo_comprobante(venta.getTipo_comprobante());
 		this.movimientoClienteService.crearMovimiento(movimiento);
 	}
 

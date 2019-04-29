@@ -13,9 +13,11 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 
+import com.certicom.scpf.domain.Cliente;
 import com.certicom.scpf.domain.Comprobante;
 import com.certicom.scpf.domain.MovimientoClientes;
 import com.certicom.scpf.domain.TablaTablasDetalle;
+import com.certicom.scpf.services.ClienteService;
 import com.certicom.scpf.services.MovimientoClienteService;
 import com.certicom.scpf.services.TablaTablasDetalleService;
 import com.pe.certicom.scpf.commons.Constante;
@@ -40,6 +42,9 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 	private Boolean disableBuscar;  
 	private LazyDataModel<MovimientoClientes> listamovimientos;
 	private List<MovimientoClientes> listaFiltroMovimientos;
+	private Cliente clienteEncontrado;
+	private ClienteService clienteService;
+	private String nroserie_documento;
 	
 	public CobranzaMB(){}
 	
@@ -51,7 +56,9 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		this.tablaTablasDetalleService = new TablaTablasDetalleService();
 		this.disableBuscar = Boolean.TRUE; 
 		this.disableRespuesta = Boolean.TRUE; 
-		
+		this.clienteEncontrado= new Cliente();
+		this.clienteService= new ClienteService();
+		this.nroserie_documento="";
 		
 		try {
 			this.listTablaTablasDetallesComprobante = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_DOCUMENTOS);
@@ -59,6 +66,42 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public List<Cliente> consultarCliente(String query) throws Exception {
+		System.out.println("entrando autocomplete");
+        List<Cliente> allClients = this.clienteService.findAll();
+        List<Cliente> filteredClients = new ArrayList<Cliente>();
+         
+        for (int i = 0; i < allClients.size(); i++) {
+        	Cliente skin = allClients.get(i);
+            if(skin.getNombre_cab().toLowerCase().startsWith(query.toLowerCase())) {
+            	filteredClients.add(skin);
+            }
+        }
+        
+        System.out.println("Cantidad: "+filteredClients.size());
+         
+        return filteredClients;
+    }
+	
+	public void onItemCliente(SelectEvent event)  throws Exception{
+		
+				String s = event.getObject().toString();
+				List<Cliente> allProducts = this.clienteService.findAll();
+		        //List<Cliente> filteredProducts = new ArrayList<Cliente>();
+				
+				for (int i = 0; i < allProducts.size(); i++) {
+		        	Cliente skin = allProducts.get(i);
+		            if(skin.getNombre_cab().equals(s)) {
+		            	//filteredProducts.add(skin);
+		            	//this.comprobanteSelec.setTipo_comprobante(skin.getDescripcion_prod_det());
+		            	this.clienteEncontrado = skin;
+		            	break;
+		            	
+		            }
+		        }		
+				
 	}
 	
 	public void listarMovimientosFiltros(){
@@ -116,6 +159,10 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 					return totalRow;
 	            }			 
 		};
+	}
+	
+	public void buscarClienteComprobante(){
+		
 	}
 	
 	public void onItemDocumento(SelectEvent event)  throws Exception{
@@ -215,6 +262,30 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 
 	public void setListaFiltroMovimientos(List<MovimientoClientes> listaFiltroMovimientos) {
 		this.listaFiltroMovimientos = listaFiltroMovimientos;
+	}
+
+	public Cliente getClienteEncontrado() {
+		return clienteEncontrado;
+	}
+
+	public void setClienteEncontrado(Cliente clienteEncontrado) {
+		this.clienteEncontrado = clienteEncontrado;
+	}
+
+	public ClienteService getClienteService() {
+		return clienteService;
+	}
+
+	public void setClienteService(ClienteService clienteService) {
+		this.clienteService = clienteService;
+	}
+
+	public String getNroserie_documento() {
+		return nroserie_documento;
+	}
+
+	public void setNroserie_documento(String nroserie_documento) {
+		this.nroserie_documento = nroserie_documento;
 	}
 	
 	

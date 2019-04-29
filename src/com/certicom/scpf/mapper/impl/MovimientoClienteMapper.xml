@@ -18,12 +18,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<result column="flag_regularizado" property="flag_regularizado"/>
 	<result column="formapago" property="formapago"/>
 	<result column="saldopagado" property="saldopagado"/>
+	
+	<association property="cliente" column="id_cliente" select="selectCliente"/>
 
 </resultMap>
 
+	<select id="selectCliente" parameterType="int" resultType="com.certicom.scpf.domain.Cliente">
+		SELECT * FROM t_cliente WHERE id_cliente=#{id_cliente}
+	</select>
 
 	<select id="listComprobantesByAnioMesTipoPAGINATOR" resultMap="movimientoClienteResult">
-		select * from  t_movimiento_clientes
+		select m.*, c.* from t_movimiento_clientes m inner join t_cliente c on m.id_cliente=c.id_cliente;
 	</select>
 	
 	<select id="countCompByAnioMesTipoPAGINATOR"  resultType="java.lang.Integer">

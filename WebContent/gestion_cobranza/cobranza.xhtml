@@ -62,22 +62,44 @@
 								<p:selectOneMenu style="width:400px" value="#{cobranzaMB.tipo_comprobante}"  >
 									<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
 									<f:selectItems value="#{cobranzaMB.listTablaTablasDetallesComprobante}" 
-									var="p" itemLabel="#{p.descripcion_largo}" itemValue="#{p.codigo_catalogo}" />
-									
-									<p:ajax event="itemSelect" listener="#{cobranzaMB.onItemDocumento}" update="buscarRespuesta"/>
-									
+									var="p" itemLabel="#{p.descripcion_largo}" itemValue="#{p.codigo_catalogo}" />									
+									<p:ajax event="itemSelect" listener="#{cobranzaMB.onItemDocumento}" update="buscarRespuesta"/>									
 								</p:selectOneMenu>
+								
+								<h:panelGrid columns="2" id="buscarRespuesta">	
+									<p:commandButton value="Buscar"  actionListener="#{cobranzaMB.listarMovimientosFiltros()}" disabled="#{cobranzaMB.disableBuscar}"
+										update=":frmListaDocumentos :msgGeneral" icon="icon-search" 
+										onstart="PF('BlockUIWidget').block();" oncomplete="PF('BlockUIWidget').unblock();"/>
+								</h:panelGrid>
 						</h:panelGrid>
-						
-						
-					</h:panelGroup>								
+					</h:panelGroup>
+					<p:panelGrid>
+						<h:outputLabel value="Cliente"></h:outputLabel>
+						<p:autoComplete id="cliente" value="#{cobranzaMB.clienteEncontrado.nombre_cab}" 
+										completeMethod="#{comprobanteMB.consultarCliente}"
+	                        			var="cliente" 
+	                        			itemLabel="#{cliente.nombre_cab}" 
+	                        			itemValue="#{cliente.nombre_cab}" 
+	                        			forceSelection="true"> 
+	                        			                        
+	                        <p:ajax event="itemSelect" 
+	                        		listener="#{cobranzaMB.onItemCliente}" 
+	                        		update="id_nombre"/>	                        
+	                    </p:autoComplete>
+	                    
+	                     <p:outputLabel value="#{cobranzaMB.clienteEncontrado.desTipoDocumento}  
+	                     					   #{cobranzaMB.clienteEncontrado.numero_docu_iden_cab}" 
+	                     				id="id_nombre"
+										style="width:200px ;font-size:15px; color:blue" />
+								
+						<h:outputLabel value="Nro Comprobante"></h:outputLabel>
+						<h:inputText value="#{cobranzaMB.nroserie_documento}"></h:inputText>
+						<p:commandButton value="Buscar" actionListener="#{cobranzaMB.buscarClienteComprobante()}"></p:commandButton>
+					</p:panelGrid>
+													
 				</p:panel>
 				
-				<h:panelGrid columns="4" id="buscarRespuesta">	
-					<p:commandButton value="Buscar"  actionListener="#{cobranzaMB.listarMovimientosFiltros()}" disabled="#{cobranzaMB.disableBuscar}"
-						update=":frmListaDocumentos :msgGeneral" icon="icon-search" 
-						onstart="PF('BlockUIWidget').block();" oncomplete="PF('BlockUIWidget').unblock();"/>
-				</h:panelGrid>
+				
 				
 			</h:form>
 			
@@ -87,7 +109,7 @@
 				        <h:graphicImage library="resources/img" value="/resources/img/ajax-loader1.gif"  style="margin-right: 12px; vertical-align: middle;" />  
 				        <h:outputText value="Cambiando de página, espere por favor..." style="white-space: nowrap; font-weight:bold; color: #036fab"/> 
 				    </pe:blockUI>
-					<p:dataTable  var="crg" value="#{cobranzaMB.listamovimientos}"  
+					<p:dataTable  var="p" value="#{cobranzaMB.listamovimientos}"  
 						lazy="true" paginator="true" filteredValue="#{cobranzaMB.listaFiltroMovimientos}" 
 						emptyMessage="No hay Comprobantes Disponibles." rowIndexVar="nro" style="FONT-SIZE: 10px;" id="dataTableComprobantes"
 						rows="10" paginatorPosition="bottom"  rowsPerPageTemplate="10,100,200,500" widgetVar="dataTableComprobantes"
@@ -106,7 +128,21 @@
 						<p:column headerText="Orden" width="20" >
 							#{nro+1}
 						</p:column>		
-						
+						<p:column style="width:70px" headerText="Cliente">
+							<h:outputText value="#{p.cliente.nombre_cab}"/>
+						</p:column>
+						<p:column style="width:70px" headerText="Nro Comprobante">
+							<h:outputText value="#{p.nroserie_documento}"/>
+						</p:column>
+						<p:column style="width:70px" headerText="Importe">
+							<h:outputText value="#{p.importe}"/>
+						</p:column>
+						<p:column style="width:70px" headerText="Saldo">
+							<h:outputText value="#{p.saldopagado}"/>
+						</p:column>
+						<p:column style="width:70px" headerText="Estado">
+							<h:outputText value="#{p.flag_regularizado}"/>
+						</p:column>
 
 						
 				</p:dataTable>
