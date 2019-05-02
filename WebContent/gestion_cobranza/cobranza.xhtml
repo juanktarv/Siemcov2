@@ -27,13 +27,12 @@
 			<p:messages  id="msgGeneral" showDetail="false" showSummary="true" closable="true" />		
 			
 			<!-- tootlbar -->
-			<h:form style="margin-bottom: 8px"> 				
+			<h:form style="margin-bottom: 8px" > 				
 				<p:panel >				
 					<h:panelGroup columns="6">	
 						<h:panelGrid columns="6" cellpadding="10">
 							#{"Periodo:"}						 
-								<p:selectOneMenu style="width:120px"
-									value="#{cobranzaMB.mes}">
+								<p:selectOneMenu style="width:120px" value="#{cobranzaMB.mes}">
 									<f:selectItem  itemLabel="Enero" itemValue="01" />
 									<f:selectItem  itemLabel="Febrero" itemValue="02" />
 									<f:selectItem  itemLabel="Marzo" itemValue="03" />
@@ -47,55 +46,57 @@
 									<f:selectItem  itemLabel="Noviembre" itemValue="11" />
 									<f:selectItem  itemLabel="Diciembre" itemValue="12" />
 								</p:selectOneMenu>
-								<p:selectOneMenu style="width:100px"
-									value="#{cobranzaMB.anio}">
-									<f:selectItem  itemLabel="2014" itemValue="2014" />
-									<f:selectItem  itemLabel="2015" itemValue="2015" />
-									<f:selectItem  itemLabel="2016" itemValue="2016" />
-									<f:selectItem  itemLabel="2017" itemValue="2017" />
-									<f:selectItem  itemLabel="2018" itemValue="2018" />
+								<p:selectOneMenu style="width:100px" value="#{cobranzaMB.anio}">
 									<f:selectItem  itemLabel="2019" itemValue="2019" />
 									<f:selectItem  itemLabel="2020" itemValue="2020" />
+									<f:selectItem  itemLabel="2021" itemValue="2021" />
+									<f:selectItem  itemLabel="2022" itemValue="2022" />
+									<f:selectItem  itemLabel="2023" itemValue="2023" />
+									<f:selectItem  itemLabel="2024" itemValue="2024" />
+									<f:selectItem  itemLabel="2025" itemValue="2025" />
 								</p:selectOneMenu>
 								
 								#{"Tipo de Documento:"}					        
 								<p:selectOneMenu style="width:400px" value="#{cobranzaMB.tipo_comprobante}"  >
 									<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
-									<f:selectItems value="#{cobranzaMB.listTablaTablasDetallesComprobante}" 
-									var="p" itemLabel="#{p.descripcion_largo}" itemValue="#{p.codigo_catalogo}" />									
-									<p:ajax event="itemSelect" listener="#{cobranzaMB.onItemDocumento}" update="buscarRespuesta"/>									
+									<f:selectItems 	value="#{cobranzaMB.listTablaTablasDetallesComprobante}" 
+													var="p" itemLabel="#{p.descripcion_largo}" 
+													itemValue="#{p.codigo_catalogo}" />									
+									<p:ajax event="itemSelect" listener="#{cobranzaMB.onItemDocumento}" 
+											update="buscarRespuesta"/>									
 								</p:selectOneMenu>
 								
-								<h:panelGrid columns="2" id="buscarRespuesta">	
-									<p:commandButton value="Buscar"  actionListener="#{cobranzaMB.listarMovimientosFiltros()}" disabled="#{cobranzaMB.disableBuscar}"
-										update=":frmListaDocumentos :msgGeneral" icon="icon-search" 
-										onstart="PF('BlockUIWidget').block();" oncomplete="PF('BlockUIWidget').unblock();"/>
-								</h:panelGrid>
+								
 						</h:panelGrid>
 					</h:panelGroup>
-					<p:panelGrid>
-						<h:outputLabel value="Cliente"></h:outputLabel>
-						<p:autoComplete id="cliente" value="#{cobranzaMB.clienteEncontrado.nombre_cab}" 
-										completeMethod="#{comprobanteMB.consultarCliente}"
-	                        			var="cliente" 
-	                        			itemLabel="#{cliente.nombre_cab}" 
-	                        			itemValue="#{cliente.nombre_cab}" 
-	                        			forceSelection="true"> 
-	                        			                        
-	                        <p:ajax event="itemSelect" 
-	                        		listener="#{cobranzaMB.onItemCliente}" 
-	                        		update="id_nombre"/>	                        
-	                    </p:autoComplete>
-	                    
-	                     <p:outputLabel value="#{cobranzaMB.clienteEncontrado.desTipoDocumento}  
-	                     					   #{cobranzaMB.clienteEncontrado.numero_docu_iden_cab}" 
-	                     				id="id_nombre"
-										style="width:200px ;font-size:15px; color:blue" />
-								
-						<h:outputLabel value="Nro Comprobante"></h:outputLabel>
-						<h:inputText value="#{cobranzaMB.nroserie_documento}"></h:inputText>
-						<p:commandButton value="Buscar" actionListener="#{cobranzaMB.buscarClienteComprobante()}"></p:commandButton>
-					</p:panelGrid>
+					<h:panelGrid columns="6" cellpadding="10">
+						<p:outputLabel value="Cliente "></p:outputLabel>
+						
+						<p:selectOneMenu id="advanced" value="#{cobranzaMB.clienteEncontrado.nombre_cab}" panelStyle="width:500px"							
+                         	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
+				            <f:selectItems value="#{cobranzaMB.listaClientes}" 
+				            			   var="cliente" itemLabel="#{cliente.nombre_cab}" itemValue="#{cliente}" />				            			   
+				            <p:column>
+				                <h:outputText value="#{t.nombre_cab}" />				                
+				            </p:column>
+				            <p:column>
+				            	<p:outputLabel value="#{t.desTipoDocumento} #{t.numero_docu_iden_cab}" style="width:400px ;font-size:15px; color:blue" />
+				            </p:column>				 
+				            				            
+				        </p:selectOneMenu>
+				
+						<p:outputLabel value="Nro Comprobante "></p:outputLabel>
+						<p:inputText value="#{cobranzaMB.nroserie_documento}"></p:inputText>
+						
+					</h:panelGrid>
+					
+					<h:panelGrid columns="2" id="buscarRespuesta">	
+									<p:commandButton value="Buscar"  
+										actionListener="#{cobranzaMB.listarMovimientosFiltros()}" 
+										disabled="#{cobranzaMB.disableBuscar}"
+										update=":frmListaDocumentos :msgGeneral" icon="icon-search" 
+										onstart="PF('BlockUIWidget').block();" oncomplete="PF('BlockUIWidget').unblock();"/>
+					</h:panelGrid>
 													
 				</p:panel>
 				
@@ -109,11 +110,19 @@
 				        <h:graphicImage library="resources/img" value="/resources/img/ajax-loader1.gif"  style="margin-right: 12px; vertical-align: middle;" />  
 				        <h:outputText value="Cambiando de página, espere por favor..." style="white-space: nowrap; font-weight:bold; color: #036fab"/> 
 				    </pe:blockUI>
+				    
+				    <p:commandButton value="Cobrar" onclick="PF('dlgNuevoCobro').show()"
+				    				 actionListener="#{cobranzaMB.prepararCobro()}"></p:commandButton>
+				    
 					<p:dataTable  var="p" value="#{cobranzaMB.listamovimientos}"  
 						lazy="true" paginator="true" filteredValue="#{cobranzaMB.listaFiltroMovimientos}" 
-						emptyMessage="No hay Comprobantes Disponibles." rowIndexVar="nro" style="FONT-SIZE: 10px;" id="dataTableComprobantes"
-						rows="10" paginatorPosition="bottom"  rowsPerPageTemplate="10,100,200,500" widgetVar="dataTableComprobantes"
-						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  sortField="#{cgr.numero_serie_documento_cab}" sortOrder="DESCENDING">
+						selection="#{cobranzaMB.listaSelectedMovimientos}" rowKey="#{p.id_comprobante}"
+						emptyMessage="No hay Comprobantes Disponibles." rowIndexVar="nro" style="FONT-SIZE: 10px;" 
+						id="dataTableComprobantes"
+						rows="10" paginatorPosition="bottom"  rowsPerPageTemplate="10,100,200,500" 
+						widgetVar="dataTableComprobantes"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+						sortField="#{cgr.numero_serie_documento_cab}" sortOrder="DESCENDING">
 						
 
 						<p:blockUI block="dataTableComprobantes" trigger="dataTableComprobantes">
@@ -125,7 +134,7 @@
 						<f:facet name="header">Lista de Comprobantes Emitidos</f:facet>
 						<p:ajax event="page" onstart="PF('BlockUIWidgetPage').block();"  oncomplete="PF('BlockUIWidgetPage').unblock();"/>
 						
-						<p:column headerText="Orden" width="20" >
+						<p:column headerText="Orden"  selectionMode="multiple" style="width:16px;text-align:center">
 							#{nro+1}
 						</p:column>		
 						<p:column style="width:70px" headerText="Cliente">
@@ -142,11 +151,40 @@
 						</p:column>
 						<p:column style="width:70px" headerText="Estado">
 							<h:outputText value="#{p.flag_regularizado}"/>
-						</p:column>
-
-						
+						</p:column>					
 				</p:dataTable>
 			</h:form>
+			
+			<p:dialog header="Registrar Cobro" widgetVar="dlgNuevoCobro" appendTo="@(body)"
+					resizable="false" id="dlgDetNuevoCobro" modal="true">					
+				<h:panelGrid columns="4" cellpadding="10">					
+					<p:outputLabel value="Cliente"></p:outputLabel>
+					<p:outputLabel value="#{cobranzaMB.cobro.cliente.nombre_cab}"></p:outputLabel>
+					<p:outputLabel value="Total Deuda Seleccionada"></p:outputLabel>
+					<p:outputLabel value="#{cobranzaMB.cobro.total_importe_cobrado}"></p:outputLabel>
+					<p:outputLabel value="Fecha"></p:outputLabel>
+					<p:outputLabel value="#{cobranzaMB.cobro.fecha_cobranza}"></p:outputLabel>
+				</h:panelGrid>
+				#{Ingresar valores a pagar :}
+				
+				<p:dataTable var="p" value="#{cobranzaMB.listaDetalleCobro}">
+					<p:column headerText="Comprobante">
+						<p:outputLabel value="#{p.comprobante.numero_serie_documento_cab}"></p:outputLabel>
+					</p:column>
+					<p:column headerText="Pendiente">
+						<p:outputLabel value="#{p.importe_pendiente}"></p:outputLabel>
+					</p:column>					
+					<p:column headerText="Pago">
+						<p:outputLabel value="#{p.importe_cobrado}"></p:outputLabel>
+					</p:column>
+				
+				
+				
+				</p:dataTable>
+				
+				
+				
+			</p:dialog>
 		</p:panel>
 		
 			

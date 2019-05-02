@@ -13,6 +13,8 @@ public class CobranzaCabecera {
 	private BigDecimal total_importe_cobrado;
 	private Date fecha_cobranza;
 	
+	private Cliente cliente;
+	
 	public Integer getId_cliente() {
 		return id_cliente;
 	}
@@ -67,6 +69,14 @@ public class CobranzaCabecera {
 	
 	public void setFecha_cobranza(Date fecha_cobranza) {
 		this.fecha_cobranza = fecha_cobranza;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}	
 	
 }

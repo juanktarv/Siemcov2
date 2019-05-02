@@ -1,7 +1,9 @@
 package com.certicom.scpf.managedBeans;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +16,8 @@ import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 
 import com.certicom.scpf.domain.Cliente;
+import com.certicom.scpf.domain.CobranzaCabecera;
+import com.certicom.scpf.domain.CobranzaDetalle;
 import com.certicom.scpf.domain.Comprobante;
 import com.certicom.scpf.domain.MovimientoClientes;
 import com.certicom.scpf.domain.TablaTablasDetalle;
@@ -45,11 +49,19 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 	private Cliente clienteEncontrado;
 	private ClienteService clienteService;
 	private String nroserie_documento;
-	
+	private List<Cliente>listaClientes;
+	private List<MovimientoClientes>listaSelectedMovimientos;
+	private CobranzaCabecera cobro;
+	private List<CobranzaDetalle> listaDetalleCobro;
 	public CobranzaMB(){}
 	
 	@PostConstruct
 	public void inicia(){
+		SimpleDateFormat sdfm= new SimpleDateFormat("MM");
+		SimpleDateFormat sdfy= new SimpleDateFormat("yyyy");
+		
+		this.mes=sdfm.format(new Date());
+		this.anio=sdfy.format(new Date());
 		
 		this.movimientoClienteSelec= new MovimientoClientes();
 		this.movimientoClienteService= new MovimientoClienteService();
@@ -62,12 +74,34 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		
 		try {
 			this.listTablaTablasDetallesComprobante = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_DOCUMENTOS);
+			this.listaClientes=this.clienteService.findAll();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	public void prepararCobro(){
+		this.cobro= new CobranzaCabecera();
+		this.listaDetalleCobro= new ArrayList<>();
+		if(this.clienteEncontrado!=null){
+			this.cobro.setId_cliente(this.clienteEncontrado.getId_cliente());
+			this.cobro.setCliente(this.clienteEncontrado);
+			this.cobro.setFecha_cobranza(new Date());
+			CobranzaDetalle detalle;
+			for(MovimientoClientes mov:this.listaSelectedMovimientos){
+				detalle= new CobranzaDetalle();
+				this.cobro.setTotal_importe_cobrado(this.cobro.getTotal_importe_cobrado().add(mov.getImporte()));
+				detalle.setId_cliente(mov.getId_cliente());
+				detalle.setId_comprobante(mov.getId_comprobante());
+				detalle.setImporte_cobrado(mov.getImporte());
+				detalle.setImporte_pendiente(mov.getImporte());
+				detalle.setComprobante(mov.getComprobante());
+				this.listaDetalleCobro.add(detalle);
+			}
+			
+		}
+	}
 	public List<Cliente> consultarCliente(String query) throws Exception {
 		System.out.println("entrando autocomplete");
         List<Cliente> allClients = this.clienteService.findAll();
@@ -108,7 +142,13 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		System.out.println(" listarComprobantesFiltros --->tipo_comprobante "+this.tipo_comprobante);
 		
 		 this.disableBuscar = Boolean.FALSE; 
-		 this.disableRespuesta = Boolean.FALSE; 		
+		 this.disableRespuesta = Boolean.FALSE; 
+		 
+		 if(this.clienteEncontrado!=null){
+			 
+		 }else{
+			 this.clienteEncontrado= new Cliente();
+		 }
 		
 		this.listamovimientos = new LazyDataModel<MovimientoClientes>() {
 			private static final long serialVersionUID = 1L;
@@ -142,9 +182,10 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 			 @Override  
 	            public List<MovimientoClientes> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String,Object> filters) {              
 					try {
-						totalRow = movimientoClienteService.countCompByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, filters);
-												
-						  datasource = movimientoClienteService.listComprobantesByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, first, pageSize, filters, "e.numero_serie_documento_cab", "DESC");
+							filters.put("id_cliente", clienteEncontrado!=null? clienteEncontrado.getId_cliente():"");
+							filters.put("nroserie_documento", nroserie_documento!=null? nroserie_documento :"");
+							totalRow = movimientoClienteService.countCompByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, filters);												
+							datasource = movimientoClienteService.listComprobantesByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, first, pageSize, filters, "m.nroserie_documento", "DESC");
 						 return datasource;
 					} catch (Exception e) {
 						System.out.println("NULL ");
@@ -161,9 +202,7 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		};
 	}
 	
-	public void buscarClienteComprobante(){
-		
-	}
+
 	
 	public void onItemDocumento(SelectEvent event)  throws Exception{
 		 this.disableBuscar = Boolean.FALSE; 
@@ -286,6 +325,38 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 
 	public void setNroserie_documento(String nroserie_documento) {
 		this.nroserie_documento = nroserie_documento;
+	}
+
+	public List<Cliente> getListaClientes() {
+		return listaClientes;
+	}
+
+	public void setListaClientes(List<Cliente> listaClientes) {
+		this.listaClientes = listaClientes;
+	}
+
+	public List<MovimientoClientes> getListaSelectedMovimientos() {
+		return listaSelectedMovimientos;
+	}
+
+	public void setListaSelectedMovimientos(List<MovimientoClientes> listaSelectedMovimientos) {
+		this.listaSelectedMovimientos = listaSelectedMovimientos;
+	}
+
+	public CobranzaCabecera getCobro() {
+		return cobro;
+	}
+
+	public void setCobro(CobranzaCabecera cobro) {
+		this.cobro = cobro;
+	}
+
+	public List<CobranzaDetalle> getListaDetalleCobro() {
+		return listaDetalleCobro;
+	}
+
+	public void setListaDetalleCobro(List<CobranzaDetalle> listaDetalleCobro) {
+		this.listaDetalleCobro = listaDetalleCobro;
 	}
 	
 	

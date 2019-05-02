@@ -134,18 +134,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		inner join t_tabla_tablas_detalle top on cast ( e.tipo_operacion_cab as int)=  cast (top.codigo_catalogo as int )and top.id_maestra=51
 		inner join t_domicilio_fiscal dom on dom.id_domicilio_fiscal_cab=e.id_domicilio_fiscal_cab
 		inner join t_emisor em on em.id_emisor=e.id_emisor
-		where e.tipo_comprobante=#{tipo_comprobante} and extract(month from e.fecha_emision_cab)= #{mes} and  extract(year from e.fecha_emision_cab)=#{anio}
+		where e.tipo_comprobante=#{tipo_comprobante} and 
+				extract(month from e.fecha_emision_cab)= #{mes} 
+				and extract(year from e.fecha_emision_cab)=#{anio}
      	
      		<if test="filters.entrySet() != null">
 		       <foreach item="item" collection="filters.entrySet()" >
 	         	  	<choose>
 					<when test="item.key == 'id_cliente'">
-						and ( e.id_cliente like ('%' || replace( #{item.value}, ' ', '%')  || '%') 		         	
-		         		) 
-					</when>
-					
+						and ( e.id_cliente like ('%' || replace( #{item.value}, ' ', '%')  || '%')) 
+					</when>					
 					<otherwise>
-					and  ${item.key} like ('%' || replace( #{item.value}, ' ', '%')  || '%') 
+						and  ${item.key} like ('%' || replace( #{item.value}, ' ', '%')  || '%') 
 					</otherwise>
 			  		</choose>
 	           </foreach> 
@@ -154,9 +154,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="sortField != null">
 				order by ${sortField} ${sortOrder}    
 		    </if>
-		    
-		    
-		    
 			 OFFSET #{first} LIMIT #{pageSize} 
 	</select>	
 

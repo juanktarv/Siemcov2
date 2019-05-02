@@ -17,6 +17,7 @@ public class Cliente {
 	
 	/* transitorio */
 	private String desTipoDocumento;
+	private String desTipoDocumentoCorto;
 	
 	 //test
 	public Cliente(){
@@ -92,6 +93,14 @@ public class Cliente {
 
 	public void setDesTipoDocumento(String desTipoDocumento) {
 		this.desTipoDocumento = desTipoDocumento;
+	}
+
+	public String getDescTipoDocumentoCorto() {
+		return desTipoDocumentoCorto;
+	}
+
+	public void setDescTipoDocumentoCorto(String descTipoDocumentoCorto) {
+		this.desTipoDocumentoCorto = descTipoDocumentoCorto;
 	}	
 	
 }

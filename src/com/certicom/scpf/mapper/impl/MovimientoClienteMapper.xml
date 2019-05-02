@@ -20,15 +20,43 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<result column="saldopagado" property="saldopagado"/>
 	
 	<association property="cliente" column="id_cliente" select="selectCliente"/>
+	<association property="comprobante" column="id_comprobante" select="selectComprobante"/>
 
 </resultMap>
 
 	<select id="selectCliente" parameterType="int" resultType="com.certicom.scpf.domain.Cliente">
 		SELECT * FROM t_cliente WHERE id_cliente=#{id_cliente}
 	</select>
+	
+	<select id="selectComprobante" parameterType="int" resultType="com.certicom.scpf.domain.Comprobante">
+		SELECT * FROM t_comprobante WHERE id_comprobante=#{id_comprobante}
+	</select>
 
 	<select id="listComprobantesByAnioMesTipoPAGINATOR" resultMap="movimientoClienteResult">
-		select m.*, c.* from t_movimiento_clientes m inner join t_cliente c on m.id_cliente=c.id_cliente;
+		select m.*, c.*, com.* from t_movimiento_clientes m 
+	  	inner join t_cliente c on m.id_cliente=c.id_cliente
+	  	inner join t_comprobante com on com.id_comprobante=m.id_comprobante
+	  	where m.tipo_comprobante like ('%' || #{tipo_comprobante} || '%')
+	  	and to_char( m.fecha_movimiento, 'MM') like ('%' ||#{mes}|| '%')
+	  	and to_char( m.fecha_movimiento, 'yyyy') like ('%' ||#{anio}|| '%')
+	  	
+	  	<if test="filters.entrySet() != null">
+		       <foreach item="item" collection="filters.entrySet()" >
+	         	  	<choose>
+					<when test="item.key == 'id_cliente'">
+						and ( m.id_cliente like ('%' || replace( #{item.value}, ' ', '%')  || '%') 		         	
+		         		) 
+					</when>					
+					<otherwise>
+						and  ${item.key} like ('%' || replace( #{item.value}, ' ', '%')  || '%') 
+					</otherwise>
+			  		</choose>
+	           </foreach> 
+            </if>            
+            <if test="sortField != null">
+				order by ${sortField} ${sortOrder}    
+		    </if>
+			 OFFSET #{first} LIMIT #{pageSize} 			 
 	</select>
 	
 	<select id="countCompByAnioMesTipoPAGINATOR"  resultType="java.lang.Integer">

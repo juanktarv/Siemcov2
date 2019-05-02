@@ -15,6 +15,12 @@ public class CobranzaDetalle {
 	private Integer id_cobranza;
 	private BigDecimal importe_cobrado;
 	private Date fecha_cobranza;
+	private BigDecimal importe_pendiente;
+	
+	private Cliente cliente;
+	private Comprobante comprobante;
+	private CuentaTesoreria cuenta;
+	private CobranzaCabecera cobranzaCabecera;
 	
 	public Integer getId_comprobante() {
 		return id_comprobante;
@@ -94,6 +100,47 @@ public class CobranzaDetalle {
 	
 	public void setFecha_cobranza(Date fecha_cobranza) {
 		this.fecha_cobranza = fecha_cobranza;
+	}
+
+	public BigDecimal getImporte_pendiente() {
+		return importe_pendiente;
+	}
+
+	public void setImporte_pendiente(BigDecimal importe_pendiente) {
+		this.importe_pendiente = importe_pendiente;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public Comprobante getComprobante() {
+		return comprobante;
+	}
+
+	public void setComprobante(Comprobante comprobante) {
+		this.comprobante = comprobante;
+	}
+
+	public CuentaTesoreria getCuenta() {
+		return cuenta;
+	}
+
+	public void setCuenta(CuentaTesoreria cuenta) {
+		this.cuenta = cuenta;
+	}
+
+	public CobranzaCabecera getCobranzaCabecera() {
+		return cobranzaCabecera;
+	}
+
+	public void setCobranzaCabecera(CobranzaCabecera cobranzaCabecera) {
+		this.cobranzaCabecera = cobranzaCabecera;
 	}	
+	
 	
 }
