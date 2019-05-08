@@ -10,7 +10,7 @@ public class Producto {
 	private String descripcion_prod_det;
 	private BigDecimal valor_unitario_prod_det;
 	private String unidad_medida_det; //Jesús
-	private Integer stock;
+	private BigDecimal stock;
 	private boolean valor_unit_incluye_impuestos;
 	
 	/* transitorio */
@@ -75,11 +75,11 @@ public class Producto {
 		this.unidad_medida_det = unidad_medida_det;
 	}
 
-	public Integer getStock() {
+	public BigDecimal getStock() {
 		return stock;
 	}
 
-	public void setStock(Integer stock) {
+	public void setStock(BigDecimal stock) {
 		this.stock = stock;
 	}
 

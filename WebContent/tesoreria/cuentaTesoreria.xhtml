@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+<ui:composition template="/WEB-INF/plantillas/plantilla.xhtml">
+	<ui:define name="contenido">
+	
+		<p:panel>
+			
+			<h:form>
+				<p:breadCrumb>  
+    				<p:menuitem value="Home" url="#" />  
+    				<p:menuitem value="Configuracion" url="#" />
+    				<p:menuitem value="Cuentas de Tesoreria" url="cuentas" />   
+				</p:breadCrumb>	
+			</h:form>
+			
+			
+			<br/>
+			<!-- growl general -->			
+			<p:messages  id="msgGeneral" showDetail="false" showSummary="true" closable="true" />		
+			
+			<!-- tootlbar -->
+			<h:form style="margin-bottom: 8px">
+				<h:panelGrid columns="4">						
+					<p:commandButton value="Nueva Cuenta" icon="icon-add" update=":dlgDetNuevaCuenta" oncomplete="PF('dlgNuevaCuenta').show();"
+						actionListener="#{cuentaTesoreriaMB.nuevoVendedor()}"/>
+				</h:panelGrid>
+			</h:form>
+			
+				<!-- listado de Planes -->
+			<h:form id="formLista">
+				<p:dataTable id="dataCuenta" var="p" value="#{cuentaTesoreriaMB.listaCuentaTesoreria}" widgetVar="dtCuentaTesoreria" 
+					emptyMessage="No hay Cuentas Disponibles." rowIndexVar="nro" 
+					 style="FONT-SIZE: 10px; ">
+					<f:facet name="header">Lista de Cuentas</f:facet>
+										
+					<p:column headerText="Orden" width="25" style="width:3%" >
+						#{nro+1}
+					</p:column>					
+					<p:column style="width:200px" headerText="Banco">
+						<h:outputText value="#{p.descortoBanco} - #{p.deslargoBanco} "/>
+					</p:column>
+					
+					<p:column headerText="Tipo Cuenta">
+						<p:outputLabel value="#{p.descTipoCuenta}"></p:outputLabel>
+					</p:column>
+					<p:column headerText="Moneda">
+						<p:outputLabel value="#{p.tipo_moneda}"></p:outputLabel>
+					</p:column>
+					
+					<p:column headerText="Nro Cuenta">
+						<p:outputLabel value="#{p.cuenta}"></p:outputLabel>
+					</p:column>
+					
+					<p:column headerText="Saldo">
+						<p:outputLabel value="#{p.saldo}"></p:outputLabel>
+					</p:column>
+					
+			        
+			        <p:column headerText="Editar/Elim." style="width:15%;text-align: center">
+					
+						<p:commandButton title="Editar"  update=":dlgDetNuevaCuenta" actionListener="#{cuentaTesoreriaMB.editarCuentaTesoreria(p)}"
+										 oncomplete="PF('dlgNuevaCuenta').show();" icon="icon-edit">
+						</p:commandButton> 
+
+						<p:commandButton title="Eliminar" oncomplete="PF('dlgEliminarCuenta').show();" actionListener="#{cuentaTesoreriaMB.eliminarCuenta(p)}" update=":dlgDetEliminarCuenta" icon="icon-delete">
+	
+						</p:commandButton>
+								
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+			
+			<!-- #############    Dialogos      ################ -->
+			
+			<!-- #############    TABLA MAESTRA      ################ -->
+			
+			<!-- dialogo nuevo/editar perfil -->
+			
+			<p:dialog header="Registrar Cuenta" widgetVar="dlgNuevaCuenta" appendTo="@(body)"
+					resizable="false" id="dlgDetNuevaCuenta" modal="true">
+					
+					<h:form id="formCuenta">
+					<p:messages showDetail="false" showSummary="true" id="msgNuevo" closable="true"/>
+					
+					<h:panelGrid columns="2">
+
+						#{"Banco:"} 
+						<p:selectOneMenu style="width:200px" value="#{cuentaTesoreriaMB.cuentaTesoreriaSelec.banco}"  
+										required="true" 
+										requiredMessage="Se necesita un banco">
+								<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
+								<f:selectItems value="#{cuentaTesoreriaMB.listaBanco}" var="p" itemLabel="#{p.descripcion_corto} - #{p.descripcion_largo}" itemValue="#{p.codigo_catalogo}" />
+								<p:ajax event="change"/>
+						</p:selectOneMenu>
+						
+						#{"Cuenta:"} 
+						<p:inputText value="#{cuentaTesoreriaMB.cuentaTesoreriaSelec.cuenta}" ></p:inputText>
+						#{"Tipo de Moneda:"} 
+						<p:selectOneMenu style="width:200px" value="#{cuentaTesoreriaMB.cuentaTesoreriaSelec.tipo_moneda}"  
+										required="true" 
+										requiredMessage="Se necesita un tipo de moneda">
+								<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
+								<f:selectItems value="#{cuentaTesoreriaMB.listaTipoMoneda}" var="p" itemLabel="#{p.descripcion_corto} - #{p.descripcion_largo}" itemValue="#{p.codigo_catalogo}" />
+								<p:ajax event="change"/>
+						</p:selectOneMenu>
+						
+						#{"Tipo de Cuenta:"}
+						<p:selectOneMenu style="width:200px" value="#{cuentaTesoreriaMB.cuentaTesoreriaSelec.tipo_cuenta}"  
+										required="true" 
+										requiredMessage="Se necesita un tipo de moneda">
+								<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
+								<f:selectItems value="#{cuentaTesoreriaMB.listaTipoCuenta}" var="p" itemLabel="#{p.descripcion_corto} - #{p.descripcion_largo}" itemValue="#{p.codigo_catalogo}" />
+								<p:ajax event="change"/>
+						</p:selectOneMenu> 
+						
+						#{"Saldo:"} 
+						<p:inputText value="#{cuentaTesoreriaMB.cuentaTesoreriaSelec.saldo}" ></p:inputText>
+						
+						#{"Fecha de Saldo:"} 
+						<p:calendar id="datetime" value="#{cuentaTesoreriaMB.cuentaTesoreriaSelec.fecha_saldo}" pattern="MM/dd/yyyy HH:mm:ss" />		
+							
+					</h:panelGrid>
+					<br/>
+					<p:commandButton value="Guardar" actionListener="#{cuentaTesoreriaMB.guardarCuenta()}"
+						update=":formLista msgNuevo" oncomplete="validarCuenta(xhr, status, args)" icon="icon-disk" />
+					
+					<p:commandButton value="Cancelar" type="button" onclick="PF('dlgNuevaCuenta').hide()" icon="icon-cancel" />
+					</h:form>	
+			</p:dialog>
+			
+
+			<!-- dialogo eliminar -->	
+			<p:confirmDialog id="dlgDetEliminarCuenta" appendTo="@(body)"
+					message="¿Desea eliminar esta cuenta?" header="Eliminar Cuenta"
+					severity="alert" widgetVar="dlgEliminarCuenta">
+				<h:form>
+					<p:commandButton value="Eliminar"
+						update=":formLista :msgGeneral" 
+						actionListener="#{cuentaTesoreriaMB.confirmaEliminarCuenta}"
+						oncomplete="PF('dlgEliminarCuenta').hide();" icon="icon-delete" />
+
+					<p:commandButton value="Cancelar" type="button"
+						onclick="PF('dlgEliminarCuenta').hide()" icon="icon-cancel" />
+
+				</h:form>
+			</p:confirmDialog>
+		</p:panel>
+		
+		<script>
+			
+		function validarCuenta(xhr, status, args) {
+			if (!args.esValido) {
+				jQuery('#dlgDetNuevaCuenta').effect("shake", {
+					times : 1
+				}, 100);
+			} else {
+				//limpiando
+				PF('dlgNuevaCuenta').hide();
+				console.log("cerro")
+			}
+		}
+
+		</script>
+		
+	</ui:define>
+</ui:composition>
+</html>

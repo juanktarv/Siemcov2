@@ -10,11 +10,41 @@ public class CuentaTesoreria {
 	private Integer id_emisor;
 	private String banco;
 	private String cuenta;
-	private Integer tipo_moneda;
+	private String tipo_moneda;
 	private Integer tipo_cuenta;
 	private BigDecimal saldo;
 	private Date fecha_saldo;
 	
+	private String deslargoBanco;
+	private String descortoBanco;
+	private String descTipoCuenta;
+	
+	
+	
+	public String getDescTipoCuenta() {
+		return descTipoCuenta;
+	}
+
+	public void setDescTipoCuenta(String descTipoCuenta) {
+		this.descTipoCuenta = descTipoCuenta;
+	}
+
+	public String getDeslargoBanco() {
+		return deslargoBanco;
+	}
+
+	public void setDeslargoBanco(String deslargoBanco) {
+		this.deslargoBanco = deslargoBanco;
+	}
+
+	public String getDescortoBanco() {
+		return descortoBanco;
+	}
+
+	public void setDescortoBanco(String descortoBanco) {
+		this.descortoBanco = descortoBanco;
+	}
+
 	public Integer getId_cuenta_tesoreria() {
 		return id_cuenta_tesoreria;
 	}
@@ -55,11 +85,11 @@ public class CuentaTesoreria {
 		this.cuenta = cuenta;
 	}
 	
-	public Integer getTipo_moneda() {
+	public String getTipo_moneda() {
 		return tipo_moneda;
 	}
 	
-	public void setTipo_moneda(Integer tipo_moneda) {
+	public void setTipo_moneda(String tipo_moneda) {
 		this.tipo_moneda = tipo_moneda;
 	}
 	

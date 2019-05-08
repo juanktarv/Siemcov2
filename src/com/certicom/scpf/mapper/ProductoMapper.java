@@ -45,12 +45,17 @@ public interface ProductoMapper {
 	@Select("select e.*, ttd1.descripcion_largo desProductoSunat, ttd2.descripcion_largo desUnidadMedida "
 			+ "from (t_producto e left join t_tabla_tablas_detalle ttd1 on ttd1.id_codigo = e.tipo_prod_sunat_det) "
 			+ "left join t_tabla_tablas_detalle ttd2 on ttd2.codigo_catalogo = e.unidad_medida_det "
-			+ " where e.cod_prod_det = #{cod_prod_det} and e.descripcion_prod_det = #{descripcion_prod_det}")
-	public Producto findByCodigoDescripcion(@Param("cod_prod_det") String cod_prod_det, @Param("descripcion_prod_det") String descripcion_prod_det) throws Exception;
+			+ " where trim(e.cod_prod_det) = trim(#{cod_prod_det}) or trim(e.descripcion_prod_det) = trim(#{descripcion_prod_det})")
+	public List<Producto> findByCodigoDescripcion(@Param("cod_prod_det") String cod_prod_det, @Param("descripcion_prod_det") String descripcion_prod_det) throws Exception;
 
 	@Select("select prod.* from t_producto prod"
 			+ " inner join t_detalle_comprobante det on prod.id_producto=det.id_producto "
 			+ "where prod.id_producto=#{id_producto}")
 	public List<Producto> buscarProductoComprobante(@Param("id_producto")Integer id_producto);
+
+	@Select ("select a.* from t_producto a where a.id_producto in (select distinct c.id_producto from t_detalle_comprobante c where c.id_producto=#{id_producto}) "
+			+ "union "
+			+ "select b.* from t_producto b where b.id_producto in (select distinct d.id_producto from t_comprobante_compra_detalle d where d.id_producto=#{id_producto})")
+	public List<Producto> buscarMovimientosPorProducto(Producto producto);
 	
 }

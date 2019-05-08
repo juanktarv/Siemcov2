@@ -34,6 +34,17 @@ public class ProveedorService implements ProveedorMapper{
 		proveedorMapper.eliminarProveedor(id_proveedor);
 	}
 
+	@Override
+	public List<Proveedores> buscarProveedorPorRazonSocialDocumento(Proveedores proveedor) {
+		// TODO Auto-generated method stub
+		return proveedorMapper.buscarProveedorPorRazonSocialDocumento(proveedor);
+	}
+
+	public List<Proveedores> buscarMovimientosPorProveedor(Proveedores proveedor) {
+		// TODO Auto-generated method stub
+		return proveedorMapper.buscarMovimientosPorProveedor(proveedor);
+	}
+
 	
 	
 }

@@ -83,13 +83,21 @@ public class ProveedorMB extends GenericBeans implements Serializable{
 				 log.setAccion("UPDATE");
 	             log.setDescripcion("Se actualiza el proveedor : " + this.proveedorSelec.getNombre_proveedor());
 	             logmb.insertarLog(log);
-				FacesUtils.showFacesMessage("El cliente ha sido actualizado", 3);
+				FacesUtils.showFacesMessage("El Proveedor ha sido actualizado", 3);
 			}else{
-				this.proveedorService.crearProveedor(this.proveedorSelec);
-				 log.setAccion("INSERT");
-	             log.setDescripcion("Se inserta el proveedor : " + this.proveedorSelec.getNombre_proveedor());
-	             logmb.insertarLog(log);
-				FacesUtils.showFacesMessage("Cliente ha sido creado", 3);
+				List<Proveedores>lista=this.proveedorService.buscarProveedorPorRazonSocialDocumento(this.proveedorSelec);
+				if(lista.isEmpty()){
+					 this.proveedorService.crearProveedor(this.proveedorSelec);
+					 log.setAccion("INSERT");
+		             log.setDescripcion("Se inserta el proveedor : " + this.proveedorSelec.getNombre_proveedor());
+		             logmb.insertarLog(log);
+					 FacesUtils.showFacesMessage("Proveedor ha sido creado", 3);
+				}else{
+					valido=Boolean.FALSE;
+					context.addCallbackParam("esValido", valido);
+					FacesUtils.showFacesMessage("Ya existe este Proveedor", 1);	
+				}
+				
 			}
 			
 			this.proveedorSelec = new Proveedores();
@@ -110,12 +118,35 @@ public class ProveedorMB extends GenericBeans implements Serializable{
 	}
 
 	public void editarProveedor(Proveedores proveedor){
-		this.proveedorSelec = proveedor;
-		this.editarProveedor = Boolean.TRUE;
+		RequestContext context = RequestContext.getCurrentInstance();
+		List<Proveedores>lista = this.proveedorService.buscarMovimientosPorProveedor(proveedor);
+		if(lista.isEmpty()){
+			this.proveedorSelec = proveedor;
+			this.editarProveedor = Boolean.TRUE;
+			RequestContext.getCurrentInstance().execute("PF('dlgNuevoProveedor').show()");
+			context.update("msgGeneral");
+		}else{
+			FacesUtils.showFacesMessage("No es posible editar este proveedor, tiene movimientos asociados", 1);
+			RequestContext.getCurrentInstance().execute("PF('dlgNuevoProveedor').hide()");
+			context.update("msgGeneral");
+		}
+		
 	}
 	
 	public void eliminarProveedor(Proveedores proveedor){
-		this.proveedorSelec = proveedor;
+		RequestContext context = RequestContext.getCurrentInstance();
+		List<Proveedores>lista = this.proveedorService.buscarMovimientosPorProveedor(proveedor);
+		if(lista.isEmpty()){
+			this.proveedorSelec = proveedor;
+			RequestContext.getCurrentInstance().execute("PF('dlgEliminarProveedor').show()");
+			context.update("msgGeneral");
+			
+		}else{
+			FacesUtils.showFacesMessage("No es posible eliminar este proveedor, tiene movimientos asociados", 1);
+			RequestContext.getCurrentInstance().execute("PF('dlgEliminarProveedor').hide()");
+			context.update("msgGeneral");
+		}
+		
 	}
 	
 	
@@ -127,7 +158,7 @@ public class ProveedorMB extends GenericBeans implements Serializable{
 			log.setAccion("DELETE");
 			log.setDescripcion("Se elimina el cliente: " + this.proveedorSelec.getNombre_proveedor());
 			logmb.insertarLog(log);
-			FacesUtils.showFacesMessage("Cliente ha sido eliminado", 3);
+			FacesUtils.showFacesMessage("Proveedor ha sido eliminado", 3);
 			
 			this.listaProveedores = this.proveedorService.findAll();
 		

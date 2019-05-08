@@ -1,6 +1,7 @@
 package com.certicom.scpf.managedBeans;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,9 +20,11 @@ import com.certicom.scpf.domain.Cliente;
 import com.certicom.scpf.domain.CobranzaCabecera;
 import com.certicom.scpf.domain.CobranzaDetalle;
 import com.certicom.scpf.domain.Comprobante;
+import com.certicom.scpf.domain.CuentaTesoreria;
 import com.certicom.scpf.domain.MovimientoClientes;
 import com.certicom.scpf.domain.TablaTablasDetalle;
 import com.certicom.scpf.services.ClienteService;
+import com.certicom.scpf.services.CuentaTesoreriaService;
 import com.certicom.scpf.services.MovimientoClienteService;
 import com.certicom.scpf.services.TablaTablasDetalleService;
 import com.pe.certicom.scpf.commons.Constante;
@@ -53,6 +56,10 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 	private List<MovimientoClientes>listaSelectedMovimientos;
 	private CobranzaCabecera cobro;
 	private List<CobranzaDetalle> listaDetalleCobro;
+	
+	private List<CuentaTesoreria> listaCuentas;
+	private CuentaTesoreriaService cuentaTesoreriaService;
+	
 	public CobranzaMB(){}
 	
 	@PostConstruct
@@ -71,10 +78,12 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		this.clienteEncontrado= new Cliente();
 		this.clienteService= new ClienteService();
 		this.nroserie_documento="";
+		this.cuentaTesoreriaService= new CuentaTesoreriaService();
 		
 		try {
 			this.listTablaTablasDetallesComprobante = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_DOCUMENTOS);
 			this.listaClientes=this.clienteService.findAll();
+			this.listaCuentas=this.cuentaTesoreriaService.findAll();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -88,10 +97,15 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 			this.cobro.setId_cliente(this.clienteEncontrado.getId_cliente());
 			this.cobro.setCliente(this.clienteEncontrado);
 			this.cobro.setFecha_cobranza(new Date());
+			this.cobro.setTotal_importe_cobrado(new BigDecimal("0.00"));
 			CobranzaDetalle detalle;
-			for(MovimientoClientes mov:this.listaSelectedMovimientos){
+			System.out.println("this.listaSelectedMovimientos--->"+listaSelectedMovimientos.size());
+			System.out.println("this.listaFiltroMovimientos--->"+listaFiltroMovimientos);
+			
+			for(MovimientoClientes mov:listaSelectedMovimientos){
 				detalle= new CobranzaDetalle();
 				this.cobro.setTotal_importe_cobrado(this.cobro.getTotal_importe_cobrado().add(mov.getImporte()));
+				System.out.println("IMPORTE--->"+this.cobro.getTotal_importe_cobrado());
 				detalle.setId_cliente(mov.getId_cliente());
 				detalle.setId_comprobante(mov.getId_comprobante());
 				detalle.setImporte_cobrado(mov.getImporte());
@@ -101,6 +115,8 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 			}
 			
 		}
+		System.out.println("this.cobro.getCliente().getNombre_cab()"+this.cobro.getCliente().getNombre_cab());
+		System.out.println("this.cobro.getTotal_importe_cobrado()"+this.cobro.getTotal_importe_cobrado());
 	}
 	public List<Cliente> consultarCliente(String query) throws Exception {
 		System.out.println("entrando autocomplete");
@@ -204,7 +220,7 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 	
 
 	
-	public void onItemDocumento(SelectEvent event)  throws Exception{
+	public void onItemDocumento()  throws Exception{
 		 this.disableBuscar = Boolean.FALSE; 
 		 this.disableRespuesta = Boolean.TRUE; 
 		
@@ -357,6 +373,22 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 
 	public void setListaDetalleCobro(List<CobranzaDetalle> listaDetalleCobro) {
 		this.listaDetalleCobro = listaDetalleCobro;
+	}
+
+	public List<CuentaTesoreria> getListaCuentas() {
+		return listaCuentas;
+	}
+
+	public void setListaCuentas(List<CuentaTesoreria> listaCuentas) {
+		this.listaCuentas = listaCuentas;
+	}
+
+	public CuentaTesoreriaService getCuentaTesoreriaService() {
+		return cuentaTesoreriaService;
+	}
+
+	public void setCuentaTesoreriaService(CuentaTesoreriaService cuentaTesoreriaService) {
+		this.cuentaTesoreriaService = cuentaTesoreriaService;
 	}
 	
 	

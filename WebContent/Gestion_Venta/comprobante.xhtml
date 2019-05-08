@@ -34,7 +34,7 @@
 						<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>						
 						<f:selectItem itemLabel="Factura" itemValue="01" />
 						<f:selectItem itemLabel="Boleta de venta" itemValue="03" />
-						<p:ajax event="itemSelect" listener="#{comprobanteMB.obtenerAbreviatura()}" update="idValoresCabecera formAccion"/>
+						<p:ajax event="change" listener="#{comprobanteMB.obtenerAbreviatura()}" update="idValoresCabecera :formAccion"/>
 					</p:selectOneMenu>												
 				</h:panelGrid>
 				
@@ -46,7 +46,7 @@
 							<p:autoComplete id="clientePojo" value="#{comprobanteMB.clienteEncontrado.nombre_cab}" completeMethod="#{comprobanteMB.consultarCliente}"
 	                        var="cliente" itemLabel="#{cliente.nombre_cab}" itemValue="#{cliente.nombre_cab}" forceSelection="true" disabled="#{comprobanteMB.ingresarCliente}">
 	                         
-	                        	<p:ajax event="itemSelect" listener="#{comprobanteMB.onItemCliente}" update="id_nombre formAccion"/>
+	                        	<p:ajax event="itemSelect" listener="#{comprobanteMB.onItemCliente}" update="id_nombre :formAccion"/>
 	                        
 	                        </p:autoComplete>
 	                        
@@ -114,8 +114,9 @@
 			</h:form>
 			<h:form id="formAccion">
 				<p:panel id="id_adicionar">
-					<p:commandButton  title="Adicionar Producto" value="Adicionar"  update=":dlgDetNuevoProducto :formProducto" actionListener="#{comprobanteMB.adicionarProducto()}" 
-										 oncomplete="PF('dlgNuevoProducto').show();" icon="icon-edit"  disabled="#{comprobanteMB.adicionar}">
+					<p:commandButton  title="Adicionar Producto" value="Adicionar"  update=":dlgDetNuevoProducto :formProducto" 
+									actionListener="#{comprobanteMB.adicionarProducto()}" 
+									oncomplete="PF('dlgNuevoProducto').show();" icon="icon-edit"  disabled="#{comprobanteMB.adicionar}">
 							
 					</p:commandButton>
 				</p:panel>
@@ -151,6 +152,22 @@
 						<p:column style="width:70px" headerText="Total">
 							<h:outputText value="#{p.precio_venta_unitario_det}" converter="montoDefaultConverter"/>
 						</p:column>
+						
+						<p:column headerText="Editar/Elim." style="width:5%;text-align: center">					
+									<p:commandButton title="Editar"  update=":dlgDetNuevoProducto" 
+													  oncomplete="PF('dlgNuevoProducto').show();"
+													  actionListener="#{comprobanteMB.editarProducto(p)}"
+													  icon="icon-edit">
+									</p:commandButton> 
+
+									<p:commandButton title="Eliminar"
+													actionListener="#{comprobanteMB.eliminarProducto(p)}" 
+													oncomplete="PF('dlgEliminarProducto').show();"
+													update=":dlgDetEliminarProducto" icon="icon-delete">
+				
+									</p:commandButton>
+								
+						</p:column>	
 					</p:dataTable>
 				</p:panel>
 				
@@ -201,6 +218,22 @@
 			
 			
 			<!-- #############    Dialogos      ################ -->
+			
+			
+			<p:confirmDialog id="dlgDetEliminarProducto" appendTo="@(body)"
+					message="¿Desea eliminar este Producto " header="Eliminar Producto"
+					severity="alert" widgetVar="dlgEliminarProducto">
+				<h:form>
+					<p:commandButton value="Eliminar"
+						update=":formAccion" 
+						actionListener="#{comprobanteMB.confirmaEliminarProducto}"
+						oncomplete="PF('dlgEliminarProducto').hide();" icon="icon-delete" />
+
+					<p:commandButton value="Cancelar" type="button"
+						onclick="PF('dlgEliminarProducto').hide()" icon="icon-cancel" />
+
+				</h:form>
+			</p:confirmDialog>
 			
 			<p:dialog header="Adicionar Producto" widgetVar="dlgNuevoProducto" appendTo="@(body)"
 					resizable="false" id="dlgDetNuevoProducto" modal="true">

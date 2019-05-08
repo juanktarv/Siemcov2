@@ -188,5 +188,10 @@
 		<property name="mapperInterface" value="com.certicom.scpf.mapper.MovimientoClienteMapper"/>
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
+	
+	<bean id="cuentaTesoreriaMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.certicom.scpf.mapper.CuentaTesoreriaMapper"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
 
 </beans>

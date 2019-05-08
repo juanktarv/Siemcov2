@@ -147,4 +147,10 @@
 		<pattern value="/cobranza" />
 		<view-id value="/faces/gestion_cobranza/cobranza.xhtml" />
 	</url-mapping>
+	
+	<url-mapping id="cuenta">
+		<pattern value="/tesoreria" />
+		<view-id value="/faces/tesoreria/cuentaTesoreria.xhtml" />
+	</url-mapping>
+	
 </pretty-config>

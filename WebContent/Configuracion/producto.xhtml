@@ -85,12 +85,12 @@
 								        
 			        <p:column headerText="Editar/Elim." style="width:5%;text-align: center">
 					
-						<p:commandButton title="Editar"  update=":dlgDetNuevoProducto" actionListener="#{productoMB.editarProducto(p)}"
-										 oncomplete="PF('dlgNuevoProducto').show();" icon="icon-edit">
+						<p:commandButton title="Editar"  update=":dlgDetNuevoProducto" 
+										  actionListener="#{productoMB.editarProducto(p)}"
+										  icon="icon-edit">
 						</p:commandButton> 
 
 						<p:commandButton title="Eliminar"
-										oncomplete="PF('dlgEliminarProducto').show();"
 										actionListener="#{productoMB.eliminarProducto(p)}" 
 										update=":dlgDetEliminarProducto" icon="icon-delete">
 	
@@ -162,7 +162,7 @@
 					</h:panelGrid>
 					<br/> 
 					<p:commandButton value="Guardar" actionListener="#{productoMB.guardarProducto()}"
-						update=":formLista msgNuevo" oncomplete="validarProducto(xhr, status, args)" icon="icon-disk" />
+						update=":formLista msgNuevo :formLista:dataTable" oncomplete="validarProducto(xhr, status, args)" icon="icon-disk" />
 					
 					<p:commandButton value="Cancelar" type="button" onclick="PF('dlgNuevoProducto').hide()" icon="icon-cancel" />
 					</h:form>	

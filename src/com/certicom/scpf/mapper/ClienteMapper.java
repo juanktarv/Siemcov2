@@ -44,6 +44,10 @@ public interface ClienteMapper {
 	@Options(flushCache=true)
 	public void eliminarCliente(@Param("id_cliente") Integer id_cliente) throws Exception;
 	
+	@Select("select c.* from t_cliente c where trim(c.numero_docu_iden_cab)=trim(#{numero_docu_iden_cab}) or trim(c.nombre_cab)=trim(#{nombre_cab}) ")
+	public List<Cliente> buscarClientePorRazonSocialDocumento(Cliente cliente);
 
+	@Select("select a.* from t_cliente a where a.id_cliente in (select distinct c.id_cliente from t_comprobante c where c.id_cliente=#{id_cliente})")
+	public List<Cliente> buscarMovimientosPorCliente(Cliente cliente);
 	
 }

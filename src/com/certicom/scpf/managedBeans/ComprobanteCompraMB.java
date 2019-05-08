@@ -380,19 +380,20 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 				if(p.isValor_unit_incluye_impuestos()){
 					this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
 				}else{
-					this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.productoSelec.getPrecio_final_editado_cliente().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+					this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.productoSelec.getPrecio_final_editado_cliente()
+							.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()));
 					this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.comprobanteCompraDetalleSelec.getValor_venta_item_det()));
 				}
 				
-				this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+				this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC()
+						.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()));
 				this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
 				this.comprobanteCompraDetalleSelec.setTpISC(tp);
 			}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
 				if(p.isValor_unit_incluye_impuestos()){
 					
 					this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente()
-							.multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()
-													)
+							.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()
 									)
 						  );
 					
@@ -414,7 +415,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 				}else{
 					
 					this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.productoSelec.getPrecio_final_editado_cliente()
-												.multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+												.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()));
 					
 					BigDecimal per=(tp.getPorcentaje_det().divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP));
 					
@@ -548,8 +549,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		   	    	System.out.println("Entra a adicionarCompra");
 		   	    	
 		   	    	if(this.comprobanteCompraDetalleSelec.getProducto().getTipo_articulo().equals("Producto")){
-		   	    		if( this.comprobanteCompraDetalleSelec.getProducto().getStock() >= this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()  ){
-		   	    		    
+		   	    		
 		   	    		    valido=Boolean.TRUE;
 				   	 		RequestContext context = RequestContext.getCurrentInstance();  
 				   	   	    context.addCallbackParam("esValido", valido);
@@ -579,14 +579,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 				   			FacesUtils.showFacesMessage("Se adiciono "+this.comprobanteCompraDetalleSelec.getProducto().getDescripcion_prod_det(), 3); /*vega.com*/
 				   			context.update("msgGeneral"); /*vega.com*/
 		   	    		   
-			   	    	}else{
-			   	    		 
-			   	    		valido=Boolean.FALSE;
-				   	 		RequestContext context = RequestContext.getCurrentInstance();  
-				   	   	    context.addCallbackParam("esValido", valido);
-				     	   	FacesUtils.showFacesMessage("La cantidad excede el stock", Constante.FATAL); /*vega.com*/
-				   	   	    context.update("msgNuevo"); /*vega.com*/
-			   	    	}
+			   	    	
 		   	    	}else{
 		   	    		
 		   	    	 valido=Boolean.TRUE;
@@ -729,7 +722,8 @@ public void calcularMontoPrecio(){
 										
 										if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
 											this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
-											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC()
+													.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()));
 											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
 											this.comprobanteCompraDetalleSelec.setTpISC(tp);
 										}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
@@ -741,9 +735,9 @@ public void calcularMontoPrecio(){
 											this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente().add(this.comprobanteCompraDetalleSelec.getMontoIGV()));
 											this.productoSelec.setValor_unitario_prod_det(this.productoSelec.getPrecio_final_editado_cliente());
 											this.comprobanteCompraDetalleSelec.setProducto(this.productoSelec);
-											int unidades=1;
-											if(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()>0){
-												unidades =this.comprobanteCompraDetalleSelec.getCant_unidades_item_det();
+											String unidades="1.00";
+											if(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det().compareTo(new BigDecimal("0.00"))>0){
+												unidades =this.comprobanteCompraDetalleSelec.getCant_unidades_item_det().toString();
 											}
 											
 //											System.out.println(" IGV===========LINEA 3 >"+unidades);
@@ -759,11 +753,13 @@ public void calcularMontoPrecio(){
 									
 									this.productoSelec.setValor_unitario_prod_det(this.productoSelec.getPrecio_final_editado_cliente());
 									this.comprobanteCompraDetalleSelec.setProducto(this.productoSelec);
-									this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+									this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det()
+											.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()));
 									this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().add(this.comprobanteCompraDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"): this.comprobanteCompraDetalleSelec.getMontoIGV()));
 									this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().add(this.comprobanteCompraDetalleSelec.getMontoISC() == null? new BigDecimal("0.00"): this.comprobanteCompraDetalleSelec.getMontoISC()));
 									this.comprobanteCompraDetalleSelec.setSuma_tributos_det((this.comprobanteCompraDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"): this.comprobanteCompraDetalleSelec.getMontoIGV()).add(this.comprobanteCompraDetalleSelec.getMontoISC() == null? new BigDecimal("0.00"):this.comprobanteCompraDetalleSelec.getMontoISC()));
-									this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.productoSelec.getValor_unitario_prod_det().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+									this.comprobanteCompraDetalleSelec.setValor_venta_item_det(this.productoSelec.getValor_unitario_prod_det()
+											.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()));
 									
 					}else{
 						System.out.println(" INCLUYE IMPUESTOS ----------> TRUE");
@@ -771,7 +767,8 @@ public void calcularMontoPrecio(){
 										
 										if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
 											this.comprobanteCompraDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
-											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC()
+													.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()));
 											this.comprobanteCompraDetalleSelec.setMontoISC(this.comprobanteCompraDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
 											this.comprobanteCompraDetalleSelec.setTpISC(tp);
 										}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
@@ -781,14 +778,13 @@ public void calcularMontoPrecio(){
 											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().multiply(new BigDecimal("18.00")));
 											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().divide(new BigDecimal("118.00"), RoundingMode.HALF_UP));	
 											this.productoSelec.setValor_unitario_prod_det(this.comprobanteCompraDetalleSelec.getPrecio_venta_unitario_det().subtract(this.comprobanteCompraDetalleSelec.getMontoIGV()));
-											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV().multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())));
+											this.comprobanteCompraDetalleSelec.setMontoIGV(this.comprobanteCompraDetalleSelec.getMontoIGV()
+													.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()));
 											
 											
 											
 											this.comprobanteCompraDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente()
-																										.multiply(new BigDecimal(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det()
-																																)
-																												)
+																										.multiply(this.comprobanteCompraDetalleSelec.getCant_unidades_item_det())
 																									  );
 											
 											BigDecimal per=(tp.getPorcentaje_det().add(new BigDecimal("100.00"))).divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);

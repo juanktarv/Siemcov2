@@ -62,9 +62,9 @@ public class ProductoMB extends GenericBeans implements Serializable{
 	private List<TablaTablasDetalle> listTablaTablasDetallesAfectacionIGV;
 	private List<TablaTablasDetalle> listTablaTablasDetallesSistemaCalculoISC;
 	
-	private List<TablaTablasDetalle> listTablaTablasDetallesTipoArticulo;
-	
+	private List<TablaTablasDetalle> listTablaTablasDetallesTipoArticulo;	
 	private List<Producto>listaFiltroProductos;
+	private Boolean estadoEditable;
 	
 	//datos Log
     private Log log;
@@ -87,6 +87,7 @@ public class ProductoMB extends GenericBeans implements Serializable{
 		
 		this.editarProducto = Boolean.FALSE;
 		this.estadoStock=Boolean.FALSE;
+		this.estadoEditable=Boolean.FALSE;
 
 		log = (Log)getSpringBean(Constante.SESSION_LOG);
 		logmb = new LogMB();	
@@ -143,15 +144,15 @@ public class ProductoMB extends GenericBeans implements Serializable{
 	             logmb.insertarLog(log);
 				FacesUtils.showFacesMessage("El producto ha sido actualizado", 3);
 			}else{
-				Producto p=this.productoService.findByCodigoDescripcion(this.productoSelec.getCod_prod_det(), this.productoSelec.getDescripcion_prod_det());
-				if(p==null){
+				List<Producto> p=this.productoService.findByCodigoDescripcion(this.productoSelec.getCod_prod_det(), this.productoSelec.getDescripcion_prod_det());
+				if(p.isEmpty()){
 					 this.productoService.crearProducto(this.productoSelec);
 					 log.setAccion("INSERT");
 		             log.setDescripcion("Se inserta el producto : " + this.productoSelec.getDescripcion_prod_det());
 		             logmb.insertarLog(log);
 					 FacesUtils.showFacesMessage("Producto ha sido creado", 3);
 					 
-					 	p=this.productoService.findByCodigoDescripcion(this.productoSelec.getCod_prod_det(), this.productoSelec.getDescripcion_prod_det());
+					 	List<Producto>lista=this.productoService.findByCodigoDescripcion(this.productoSelec.getCod_prod_det(), this.productoSelec.getDescripcion_prod_det());
 						
 						this.tributoProductoIGV = new TributoProducto();
 						TablaTablasDetalle ttdIGV = new TablaTablasDetalle();
@@ -161,7 +162,7 @@ public class ProductoMB extends GenericBeans implements Serializable{
 						this.tributoProductoIGV.setTipo_tributo_inter_det(ttdIGV.getDescripcion_corto());
 						this.tributoProductoIGV.setTipo_tributo_nombre_det(ttdIGV.getDescripcion_largo());						
 						this.tributoProductoIGV.setAsignado(Boolean.TRUE);
-						this.tributoProductoIGV.setId_producto(p.getId_producto());
+						this.tributoProductoIGV.setId_producto(lista.get(0).getId_producto());
 						this.tributoProductoIGV.setTipo_tributo_det(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS);
 						this.tributoProductoIGV.setPorcentaje_det(new BigDecimal(Constante.VALOR_IGV));
 						this.tributoProductoIGV.setTipo_afectacion_igv_det(this.listTablaTablasDetallesAfectacionIGV.get(0).getId_codigo());
@@ -169,7 +170,7 @@ public class ProductoMB extends GenericBeans implements Serializable{
 				}else{
 					valido=Boolean.FALSE;
 					context.addCallbackParam("esValido", valido);
-					FacesUtils.showFacesMessage("Ya existe este Producto", 3);										
+					FacesUtils.showFacesMessage("Ya existe este Producto", 1);										
 				}												
 			}
 			
@@ -201,13 +202,24 @@ public class ProductoMB extends GenericBeans implements Serializable{
 	}
 
 	public void editarProducto(Producto producto){
-		this.productoSelec = producto;
-		this.editarProducto = Boolean.TRUE;
-		if(this.productoSelec.getTipo_articulo().equals("Producto")){
-			this.estadoStock=Boolean.TRUE;
+		RequestContext context = RequestContext.getCurrentInstance();
+		List<Producto> lista=this.productoService.buscarMovimientosPorProducto(producto);
+		if(lista.isEmpty()){
+			this.productoSelec = producto;
+			this.editarProducto = Boolean.TRUE;
+			if(this.productoSelec.getTipo_articulo().equals("Producto")){
+				this.estadoStock=Boolean.TRUE;
+			}else{
+				this.estadoStock=Boolean.FALSE;
+			}	
+			RequestContext.getCurrentInstance().execute("PF('dlgNuevoProducto').show()");
+			context.update("msgGeneral");
+			
 		}else{
-			this.estadoStock=Boolean.FALSE;
-		}
+			RequestContext.getCurrentInstance().execute("PF('dlgNuevoProducto').hide()");
+			FacesUtils.showFacesMessage("No es posible editar este producto, tiene movimientos asociados", 1);
+			context.update("msgGeneral");
+		}				
 	}
 	
 	public void asignarTributoProducto(Producto producto){			
@@ -304,8 +316,18 @@ public class ProductoMB extends GenericBeans implements Serializable{
 	}
 	
 	public void eliminarProducto(Producto producto){
-//		System.out.println("eliminarProducto");  
-		this.productoSelec = producto;
+		RequestContext context = RequestContext.getCurrentInstance();
+		List<Producto> lista=this.productoService.buscarMovimientosPorProducto(producto);
+		if(lista.isEmpty()){
+			this.productoSelec = producto;
+			RequestContext.getCurrentInstance().execute("PF('dlgEliminarProducto').show()");
+			context.update("msgGeneral");
+		}else{
+			FacesUtils.showFacesMessage("No es posible eliminar este producto, tiene movimientos asociados", 1);
+			RequestContext.getCurrentInstance().execute("PF('dlgEliminarProducto').hide()");
+			context.update("msgGeneral");
+		}
+		
 	}
 	
 	

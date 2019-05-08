@@ -78,6 +78,9 @@ public class Constante {
 	public static final Integer COD_TIPOS_DE_AFECTACION_DEL_IGV = 7;
 	public static final Integer COD_TIPOS_DE_SISTEMA_DE_CALCULO_DEL_ISC = 8;
 	public static final Integer COD_TIPO_OPERACION = 51;	
+	public static final Integer COD_TIPO_BANCO = 61;	
+	public static final Integer COD_TIPO_MONEDA=2;
+	public static final Integer COD_TIPO_CUENTA=62; 
 	public static final Integer COD_TIPOS_PRODUCTO = 25;
 	public static final Integer COD_TIPOS_NOTA_CRED = 9;
 	public static final Integer COD_TIPOS_NOTA_DEB = 10;

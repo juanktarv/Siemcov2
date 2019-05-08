@@ -62,7 +62,7 @@
 									<f:selectItems 	value="#{cobranzaMB.listTablaTablasDetallesComprobante}" 
 													var="p" itemLabel="#{p.descripcion_largo}" 
 													itemValue="#{p.codigo_catalogo}" />									
-									<p:ajax event="itemSelect" listener="#{cobranzaMB.onItemDocumento}" 
+									<p:ajax event="change" listener="#{cobranzaMB.onItemDocumento()}" 
 											update="buscarRespuesta"/>									
 								</p:selectOneMenu>
 								
@@ -75,7 +75,7 @@
 						<p:selectOneMenu id="advanced" value="#{cobranzaMB.clienteEncontrado.nombre_cab}" panelStyle="width:500px"							
                          	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
 				            <f:selectItems value="#{cobranzaMB.listaClientes}" 
-				            			   var="cliente" itemLabel="#{cliente.nombre_cab}" itemValue="#{cliente}" />				            			   
+				            			   var="cliente" itemLabel="#{cliente.nombre_cab}" itemValue="#{cliente.nombre_cab}" />				            			   
 				            <p:column>
 				                <h:outputText value="#{t.nombre_cab}" />				                
 				            </p:column>
@@ -105,42 +105,45 @@
 			</h:form>
 			
 			
-			<h:form id="frmListaDocumentos">
+			<h:form id="frmListaDocumentos"  prependId="false">
 					<pe:blockUI  widgetVar="BlockUIWidgetPage">        
 				        <h:graphicImage library="resources/img" value="/resources/img/ajax-loader1.gif"  style="margin-right: 12px; vertical-align: middle;" />  
 				        <h:outputText value="Cambiando de página, espere por favor..." style="white-space: nowrap; font-weight:bold; color: #036fab"/> 
 				    </pe:blockUI>
 				    
 				    <p:commandButton value="Cobrar" onclick="PF('dlgNuevoCobro').show()"
-				    				 actionListener="#{cobranzaMB.prepararCobro()}"></p:commandButton>
-				    
-					<p:dataTable  var="p" value="#{cobranzaMB.listamovimientos}"  
-						lazy="true" paginator="true" filteredValue="#{cobranzaMB.listaFiltroMovimientos}" 
-						selection="#{cobranzaMB.listaSelectedMovimientos}" rowKey="#{p.id_comprobante}"
-						emptyMessage="No hay Comprobantes Disponibles." rowIndexVar="nro" style="FONT-SIZE: 10px;" 
-						id="dataTableComprobantes"
-						rows="10" paginatorPosition="bottom"  rowsPerPageTemplate="10,100,200,500" 
-						widgetVar="dataTableComprobantes"
-						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
-						sortField="#{cgr.numero_serie_documento_cab}" sortOrder="DESCENDING">
-						
-
-						<p:blockUI block="dataTableComprobantes" trigger="dataTableComprobantes">
+				    				 actionListener="#{cobranzaMB.prepararCobro()}" update="pnlCobro dtlistCobro"></p:commandButton>
+				    				 
+				    	<p:blockUI block="dataTableComprobantes" trigger="dataTableComprobantes">
 					        <h:graphicImage library="resources/img" value="/resources/img/ajax-loader1.gif"  
 					        style="margin-right: 12px; vertical-align: middle;" />  
 				        	<h:outputText value="Buscando, espere por favor..." 
 				        		style="white-space: nowrap; font-weight:bold; color: #036fab"/>
 					    </p:blockUI>
+					    					
+					<p:dataTable var="p" value="#{cobranzaMB.listamovimientos}" 
+								emptyMessage="No se encontraron Comprobantes" 
+								lazy="true" paginatorPosition="bottom"  
+								filteredValue="#{cobranzaMB.listaFiltroMovimientos}" 
+								paginator="true" rowIndexVar="nro" 
+								id="dataTableComprobantes"
+								rows="10" 
+								rowsPerPageTemplate="10, 15, 20, 50, 100"
+								selection="#{cobranzaMB.listaSelectedMovimientos}"
+								 style="FONT-SIZE: 10px;" rowKey="#{p.id_comprobante}" 
+								 widgetVar="dataTableComprobantes">
+								 
 						<f:facet name="header">Lista de Comprobantes Emitidos</f:facet>
 						<p:ajax event="page" onstart="PF('BlockUIWidgetPage').block();"  oncomplete="PF('BlockUIWidgetPage').unblock();"/>
 						
-						<p:column headerText="Orden"  selectionMode="multiple" style="width:16px;text-align:center">
-							#{nro+1}
-						</p:column>		
+						<p:column selectionMode="multiple" style="width:16px;text-align:center" >
+						</p:column>	
+						<p:column style="width:16px;text-align:center" headerText="Orden">#{nro+1}</p:column>	
 						<p:column style="width:70px" headerText="Cliente">
 							<h:outputText value="#{p.cliente.nombre_cab}"/>
 						</p:column>
-						<p:column style="width:70px" headerText="Nro Comprobante">
+						<p:column style="width:70px" headerText="Nro Comprobante" sortBy="#{p.nroserie_documento}" 
+									filterBy="#{p.nroserie_documento}" filterMatchMode="contains" filterStyle="width: 95%">
 							<h:outputText value="#{p.nroserie_documento}"/>
 						</p:column>
 						<p:column style="width:70px" headerText="Importe">
@@ -153,38 +156,82 @@
 							<h:outputText value="#{p.flag_regularizado}"/>
 						</p:column>					
 				</p:dataTable>
+				
+				<p:dialog header="Registrar Cobro" widgetVar="dlgNuevoCobro" appendTo="@(body)" 
+					resizable="false" id="dlgDetNuevoCobro" modal="true">
+					
+					<p:panel id="pnlCobro">
+					
+					
+										
+						<h:panelGrid columns="4" cellpadding="10">
+											
+							<p:outputLabel value="Cliente" 
+								style="white-space: nowrap; font-weight:bold; color: #036fab">
+							</p:outputLabel>
+							<p:outputLabel value="#{cobranzaMB.cobro.cliente.nombre_cab}"></p:outputLabel>
+							
+							<p:outputLabel value="Total Deuda Seleccionada" 
+										   style="white-space: nowrap; font-weight:bold; color: #036fab">
+							</p:outputLabel>
+							
+							<p:outputLabel value="#{cobranzaMB.cobro.total_importe_cobrado}"></p:outputLabel>
+							
+							<p:outputLabel value="Fecha" 
+								style="white-space: nowrap; font-weight:bold; color: #036fab">
+							</p:outputLabel>
+							<p:outputLabel value="#{cobranzaMB.cobro.fecha_cobranza}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss"></f:convertDateTime>
+							</p:outputLabel>
+							
+						</h:panelGrid>
+						
+						<p:outputLabel value="Ingresar valores a pagar :" 
+									   style="white-space: nowrap; font-weight:bold; color: #036fab;">
+						</p:outputLabel>												
+						
+						<p:dataTable var="p" value="#{cobranzaMB.listaDetalleCobro}" id="dtlistCobro" style="width:50%">
+							<p:column headerText="Comprobante" style="width:60%">
+								<p:outputLabel value="#{p.comprobante.numero_serie_documento_cab}" style="width:90%"></p:outputLabel>
+							</p:column>
+							<p:column headerText="Pendiente" style="width:20%">
+								<p:outputLabel value="#{p.importe_pendiente}" style="width:90%"></p:outputLabel>
+							</p:column>					
+							<p:column headerText="Pago" style="width:20%">
+								<p:inputText value="#{p.importe_cobrado}" style="width:90%"></p:inputText>
+							</p:column>
+						</p:dataTable>
+						
+						<h:panelGrid columns="2" cellpadding="4">
+						
+							<p:outputLabel value="Saldo Deudor :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+							</p:outputLabel>
+							
+							<p:outputLabel value="#{cobranzaMB.cobro.saldo_deudor}" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+							</p:outputLabel>
+							
+							<p:outputLabel value="Saldo a Pagar :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+							</p:outputLabel>
+							
+							<p:outputLabel value="#{cobranzaMB.cobro.saldo_pagar}" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+							</p:outputLabel>
+														
+						</h:panelGrid>
+						
+						<p:outputLabel value="Ingresar a las siguientes cuentas :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+						</p:outputLabel>
+						
+						
+						
+						
+						
+					</p:panel>
+			</p:dialog>
+				
+				
 			</h:form>
 			
-			<p:dialog header="Registrar Cobro" widgetVar="dlgNuevoCobro" appendTo="@(body)"
-					resizable="false" id="dlgDetNuevoCobro" modal="true">					
-				<h:panelGrid columns="4" cellpadding="10">					
-					<p:outputLabel value="Cliente"></p:outputLabel>
-					<p:outputLabel value="#{cobranzaMB.cobro.cliente.nombre_cab}"></p:outputLabel>
-					<p:outputLabel value="Total Deuda Seleccionada"></p:outputLabel>
-					<p:outputLabel value="#{cobranzaMB.cobro.total_importe_cobrado}"></p:outputLabel>
-					<p:outputLabel value="Fecha"></p:outputLabel>
-					<p:outputLabel value="#{cobranzaMB.cobro.fecha_cobranza}"></p:outputLabel>
-				</h:panelGrid>
-				#{Ingresar valores a pagar :}
-				
-				<p:dataTable var="p" value="#{cobranzaMB.listaDetalleCobro}">
-					<p:column headerText="Comprobante">
-						<p:outputLabel value="#{p.comprobante.numero_serie_documento_cab}"></p:outputLabel>
-					</p:column>
-					<p:column headerText="Pendiente">
-						<p:outputLabel value="#{p.importe_pendiente}"></p:outputLabel>
-					</p:column>					
-					<p:column headerText="Pago">
-						<p:outputLabel value="#{p.importe_cobrado}"></p:outputLabel>
-					</p:column>
-				
-				
-				
-				</p:dataTable>
-				
-				
-				
-			</p:dialog>
+			
 		</p:panel>
 		
 			

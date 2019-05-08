@@ -13,6 +13,10 @@ public class CobranzaCabecera {
 	private BigDecimal total_importe_cobrado;
 	private Date fecha_cobranza;
 	
+	private BigDecimal deuda_seleccionada;
+	private BigDecimal saldo_deudor;
+	private BigDecimal saldo_pagar;	
+	
 	private Cliente cliente;
 	
 	public Integer getId_cliente() {
@@ -77,6 +81,30 @@ public class CobranzaCabecera {
 
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
+	}
+
+	public BigDecimal getDeuda_seleccionada() {
+		return deuda_seleccionada;
+	}
+
+	public void setDeuda_seleccionada(BigDecimal deuda_seleccionada) {
+		this.deuda_seleccionada = deuda_seleccionada;
+	}
+
+	public BigDecimal getSaldo_deudor() {
+		return saldo_deudor;
+	}
+
+	public void setSaldo_deudor(BigDecimal saldo_deudor) {
+		this.saldo_deudor = saldo_deudor;
+	}
+
+	public BigDecimal getSaldo_pagar() {
+		return saldo_pagar;
+	}
+
+	public void setSaldo_pagar(BigDecimal saldo_pagar) {
+		this.saldo_pagar = saldo_pagar;
 	}	
 	
 }

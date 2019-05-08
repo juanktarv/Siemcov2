@@ -25,7 +25,7 @@ xmlns="http://java.sun.com/xml/ns/javaee"
     <url-pattern>/faces/*</url-pattern>
   </servlet-mapping>
   <session-config>
-    <session-timeout>60</session-timeout>
+    <session-timeout>90</session-timeout>
   </session-config>
   <filter>
     <filter-name>Pretty Filter</filter-name>

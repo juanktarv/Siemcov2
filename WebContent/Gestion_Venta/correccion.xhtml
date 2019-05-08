@@ -34,7 +34,7 @@
 						required="true" requiredMessage="Se necesita un tipo de documento" >
 						<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
 						<f:selectItem itemLabel="Nota de crédito" itemValue="07" />						
-						<p:ajax event="itemSelect" listener="#{correccionMB.obtenerAbreviatura()}" update=" idValoresCabecera formAccion"/>
+						<p:ajax event="change" listener="#{correccionMB.obtenerAbreviatura()}" update=" idValoresCabecera :formAccion"/>
 					</p:selectOneMenu>
 					
 					

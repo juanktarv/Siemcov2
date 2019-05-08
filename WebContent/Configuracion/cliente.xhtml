@@ -78,11 +78,14 @@
 								        
 			        <p:column headerText="Editar/Elim." style="width:5%;text-align: center">
 					
-						<p:commandButton title="Editar"  update=":dlgDetNuevoCliente" actionListener="#{clienteMB.editarCliente(p)}"
-										 oncomplete="PF('dlgNuevoCliente').show();" icon="icon-edit">
+						<p:commandButton title="Editar"  update=":dlgDetNuevoCliente" 
+										actionListener="#{clienteMB.editarCliente(p)}"
+										 icon="icon-edit">
 						</p:commandButton> 
 
-						<p:commandButton title="Eliminar" oncomplete="PF('dlgEliminarCliente').show();" actionListener="#{clienteMB.eliminarCliente(p)}" update=":dlgDetEliminarCliente" icon="icon-delete">
+						<p:commandButton title="Eliminar" 
+										 actionListener="#{clienteMB.eliminarCliente(p)}" 
+										 update=":dlgDetEliminarCliente" icon="icon-delete">
 	
 						</p:commandButton>
 								

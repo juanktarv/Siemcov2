@@ -35,6 +35,12 @@ public interface ProveedorMapper {
 	@Options(flushCache=true)
 	public void eliminarProveedor(@Param("id_proveedor") Integer id_proveedor) throws Exception;
 	
+	@Select(" select * from t_proveedores c where trim(c.numero_docu_iden_cab)=trim(#{numero_documento}) or trim(c.nombre_cab)=trim(#{nombre_proveedor}) ")
+	public List<Proveedores> buscarProveedorPorRazonSocialDocumento(Proveedores proveedor);
+
+	@Select("select c.* from t_proveedores c where c.id_proveedor in (select distinct d.id_proveedor from t_comprobante_compra d where d.id_proveedor=#{id_proveedor})")
+	public List<Proveedores> buscarMovimientosPorProveedor(Proveedores proveedor);
+	
 
 	
 }

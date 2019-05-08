@@ -47,5 +47,16 @@ public class ClienteService implements ClienteMapper{
 		// TODO Auto-generated method stub
 		return clienteMapper.findByFiltro(filtro);
 	}
+
+	@Override
+	public List<Cliente> buscarClientePorRazonSocialDocumento(Cliente cliente) {
+		// TODO Auto-generated method stub
+		return clienteMapper.buscarClientePorRazonSocialDocumento(cliente);
+	}
+
+	public List<Cliente> buscarMovimientosPorCliente(Cliente cliente) {
+		// TODO Auto-generated method stub
+		return clienteMapper.buscarMovimientosPorCliente(cliente);
+	}
 	
 }

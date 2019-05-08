@@ -1,5 +1,6 @@
 package com.certicom.scpf.services;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.session.ExecutorType;
@@ -56,9 +57,9 @@ public class ProductoService implements ProductoMapper{
 		ProductoMapper daoObj= (ProductoMapper)sqlSession.getMapper(ProductoMapper.class);
 		
 		for (ComprobanteDetalle fpd:cDetalle) {
-			Integer nuevoStock =0; 	
+		 	
 			if(fpd.getProducto().getTipo_articulo().equals("Producto")){
-				nuevoStock = fpd.getProducto().getStock()-fpd.getCant_unidades_item_det(); 
+				BigDecimal nuevoStock = fpd.getProducto().getStock().subtract(fpd.getCant_unidades_item_det()); 
 				fpd.getProducto().setStock(nuevoStock);
 				this.productoMapper.actualizarStockProducto(fpd.getProducto());
 			}						
@@ -74,9 +75,8 @@ public class ProductoService implements ProductoMapper{
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
 		ProductoMapper daoObj= (ProductoMapper)sqlSession.getMapper(ProductoMapper.class);
 		
-		for (ComprobanteDetalle fpd:cDetalle) {
-			Integer nuevoStock =0; 			
-			nuevoStock = fpd.getProducto().getStock()+fpd.getCant_unidades_item_det(); 
+		for (ComprobanteDetalle fpd:cDetalle) {		
+			BigDecimal nuevoStock = fpd.getProducto().getStock().subtract(fpd.getCant_unidades_item_det()); 
 			fpd.getProducto().setStock(nuevoStock);
 			this.productoMapper.actualizarStockProducto(fpd.getProducto());
 			
@@ -85,7 +85,7 @@ public class ProductoService implements ProductoMapper{
 	}
 
 	@Override
-	public Producto findByCodigoDescripcion(String cod_prod_det,String descripcion_prod_det) throws Exception { 
+	public List<Producto> findByCodigoDescripcion(String cod_prod_det,String descripcion_prod_det) throws Exception { 
 		// TODO Auto-generated method stub
 		return this.productoMapper.findByCodigoDescripcion(cod_prod_det, descripcion_prod_det);
 	}
@@ -99,6 +99,11 @@ public class ProductoService implements ProductoMapper{
 	public void actualizarStockProducto(Producto producto) throws Exception {
 		// TODO Auto-generated method stub
 		this.productoMapper.actualizarStockProducto(producto);
+	}
+
+	public List<Producto> buscarMovimientosPorProducto(Producto producto) {
+		// TODO Auto-generated method stub
+		return this.productoMapper.buscarMovimientosPorProducto(producto);
 	}
 
 

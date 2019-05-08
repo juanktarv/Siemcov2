@@ -23,7 +23,7 @@ public class ComprobanteCompraDetalle {
 	private BigDecimal precio_venta_unitario_costo;
 	private BigDecimal valor_venta_item;
 	private BigDecimal valor_referencial_unit;
-	private Integer cant_unidades_item_det;
+	private BigDecimal cant_unidades_item_det;
 	private String numeroSerie;
 	private Producto producto;
 	private TributoProducto tpISC;
@@ -200,11 +200,11 @@ public class ComprobanteCompraDetalle {
 		this.producto = producto;
 	}
 
-	public Integer getCant_unidades_item_det() {
+	public BigDecimal getCant_unidades_item_det() {
 		return cant_unidades_item_det;
 	}
 
-	public void setCant_unidades_item_det(Integer cant_unidades_item_det) {
+	public void setCant_unidades_item_det(BigDecimal cant_unidades_item_det) {
 		this.cant_unidades_item_det = cant_unidades_item_det;
 	}
 

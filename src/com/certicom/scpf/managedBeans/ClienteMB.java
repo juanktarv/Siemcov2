@@ -85,13 +85,20 @@ public class ClienteMB extends GenericBeans implements Serializable{
 	             logmb.insertarLog(log);
 				FacesUtils.showFacesMessage("El cliente ha sido actualizado", 3);
 			}else{
-				this.clienteService.crearCliente(this.clienteSelec);
-				 log.setAccion("INSERT");
-	             log.setDescripcion("Se inserta el tabla maestra : " + this.clienteSelec.getNombre_cab());
-	             logmb.insertarLog(log);
-				FacesUtils.showFacesMessage("Cliente ha sido creado", 3);
-			}
-			
+				
+				List<Cliente> lista=this.clienteService.buscarClientePorRazonSocialDocumento(this.clienteSelec);				
+				if(lista.isEmpty()){
+					 this.clienteService.crearCliente(this.clienteSelec);
+					 log.setAccion("INSERT");
+		             log.setDescripcion("Se inserta en clientes : " + this.clienteSelec.getNombre_cab());
+		             logmb.insertarLog(log);
+					 FacesUtils.showFacesMessage("Cliente ha sido creado", 3);					
+				}else{	
+					valido=Boolean.FALSE;
+					context.addCallbackParam("esValido", valido);		
+					 FacesUtils.showFacesMessage("Ya existe este Cliente", 1);
+				}
+			}			
 			this.clienteSelec = new Cliente();
 			this.editarCliente = Boolean.FALSE;
 			
@@ -110,12 +117,34 @@ public class ClienteMB extends GenericBeans implements Serializable{
 	}
 
 	public void editarCliente(Cliente cliente){
-		this.clienteSelec = cliente;
-		this.editarCliente = Boolean.TRUE;
+		RequestContext context = RequestContext.getCurrentInstance();
+		List<Cliente> lista=this.clienteService.buscarMovimientosPorCliente(cliente);
+		if(lista.isEmpty()){
+			this.clienteSelec = cliente;
+			this.editarCliente = Boolean.TRUE;
+			RequestContext.getCurrentInstance().execute("PF('dlgNuevoCliente').show()");
+			context.update("msgGeneral");
+		}else{
+			FacesUtils.showFacesMessage("No es posible editar este cliente, tiene movimientos asociados", 1);
+			RequestContext.getCurrentInstance().execute("PF('dlgNuevoCliente').hide()");
+			context.update("msgGeneral");
+		}
+		
 	}
 	
 	public void eliminarCliente(Cliente cliente){
-		this.clienteSelec = cliente;
+		RequestContext context = RequestContext.getCurrentInstance();
+		List<Cliente> lista=this.clienteService.buscarMovimientosPorCliente(cliente);
+		if(lista.isEmpty()){
+			this.clienteSelec = cliente;
+			RequestContext.getCurrentInstance().execute("PF('dlgEliminarCliente').show()");
+			context.update("msgGeneral");
+		}else{
+			FacesUtils.showFacesMessage("No es posible eliminar este cliente, tiene movimientos asociados", 1);
+			RequestContext.getCurrentInstance().execute("PF('dlgEliminarCliente').hide()");
+			context.update("msgGeneral");
+		}
+		
 	}
 	
 	

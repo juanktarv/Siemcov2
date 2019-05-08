@@ -37,8 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.sf.jasperreports.engine.JRParameter;
 import src.com.certicom.scpf.utils.Utils;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
+
 import org.primefaces.context.PrimeFacesContext;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -85,6 +84,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 	private List<ComprobanteDetalle> listaComprobanteDetalle;
 	private Cliente clienteEncontrado;
 	private Producto productoEncontrado;
+	private int posicionEdicion;
 	private Producto productoSelec;
 	private DomicilioFiscal domicilioFiscalSelec;
 	private TributoProducto tributoProducto;
@@ -120,6 +120,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 	//datos Log
     private Log log;
 	private LogMB logmb;
+	private Boolean estadoEditarProducto;
 	
 	public ComprobanteMB(){}
 	
@@ -130,6 +131,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		this.menuServices=new MenuServices();
 		
 		this.editarCliente = Boolean.FALSE;
+		this.estadoEditarProducto=Boolean.FALSE;
 		this.comprobanteSelec = new Comprobante();
 		this.clienteEncontrado = new Cliente();
 		this.clienteService = new ClienteService();
@@ -159,7 +161,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		this.comprobanteSelec.setTotal_precio_venta_cab(new BigDecimal("0.00"));
 		this.comprobanteSelec.setTotal_valor_venta_cab(new BigDecimal("0.00"));
 		this.comprobanteSelec.setImporte_total_venta_cab(new BigDecimal("0.00"));
-
+		this.posicionEdicion=-1;
 		
 		this.movimientoClienteService= new MovimientoClienteService();
 
@@ -555,6 +557,31 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
     }
 	
+	public void editarProducto(ComprobanteDetalle detalle){
+		this.comprobanteDetalleSelec=detalle;
+		this.productoEncontrado=this.comprobanteDetalleSelec.getProducto();
+		this.estadoEditarProducto=Boolean.TRUE;
+		try {
+			consultarProductoCod(this.productoEncontrado.getCod_prod_det());
+			for(int i=0;i<listaComprobanteDetalle.size(); i++){
+				if(this.comprobanteDetalleSelec.getId_producto()==listaComprobanteDetalle.get(i).getId_producto()){
+					this.posicionEdicion=i;
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void eliminarProducto(ComprobanteDetalle detalle){
+		this.comprobanteDetalleSelec=detalle;
+	}
+	
+	public void confirmaEliminarProducto(){
+		this.listaComprobanteDetalle.remove(this.comprobanteDetalleSelec);
+	}
+	
 	public void adicionarProducto(){
 		this.productoEncontrado = new Producto();
 		this.comprobanteDetalleSelec = new ComprobanteDetalle();
@@ -600,21 +627,20 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 				if(p.isValor_unit_incluye_impuestos()){
 					this.comprobanteDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
 				}else{
-					this.comprobanteDetalleSelec.setValor_venta_item_det(this.productoSelec.getPrecio_final_editado_cliente().multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det())));
+					this.comprobanteDetalleSelec.setValor_venta_item_det(this.productoSelec.getPrecio_final_editado_cliente()
+							.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 					this.comprobanteDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.comprobanteDetalleSelec.getValor_venta_item_det()));
 				}
 				
-				this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC().multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det())));
+				this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC()
+						.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 				this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
 				this.comprobanteDetalleSelec.setTpISC(tp);
 			}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
 				if(p.isValor_unit_incluye_impuestos()){
 					
 					this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente()
-							.multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det()
-													)
-									)
-						  );
+							.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 					
 //					System.out.println("TOTAL:---->"+this.comprobanteDetalleSelec.getPrecio_venta_unitario_det());
 					BigDecimal per=(tp.getPorcentaje_det().add(new BigDecimal("100.00"))).divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
@@ -634,7 +660,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 				}else{
 					
 					this.comprobanteDetalleSelec.setValor_venta_item_det(this.productoSelec.getPrecio_final_editado_cliente()
-												.multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det())));
+												.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 					
 					BigDecimal per=(tp.getPorcentaje_det().divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP));
 					
@@ -669,7 +695,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 										
 										if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
 											this.comprobanteDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
-											this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC().multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det())));
+											this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC()
+													.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 											this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
 											this.comprobanteDetalleSelec.setTpISC(tp);
 										}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
@@ -681,9 +708,12 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 											this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente().add(this.comprobanteDetalleSelec.getMontoIGV()));
 											this.productoSelec.setValor_unitario_prod_det(this.productoSelec.getPrecio_final_editado_cliente());
 											this.comprobanteDetalleSelec.setProducto(this.productoSelec);
-											int unidades=1;
-											if(this.comprobanteDetalleSelec.getCant_unidades_item_det()>0){
-												unidades =this.comprobanteDetalleSelec.getCant_unidades_item_det();
+											String unidades="1";
+//											if(this.comprobanteDetalleSelec.getCant_unidades_item_det()>0){
+//												unidades =this.comprobanteDetalleSelec.getCant_unidades_item_det();
+//											}
+											if(this.comprobanteDetalleSelec.getCant_unidades_item_det().compareTo(new BigDecimal("0.00"))==1){
+												unidades =this.comprobanteDetalleSelec.getCant_unidades_item_det().toString();
 											}
 											
 //											System.out.println(" IGV===========LINEA 3 >"+unidades);
@@ -699,11 +729,13 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 									
 									this.productoSelec.setValor_unitario_prod_det(this.productoSelec.getPrecio_final_editado_cliente());
 									this.comprobanteDetalleSelec.setProducto(this.productoSelec);
-									this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det().multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det())));
+									this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det()
+											.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 									this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.comprobanteDetalleSelec.getPrecio_venta_unitario_det().add(this.comprobanteDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"): this.comprobanteDetalleSelec.getMontoIGV()));
 									this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.comprobanteDetalleSelec.getPrecio_venta_unitario_det().add(this.comprobanteDetalleSelec.getMontoISC() == null? new BigDecimal("0.00"): this.comprobanteDetalleSelec.getMontoISC()));
 									this.comprobanteDetalleSelec.setSuma_tributos_det((this.comprobanteDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"): this.comprobanteDetalleSelec.getMontoIGV()).add(this.comprobanteDetalleSelec.getMontoISC() == null? new BigDecimal("0.00"):this.comprobanteDetalleSelec.getMontoISC()));
-									this.comprobanteDetalleSelec.setValor_venta_item_det(this.productoSelec.getValor_unitario_prod_det().multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det())));
+									this.comprobanteDetalleSelec.setValor_venta_item_det(this.productoSelec.getValor_unitario_prod_det()
+											.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 									
 					}else{
 						System.out.println(" INCLUYE IMPUESTOS ----------> TRUE");
@@ -711,7 +743,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 										
 										if(tp.getTipo_tributo_det().equals(Constante.COD_ISC_IMPUESTO_SELECTIVO_AL_CONSUMO)){
 											this.comprobanteDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.productoSelec.getValor_unitario_prod_det()));
-											this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC().multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det())));
+											this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC()
+													.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 											this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC().divide(new BigDecimal("100.00")));
 											this.comprobanteDetalleSelec.setTpISC(tp);
 										}else if(tp.getTipo_tributo_det().equals(Constante.COD_IGV_IMPUESTO_GENERAL_A_LAS_VENTAS)){
@@ -721,15 +754,13 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 											this.comprobanteDetalleSelec.setMontoIGV(this.comprobanteDetalleSelec.getPrecio_venta_unitario_det().multiply(new BigDecimal("18.00")));
 											this.comprobanteDetalleSelec.setMontoIGV(this.comprobanteDetalleSelec.getMontoIGV().divide(new BigDecimal("118.00"), RoundingMode.HALF_UP));	
 											this.productoSelec.setValor_unitario_prod_det(this.comprobanteDetalleSelec.getPrecio_venta_unitario_det().subtract(this.comprobanteDetalleSelec.getMontoIGV()));
-											this.comprobanteDetalleSelec.setMontoIGV(this.comprobanteDetalleSelec.getMontoIGV().multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det())));
+											this.comprobanteDetalleSelec.setMontoIGV(this.comprobanteDetalleSelec.getMontoIGV()
+													.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 											
 											
 											
 											this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getPrecio_final_editado_cliente()
-																										.multiply(new BigDecimal(this.comprobanteDetalleSelec.getCant_unidades_item_det()
-																																)
-																												)
-																									  );
+												.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 											
 											BigDecimal per=(tp.getPorcentaje_det().add(new BigDecimal("100.00"))).divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
 											
@@ -777,7 +808,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		   	    	System.out.println("Entra a adicionarCompra");
 		   	    	
 		   	    	if(this.comprobanteDetalleSelec.getProducto().getTipo_articulo().equals("Producto")){
-		   	    		if( this.comprobanteDetalleSelec.getProducto().getStock() >= this.comprobanteDetalleSelec.getCant_unidades_item_det()  ){
+		   	    		if( this.comprobanteDetalleSelec.getProducto().getStock().compareTo(this.comprobanteDetalleSelec.getCant_unidades_item_det())==1){
 		   	    		    
 		   	    		    valido=Boolean.TRUE;
 				   	 		RequestContext context = RequestContext.getCurrentInstance();  
@@ -789,6 +820,18 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 				   			this.comprobanteDetalleSelec.setId_domicilio_fiscal_cab(this.comprobanteSelec.getId_domicilio_fiscal_cab());
 				   			this.comprobanteDetalleSelec.setId_modo_pago(this.comprobanteSelec.getId_modo_pago());
 				   			System.out.println("MODO PAGO :"+this.comprobanteSelec.getId_modo_pago());
+				   			
+				   			if(this.estadoEditarProducto){
+				   					ComprobanteDetalle comprobanteDetallex = this.listaComprobanteDetalle.get(posicionEdicion);
+					   				this.comprobanteSelec.setSuma_tributos_cab(this.comprobanteSelec.getSuma_tributos_cab().subtract(comprobanteDetallex.getSuma_tributos_det()));
+					   				this.comprobanteSelec.setTotal_precio_venta_cab(this.comprobanteSelec.getTotal_precio_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+					   				this.comprobanteSelec.setTotal_valor_venta_cab(this.comprobanteSelec.getTotal_valor_venta_cab().subtract(comprobanteDetallex.getValor_venta_item_det()));
+					   				this.comprobanteSelec.setImporte_total_venta_cab(this.comprobanteSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+					   			
+				   				this.listaComprobanteDetalle.remove(posicionEdicion);
+				   			}
+				   			
+				   			
 				   			this.listaComprobanteDetalle.add(this.comprobanteDetalleSelec);
 				   			
 				   			this.comprobanteSelec.setSuma_tributos_cab(new BigDecimal("0.00"));
@@ -805,7 +848,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 				   			
 				   			this.generarComprobante = Boolean.FALSE; /*Jesus*/
 				   			
-				   			FacesUtils.showFacesMessage("Se adiciono "+productoSelec.getDescripcion_prod_det(), 3); /*vega.com*/
+				   			FacesUtils.showFacesMessage("Se adiciono "+this.comprobanteDetalleSelec.getProducto().getDescripcion_prod_det(), 3); /*vega.com*/
 				   			context.update("msgGeneral"); /*vega.com*/
 		   	    		   
 			   	    	}else{
@@ -828,6 +871,17 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			   			this.comprobanteDetalleSelec.setId_domicilio_fiscal_cab(this.comprobanteSelec.getId_domicilio_fiscal_cab());
 			   			this.comprobanteDetalleSelec.setId_modo_pago(this.comprobanteSelec.getId_modo_pago());
 			   			System.out.println("MODO PAGO :"+this.comprobanteSelec.getId_modo_pago());
+			   			
+			   			if(this.estadoEditarProducto){
+		   					ComprobanteDetalle comprobanteDetallex = this.listaComprobanteDetalle.get(posicionEdicion);
+			   				this.comprobanteSelec.setSuma_tributos_cab(this.comprobanteSelec.getSuma_tributos_cab().subtract(comprobanteDetallex.getSuma_tributos_det()));
+			   				this.comprobanteSelec.setTotal_precio_venta_cab(this.comprobanteSelec.getTotal_precio_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+			   				this.comprobanteSelec.setTotal_valor_venta_cab(this.comprobanteSelec.getTotal_valor_venta_cab().subtract(comprobanteDetallex.getValor_venta_item_det()));
+			   				this.comprobanteSelec.setImporte_total_venta_cab(this.comprobanteSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+			   			
+		   				this.listaComprobanteDetalle.remove(posicionEdicion);
+		   			}
+			   			
 			   			this.listaComprobanteDetalle.add(this.comprobanteDetalleSelec);
 			   			
 			   			this.comprobanteSelec.setSuma_tributos_cab(new BigDecimal("0.00"));
@@ -844,7 +898,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			   			
 			   			this.generarComprobante = Boolean.FALSE; /*Jesus*/
 			   			
-			   			FacesUtils.showFacesMessage("Se adiciono "+productoSelec.getDescripcion_prod_det(), 3); /*vega.com*/
+			   			FacesUtils.showFacesMessage("Se adiciono "+this.comprobanteDetalleSelec.getProducto().getDescripcion_prod_det(), 3); /*vega.com*/
 			   			context.update("msgGeneral"); /*vega.com*/
 		   	    		
 		   	    	}

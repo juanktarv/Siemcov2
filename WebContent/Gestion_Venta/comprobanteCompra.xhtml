@@ -34,7 +34,7 @@
 						<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>						
 						<f:selectItem itemLabel="Factura" itemValue="01" />
 						<f:selectItem itemLabel="Boleta de venta" itemValue="03" />
-						<p:ajax event="itemSelect" listener="#{comprobanteCompraMB.obtenerAbreviatura()}" update="idValoresCabecera"/>
+						<p:ajax event="change" listener="#{comprobanteCompraMB.obtenerAbreviatura()}" update="idValoresCabecera"/>
 					</p:selectOneMenu>												
 				</h:panelGrid>
 				
@@ -49,7 +49,7 @@
 	                        				itemValue="#{proveedor.nombre_proveedor}" 
 	                        				forceSelection="true" 
 	                        				disabled="#{comprobanteCompraMB.ingresarProveedor}">
-	                        	<p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemProveedor}" update="id_nro_serie formAccion"/>
+	                        	<p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemProveedor}" update="id_nro_serie :formAccion"/>
 	                        	
 	                        </p:autoComplete>
 						</h:panelGrid>

@@ -64,7 +64,7 @@
 									<f:selectItems value="#{comunicacionBajaMB.listTablaTablasDetallesComprobante}" 
 									var="p" itemLabel="#{p.descripcion_largo}" itemValue="#{p.codigo_catalogo}" />
 									
-									<p:ajax event="itemSelect" listener="#{comunicacionBajaMB.onItemDocumento}" update="buscarRespuesta"/>
+									<p:ajax event="change" listener="#{comunicacionBajaMB.onItemDocumento}" update="buscarRespuesta"/>
 									
 								</p:selectOneMenu>
 						</h:panelGrid>
@@ -108,7 +108,8 @@
 						lazy="true" paginator="true" filteredValue="#{comunicacionBajaMB.listaFiltroComprobante}" 
 						emptyMessage="No hay Comprobantes Disponibles." rowIndexVar="nro" style="FONT-SIZE: 10px;" id="dataTableComprobantes"
 						rows="10" paginatorPosition="bottom"  rowsPerPageTemplate="10,100,200,500" widgetVar="dataTableComprobantes"
-						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  sortField="#{cgr.numero_serie_documento_cab}" sortOrder="DESCENDING">
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+						sortField="#{cgr.numero_serie_documento_cab}" sortOrder="DESCENDING">
 						
 
 						<p:blockUI block="dataTableComprobantes" trigger="dataTableComprobantes">
@@ -161,7 +162,7 @@
 							<p:commandButton title="Comunicar Sunat" 
 								disabled="#{crg.estado_sunat eq 'ENVIADO' or crg.estado_sunat eq 'ANULADO' or crg.estado_comunicacion_baja eq 'TRUE'}"
 										 actionListener="#{comunicacionBajaMB.enviarSunat(crg)}"
-										 icon="icon-plantilla" update="frmListaDocumentos"/>
+										 icon="icon-plantilla" update=":frmListaDocumentos"/>
 						</p:column>
 						
 						<p:column width="50" headerText="Estado Respuesta Sunat" filterBy="#{crg.estado_respuesta_sunat}" filterMatchMode="contains" filterStyle="width: 95%" >
@@ -216,7 +217,7 @@
 					severity="alert" widgetVar="dlgAnularComprobante">
 				<h:form>
 					<p:commandButton value="Anular"
-						update=":frmListaDocumentos msgGeneral" 
+						update=":frmListaDocumentos :msgGeneral" 
 						actionListener="#{comunicacionBajaMB.confirmaAnularComprobante}"
 						oncomplete="PF('dlgAnularComprobante').hide();" icon="icon-delete" />
 

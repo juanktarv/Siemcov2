@@ -195,7 +195,7 @@ public class ComunicacionBajaMB extends GenericBeans implements Serializable{
 	}
 	
 	/*Jesus*/
-	public void onItemDocumento(SelectEvent event)  throws Exception{
+	public void onItemDocumento()  throws Exception{
 					
 					
 		 this.disableBuscar = Boolean.FALSE; 
@@ -256,7 +256,8 @@ public void imprimirComprobanteTicket(Comprobante comprobanteImprimir){
 				linea.setPrecio_venta_unitario_det(det.getPrecio_venta_unitario_det().setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());/*revisar campo*/
 				linea.setValor_item(det.getValor_venta_item_det().setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());
 //				linea.setValor_unitario(det.getProducto().getPrecio_final_editado_cliente().setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());
-				linea.setValor_unitario((((det.getPrecio_venta_unitario_det()).setScale(2, BigDecimal.ROUND_HALF_EVEN).divide((new BigDecimal(det.getCant_unidades_item_det())))).setScale(2, BigDecimal.ROUND_HALF_EVEN)).toString());
+				linea.setValor_unitario((((det.getPrecio_venta_unitario_det()).setScale(2, BigDecimal.ROUND_HALF_EVEN)
+						.divide((det.getCant_unidades_item_det()))).setScale(2, BigDecimal.ROUND_HALF_EVEN)).toString());
 //				(det.getPrecio_venta_unitario_det()).setScale(2, BigDecimal.ROUND_HALF_EVEN).divide(det.getCant_unidades_item_det().setScale(2, BigDecimal.ROUND_HALF_EVEN)).setScale(2, BigDecimal.ROUND_HALF_EVEN)).toString()				
 //				((det.getPrecio_venta_unitario_det()).setScale(2, BigDecimal.ROUND_HALF_EVEN).divide((det.getCant_unidades_item_det()).setScale(2, BigDecimal.ROUND_HALF_EVEN))).setScale(2, BigDecimal.ROUND_HALF_EVEN)).toString()
 				listaDetalleReporte.add(linea);
@@ -1029,7 +1030,8 @@ public void imprimirFacturaTexto(Map<String, Object> input,List<DetalleComproban
 				//linea.setValor_unitario(det.getProducto().getValor_unitario_prod_det().setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());
 				//linea.setValor_unitario(det.getValor_venta_item_det().divide(new BigDecimal(det.getCant_unidades_item_det())).setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());
 				linea.setSuma_tributos_det(det.getSuma_tributos_det().setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());/*vega.com*/
-				linea.setValor_unitario(det.getValor_venta_item_det().divide(new BigDecimal(det.getCant_unidades_item_det()),2 , RoundingMode.HALF_UP).setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());
+				linea.setValor_unitario(det.getValor_venta_item_det()
+						.divide(det.getCant_unidades_item_det(),2 , RoundingMode.HALF_UP).setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());
 				listaDetalleReporte.add(linea);
 			}
 			

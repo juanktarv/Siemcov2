@@ -11,7 +11,7 @@ public class ComprobanteDetalle {
 	private Integer id_emisor;
 	private Integer id_domicilio_fiscal_cab;
 	private Integer tipo_unidad_medida_det;
-	private Integer cant_unidades_item_det;
+	private BigDecimal cant_unidades_item_det;
 	private BigDecimal suma_tributos_det;
 	private BigDecimal precio_venta_unitario_det;
 	private BigDecimal valor_venta_item_det;
@@ -94,11 +94,11 @@ public class ComprobanteDetalle {
 		this.tipo_unidad_medida_det = tipo_unidad_medida_det;
 	}
 
-	public Integer getCant_unidades_item_det() {
+	public BigDecimal getCant_unidades_item_det() {
 		return cant_unidades_item_det;
 	}
 
-	public void setCant_unidades_item_det(Integer cant_unidades_item_det) {
+	public void setCant_unidades_item_det(BigDecimal cant_unidades_item_det) {
 		this.cant_unidades_item_det = cant_unidades_item_det;
 	}
 
