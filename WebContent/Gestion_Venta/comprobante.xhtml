@@ -43,8 +43,12 @@
 						<h:panelGrid columns="3">
 						
 							#{"Cliente:"}
-							<p:autoComplete id="clientePojo" value="#{comprobanteMB.clienteEncontrado.nombre_cab}" completeMethod="#{comprobanteMB.consultarCliente}"
-	                        var="cliente" itemLabel="#{cliente.nombre_cab}" itemValue="#{cliente.nombre_cab}" forceSelection="true" disabled="#{comprobanteMB.ingresarCliente}">
+							<p:autoComplete id="clientePojo" scrollHeight="300" dropdown="true"
+											value="#{comprobanteMB.clienteEncontrado.nombre_cab}" 
+											completeMethod="#{comprobanteMB.consultarCliente}"
+					                        var="cliente" itemLabel="#{cliente.nombre_cab}" 
+					                        itemValue="#{cliente.nombre_cab}" forceSelection="true" 
+					                        disabled="#{comprobanteMB.ingresarCliente}">
 	                         
 	                        	<p:ajax event="itemSelect" listener="#{comprobanteMB.onItemCliente}" update="id_nombre :formAccion"/>
 	                        
@@ -243,14 +247,15 @@
 					<p:panel border="0" header="Buscar producto:">			
 					<h:panelGrid columns="2" border="0">
 						<p:outputLabel value="Código Producto:"></p:outputLabel>
-						<p:autoComplete id="codigoProd" inputStyle="width:300px" 
+						<p:autoComplete id="codigoProd" inputStyle="width:300px" scrollHeight="300" dropdown="true"
 							value="#{comprobanteMB.productoEncontrado.cod_prod_det}" completeMethod="#{comprobanteMB.consultarProductoCod}" 
 							var="codprd" itemLabel="#{codprd.cod_prod_det}" itemValue="#{codprd.cod_prod_det}" forceSelection="true">
 	                        <p:ajax event="itemSelect" listener="#{comprobanteMB.onItemSelectCod}" update=":formProducto:pnOtros productoPojo"/>
 	                    </p:autoComplete>
 	                    
 						<p:outputLabel value="Producto:"></p:outputLabel>						        
-						<p:autoComplete id="productoPojo" inputStyle="width:300px" value="#{comprobanteMB.productoEncontrado.descripcion_prod_det}" completeMethod="#{comprobanteMB.consultarProducto}" 
+						<p:autoComplete id="productoPojo" inputStyle="width:300px" scrollHeight="300" dropdown="true"
+								value="#{comprobanteMB.productoEncontrado.descripcion_prod_det}" completeMethod="#{comprobanteMB.consultarProducto}" 
 						 var="prd" itemLabel="#{prd.descripcion_prod_det}" itemValue="#{prd.descripcion_prod_det}" forceSelection="true">
 	                        <p:ajax event="itemSelect" listener="#{comprobanteMB.onItemSelect}" update=":formProducto:pnOtros codigoProd"/>
 	                    </p:autoComplete>

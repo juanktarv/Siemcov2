@@ -566,6 +566,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			for(int i=0;i<listaComprobanteDetalle.size(); i++){
 				if(this.comprobanteDetalleSelec.getId_producto()==listaComprobanteDetalle.get(i).getId_producto()){
 					this.posicionEdicion=i;
+					break;
 				}
 			}
 		} catch (Exception e) {
@@ -576,10 +577,32 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 	
 	public void eliminarProducto(ComprobanteDetalle detalle){
 		this.comprobanteDetalleSelec=detalle;
+		this.productoEncontrado=this.comprobanteDetalleSelec.getProducto();
+		this.estadoEditarProducto=Boolean.TRUE;
+		try {
+			consultarProductoCod(this.productoEncontrado.getCod_prod_det());
+			for(int i=0;i<listaComprobanteDetalle.size(); i++){
+				if(this.comprobanteDetalleSelec.getId_producto()==listaComprobanteDetalle.get(i).getId_producto()){
+					this.posicionEdicion=i;
+					break;
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void confirmaEliminarProducto(){
-		this.listaComprobanteDetalle.remove(this.comprobanteDetalleSelec);
+		
+			ComprobanteDetalle comprobanteDetallex = this.listaComprobanteDetalle.get(posicionEdicion);
+			this.comprobanteSelec.setSuma_tributos_cab(this.comprobanteSelec.getSuma_tributos_cab().subtract(comprobanteDetallex.getSuma_tributos_det()));
+			this.comprobanteSelec.setTotal_precio_venta_cab(this.comprobanteSelec.getTotal_precio_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+			this.comprobanteSelec.setTotal_valor_venta_cab(this.comprobanteSelec.getTotal_valor_venta_cab().subtract(comprobanteDetallex.getValor_venta_item_det()));
+			this.comprobanteSelec.setImporte_total_venta_cab(this.comprobanteSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+			this.listaComprobanteDetalle.remove(this.comprobanteDetalleSelec);
+			this.estadoEditarProducto=Boolean.FALSE;
+			this.posicionEdicion=-1;
 	}
 	
 	public void adicionarProducto(){
@@ -826,9 +849,10 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 					   				this.comprobanteSelec.setSuma_tributos_cab(this.comprobanteSelec.getSuma_tributos_cab().subtract(comprobanteDetallex.getSuma_tributos_det()));
 					   				this.comprobanteSelec.setTotal_precio_venta_cab(this.comprobanteSelec.getTotal_precio_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
 					   				this.comprobanteSelec.setTotal_valor_venta_cab(this.comprobanteSelec.getTotal_valor_venta_cab().subtract(comprobanteDetallex.getValor_venta_item_det()));
-					   				this.comprobanteSelec.setImporte_total_venta_cab(this.comprobanteSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
-					   			
-				   				this.listaComprobanteDetalle.remove(posicionEdicion);
+					   				this.comprobanteSelec.setImporte_total_venta_cab(this.comprobanteSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));				   			
+					   				this.listaComprobanteDetalle.remove(posicionEdicion);
+					   				this.estadoEditarProducto=Boolean.FALSE;
+					   				this.posicionEdicion=-1;
 				   			}
 				   			
 				   			
@@ -877,9 +901,10 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			   				this.comprobanteSelec.setSuma_tributos_cab(this.comprobanteSelec.getSuma_tributos_cab().subtract(comprobanteDetallex.getSuma_tributos_det()));
 			   				this.comprobanteSelec.setTotal_precio_venta_cab(this.comprobanteSelec.getTotal_precio_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
 			   				this.comprobanteSelec.setTotal_valor_venta_cab(this.comprobanteSelec.getTotal_valor_venta_cab().subtract(comprobanteDetallex.getValor_venta_item_det()));
-			   				this.comprobanteSelec.setImporte_total_venta_cab(this.comprobanteSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
-			   			
-		   				this.listaComprobanteDetalle.remove(posicionEdicion);
+			   				this.comprobanteSelec.setImporte_total_venta_cab(this.comprobanteSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));	   			
+			   				this.listaComprobanteDetalle.remove(posicionEdicion);
+			   				this.estadoEditarProducto=Boolean.FALSE;
+			   				this.posicionEdicion=-1;
 		   			}
 			   			
 			   			this.listaComprobanteDetalle.add(this.comprobanteDetalleSelec);
@@ -902,10 +927,6 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			   			context.update("msgGeneral"); /*vega.com*/
 		   	    		
 		   	    	}
-		   	    	
-		   	    	
-		   	    	
-
    	    	
    	    } catch (Exception e) {
 			e.printStackTrace(); /*vega.com*/

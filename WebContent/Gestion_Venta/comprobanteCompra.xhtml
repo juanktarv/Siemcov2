@@ -43,7 +43,8 @@
 						<h:panelGrid columns="2">
 						
 							#{"Proveedor:"} 
-							<p:autoComplete id="proveedorPojo" value="#{comprobanteCompraMB.proveedorEncontrado.nombre_proveedor}" 
+							<p:autoComplete id="proveedorPojo" scrollHeight="300" dropdown="true"
+											value="#{comprobanteCompraMB.proveedorEncontrado.nombre_proveedor}" 
 											completeMethod="#{comprobanteCompraMB.consultarProveedor}" 
 	                        				var="proveedor" itemLabel="#{proveedor.nombre_proveedor}" 
 	                        				itemValue="#{proveedor.nombre_proveedor}" 
@@ -160,6 +161,24 @@
 						<p:column style="width:70px" headerText="Total">
 							<h:outputText value="#{p.precio_venta_unitario_det}" converter="montoDefaultConverter"/>
 						</p:column>
+						
+						<p:column headerText="Editar/Elim." style="width:5%;text-align: center">					
+									<p:commandButton title="Editar"  update=":dlgDetNuevoProducto" 
+													  oncomplete="PF('dlgNuevoProducto').show();"
+													  actionListener="#{comprobanteCompraMB.editarProducto(p)}"
+													  icon="icon-edit">
+									</p:commandButton> 
+
+									<p:commandButton title="Eliminar"
+													actionListener="#{comprobanteCompraMB.eliminarProducto(p)}" 
+													oncomplete="PF('dlgEliminarProducto').show();"
+													update=":dlgDetEliminarProducto" icon="icon-delete">
+				
+									</p:commandButton>
+								
+						</p:column>	
+						
+						
 					</p:dataTable>
 				</p:panel>
 				
@@ -202,6 +221,21 @@
 							
 			</h:form>
 			
+			<p:confirmDialog id="dlgDetEliminarProducto" appendTo="@(body)"
+					message="¿Desea eliminar este Producto " header="Eliminar Producto"
+					severity="alert" widgetVar="dlgEliminarProducto">
+				<h:form>
+					<p:commandButton value="Eliminar"
+						update=":formAccion" 
+						actionListener="#{comprobanteCompraMB.confirmaEliminarProducto}"
+						oncomplete="PF('dlgEliminarProducto').hide();" icon="icon-delete" />
+
+					<p:commandButton value="Cancelar" type="button"
+						onclick="PF('dlgEliminarProducto').hide()" icon="icon-cancel" />
+
+				</h:form>
+			</p:confirmDialog>
+			
 			<p:dialog header="Adicionar Producto" widgetVar="dlgNuevoProducto" appendTo="@(body)"
 					resizable="false" id="dlgDetNuevoProducto" modal="true">
 					
@@ -211,7 +245,7 @@
 					<h:panelGrid columns="2" border="0">
 						<p:outputLabel value="Código Producto:"></p:outputLabel>
 						
-						<p:autoComplete id="codigoProd" inputStyle="width:300px" 
+						<p:autoComplete id="codigoProd" inputStyle="width:300px" scrollHeight="300" dropdown="true"
 							value="#{comprobanteCompraMB.productoEncontrado.cod_prod_det}" 
 							completeMethod="#{comprobanteCompraMB.consultarProductoCod}" 
 							var="codprd" itemLabel="#{codprd.cod_prod_det}" 
@@ -221,8 +255,12 @@
 	                    </p:autoComplete>
 	                    
 						<p:outputLabel value="Producto:"></p:outputLabel>						        
-						<p:autoComplete id="productoPojo" inputStyle="width:300px" value="#{comprobanteCompraMB.productoEncontrado.descripcion_prod_det}" completeMethod="#{comprobanteCompraMB.consultarProducto}" 
-						 var="prd" itemLabel="#{prd.descripcion_prod_det}" itemValue="#{prd.descripcion_prod_det}" forceSelection="true">
+						<p:autoComplete id="productoPojo" inputStyle="width:300px" scrollHeight="300" dropdown="true"
+									value="#{comprobanteCompraMB.productoEncontrado.descripcion_prod_det}" 
+									completeMethod="#{comprobanteCompraMB.consultarProducto}" 
+						 			var="prd" itemLabel="#{prd.descripcion_prod_det}" 
+						 			itemValue="#{prd.descripcion_prod_det}" 
+						 			forceSelection="true">
 	                        <p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemSelect}" update=":formProducto:pnOtros codigoProd"/>
 	                    </p:autoComplete>
 	                 </h:panelGrid>

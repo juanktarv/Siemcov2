@@ -97,6 +97,8 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
     private boolean ingresarProveedor; /*Jesus*/
 	
 	private List<Cliente>listaClientesFilter;
+	private Boolean estadoEditarProducto;
+	private int posicionEdicion;
 	
 	//datos Log
     private Log log;
@@ -122,11 +124,13 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		this.comprobanteCompraSelec.setTipo_operacion("0101"); /* Jesus Tipo Operacion*/
 		this.comprobanteCompraSelec.setTipo_moneda_cab("PEN"); /* Jesus Tipo Moneda*/
 		this.adicionar = Boolean.TRUE;
+		this.estadoEditarProducto=Boolean.FALSE;
 		//this.comprobanteCompraSelec.setId_vendedor(2);
 		this.productoEncontrado= new Producto();
 		this.productoSelec= new Producto();
 		this.productoService= new ProductoService();
 		this.editarCliente = Boolean.FALSE;
+		this.posicionEdicion=-1;
 		this.tributoProductoService= new TributoProductoService();
 		this.listaComprobanteCompraDetalle= new ArrayList<ComprobanteCompraDetalle>();
 		log = (Log)getSpringBean(Constante.SESSION_LOG);
@@ -157,6 +161,54 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		System.out.println(" nroserie_documento -----> "+this.nroserie_documento);
 		this.comprobanteCompraSelec.setNroserie_documento(this.nroserie_documento);
 	}
+	
+	public void eliminarProducto(ComprobanteCompraDetalle detalle){
+		this.comprobanteCompraDetalleSelec=detalle;
+		this.productoEncontrado=this.comprobanteCompraDetalleSelec.getProducto();
+		this.estadoEditarProducto=Boolean.TRUE;
+		try {
+			consultarProductoCod(this.productoEncontrado.getCod_prod_det());
+			for(int i=0;i<listaComprobanteCompraDetalle.size(); i++){
+				if(this.comprobanteCompraDetalleSelec.getId_producto()==listaComprobanteCompraDetalle.get(i).getId_producto()){
+					this.posicionEdicion=i;
+					break;
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void confirmaEliminarProducto(){
+		
+			ComprobanteCompraDetalle comprobanteDetallex = this.listaComprobanteCompraDetalle.get(posicionEdicion);
+			this.comprobanteCompraSelec.setSuma_tributos_cab(this.comprobanteCompraSelec.getSuma_tributos_cab().subtract(comprobanteDetallex.getSuma_tributos_det()));
+			this.comprobanteCompraSelec.setTotal_precio_venta_cab(this.comprobanteCompraSelec.getTotal_precio_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+			this.comprobanteCompraSelec.setTotal_valor_venta_cab(this.comprobanteCompraSelec.getTotal_valor_venta_cab().subtract(comprobanteDetallex.getValor_venta_item_det()));
+			this.comprobanteCompraSelec.setImporte_total_venta_cab(this.comprobanteCompraSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+			this.listaComprobanteCompraDetalle.remove(this.comprobanteCompraDetalleSelec);
+			this.estadoEditarProducto=Boolean.FALSE;
+			this.posicionEdicion=-1;
+	}
+	
+	public void editarProducto(ComprobanteCompraDetalle detalle){
+		this.comprobanteCompraDetalleSelec=detalle;
+		this.productoEncontrado=this.comprobanteCompraDetalleSelec.getProducto();
+		this.estadoEditarProducto=Boolean.TRUE;
+		try {
+			consultarProductoCod(this.productoEncontrado.getCod_prod_det());
+			for(int i=0;i<listaComprobanteCompraDetalle.size(); i++){
+				if(this.comprobanteCompraDetalleSelec.getId_producto()==listaComprobanteCompraDetalle.get(i).getId_producto()){
+					this.posicionEdicion=i;
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	
 	public void onItemSelect(SelectEvent event)  throws Exception{
 		
@@ -560,6 +612,20 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 				   			this.comprobanteCompraDetalleSelec.setId_domicilio_fiscal_cab(this.comprobanteCompraSelec.getId_domicilio_fiscal_cab());
 				   			this.comprobanteCompraDetalleSelec.setId_modo_pago(this.comprobanteCompraSelec.getId_modo_pago());
 				   			System.out.println("MODO PAGO :"+this.comprobanteCompraSelec.getId_modo_pago());
+				   			
+				   			
+				   			if(this.estadoEditarProducto){
+			   					ComprobanteCompraDetalle comprobanteDetallex = this.listaComprobanteCompraDetalle.get(posicionEdicion);
+				   				this.comprobanteCompraSelec.setSuma_tributos_cab(this.comprobanteCompraSelec.getSuma_tributos_cab().subtract(comprobanteDetallex.getSuma_tributos_det()));
+				   				this.comprobanteCompraSelec.setTotal_precio_venta_cab(this.comprobanteCompraSelec.getTotal_precio_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+				   				this.comprobanteCompraSelec.setTotal_valor_venta_cab(this.comprobanteCompraSelec.getTotal_valor_venta_cab().subtract(comprobanteDetallex.getValor_venta_item_det()));
+				   				this.comprobanteCompraSelec.setImporte_total_venta_cab(this.comprobanteCompraSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));				   			
+				   				this.listaComprobanteCompraDetalle.remove(posicionEdicion);
+				   				this.estadoEditarProducto=Boolean.FALSE;
+				   				this.posicionEdicion=-1;
+			   			}
+				   			
+				   			
 				   			this.listaComprobanteCompraDetalle.add(this.comprobanteCompraDetalleSelec);
 				   			
 				   			this.comprobanteCompraSelec.setSuma_tributos_cab(new BigDecimal("0.00"));
@@ -592,6 +658,19 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 			   			this.comprobanteCompraDetalleSelec.setId_domicilio_fiscal_cab(this.comprobanteCompraSelec.getId_domicilio_fiscal_cab());
 			   			this.comprobanteCompraDetalleSelec.setId_modo_pago(this.comprobanteCompraSelec.getId_modo_pago());
 			   			System.out.println("MODO PAGO :"+this.comprobanteCompraSelec.getId_modo_pago());
+			   			
+			   			if(this.estadoEditarProducto){
+		   					ComprobanteCompraDetalle comprobanteDetallex = this.listaComprobanteCompraDetalle.get(posicionEdicion);
+			   				this.comprobanteCompraSelec.setSuma_tributos_cab(this.comprobanteCompraSelec.getSuma_tributos_cab().subtract(comprobanteDetallex.getSuma_tributos_det()));
+			   				this.comprobanteCompraSelec.setTotal_precio_venta_cab(this.comprobanteCompraSelec.getTotal_precio_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+			   				this.comprobanteCompraSelec.setTotal_valor_venta_cab(this.comprobanteCompraSelec.getTotal_valor_venta_cab().subtract(comprobanteDetallex.getValor_venta_item_det()));
+			   				this.comprobanteCompraSelec.setImporte_total_venta_cab(this.comprobanteCompraSelec.getImporte_total_venta_cab().subtract(comprobanteDetallex.getPrecio_venta_unitario_det()));
+			   				this.listaComprobanteCompraDetalle.remove(posicionEdicion);
+			   				this.estadoEditarProducto=Boolean.FALSE;
+			   				this.posicionEdicion=-1;
+		   			}
+			   			
+			   			
 			   			this.listaComprobanteCompraDetalle.add(this.comprobanteCompraDetalleSelec);
 			   			
 			   			this.comprobanteCompraSelec.setSuma_tributos_cab(new BigDecimal("0.00"));
