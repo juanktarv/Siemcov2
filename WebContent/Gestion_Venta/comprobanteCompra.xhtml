@@ -245,24 +245,33 @@
 					<h:panelGrid columns="2" border="0">
 						<p:outputLabel value="Código Producto:"></p:outputLabel>
 						
-						<p:autoComplete id="codigoProd" inputStyle="width:300px" scrollHeight="300" dropdown="true"
-							value="#{comprobanteCompraMB.productoEncontrado.cod_prod_det}" 
-							completeMethod="#{comprobanteCompraMB.consultarProductoCod}" 
-							var="codprd" itemLabel="#{codprd.cod_prod_det}" 
-							itemValue="#{codprd.cod_prod_det}" forceSelection="true">
-	                        <p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemSelectCod}" 
-	                        		update=":formProducto:pnOtros productoPojo"/>
+						<p:selectOneMenu id="codigoProd" value="#{comprobanteCompraMB.productoEncontrado.cod_prod_det}" panelStyle="width:500px"							
+                         	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
+				            <f:selectItems value="#{comprobanteCompraMB.listaProductos}" 
+				            			   var="codprd" 
+				            			   itemLabel="#{codprd.cod_prod_det}" 
+				            			   itemValue="#{codprd.cod_prod_det}"  forceSelection="true"/>				            			   
+				            <p:column>
+				                <h:outputText value="#{t.cod_prod_det}" />				                
+				            </p:column>
+				            <p:ajax event="change" listener="#{comprobanteCompraMB.onItemSelectCod}" update=":formProducto:pnOtros productoPojo"/>			 				            				            
+				        </p:selectOneMenu>
+						
+					
 	                    </p:autoComplete>
 	                    
-						<p:outputLabel value="Producto:"></p:outputLabel>						        
-						<p:autoComplete id="productoPojo" inputStyle="width:300px" scrollHeight="300" dropdown="true"
-									value="#{comprobanteCompraMB.productoEncontrado.descripcion_prod_det}" 
-									completeMethod="#{comprobanteCompraMB.consultarProducto}" 
-						 			var="prd" itemLabel="#{prd.descripcion_prod_det}" 
-						 			itemValue="#{prd.descripcion_prod_det}" 
-						 			forceSelection="true">
-	                        <p:ajax event="itemSelect" listener="#{comprobanteCompraMB.onItemSelect}" update=":formProducto:pnOtros codigoProd"/>
-	                    </p:autoComplete>
+						<p:outputLabel value="Producto:"></p:outputLabel>
+						<p:selectOneMenu id="productoPojo" value="#{comprobanteCompraMB.productoEncontrado.descripcion_prod_det}" panelStyle="width:500px"							
+                         	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
+				            <f:selectItems value="#{comprobanteMB.listaProductos}" 
+				            			   var="prd" 
+				            			   itemLabel="#{prd.descripcion_prod_det}" 
+				            			   itemValue="#{prd.descripcion_prod_det}"  forceSelection="true"/>				            			   
+				            <p:column>
+				                <h:outputText value="#{t.descripcion_prod_det}" />				                
+				            </p:column>
+				            <p:ajax event="change" listener="#{comprobanteMB.onItemSelect}" update=":formProducto:pnOtros codigoProd"/>			 				            				            
+				        </p:selectOneMenu>		
 	                 </h:panelGrid>
 	                 </p:panel>
 					

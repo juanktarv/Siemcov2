@@ -99,6 +99,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	private List<Cliente>listaClientesFilter;
 	private Boolean estadoEditarProducto;
 	private int posicionEdicion;
+	private List<Producto> listaProductos;
 	
 	//datos Log
     private Log log;
@@ -147,6 +148,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 			this.listTablaTablasDetallesProducto = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_PRODUCTO);
 			this.listaComprobanteCompra = this.comprobanteCompraService.findAll();
 			this.listModoPagos = this.modoPagoService.findAll();
+			this.listaProductos=this.productoService.findAll();
 			this.fechaActual = new Date();
 			System.out.println("CANTIDAD DE MODO PAGOS: "+this.listModoPagos.size());
 			Menu codMenu = menuServices.opcionMenuByPretty("pretty:comprobanteCompra");
@@ -210,21 +212,26 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	}
 
 	
-	public void onItemSelect(SelectEvent event)  throws Exception{
-		
-		String s = event.getObject().toString();
-		List<Producto> allProducts = this.productoService.findAll();
-        List<Producto> filteredProducts = new ArrayList<Producto>();
-				
-		for (int i = 0; i < allProducts.size(); i++) {
-        	Producto skin = allProducts.get(i);
-            if(skin.getDescripcion_prod_det().equals(s)) {
-            	//filteredProducts.add(skin);
-            	this.productoSelec = skin;           	
-            	break;
-            	
-            }
-        }
+	public void onItemSelect()  throws Exception{
+//		
+//		String s = event.getObject().toString();
+//		List<Producto> allProducts = this.productoService.findAll();
+//        List<Producto> filteredProducts = new ArrayList<Producto>();
+//				
+//		for (int i = 0; i < allProducts.size(); i++) {
+//        	Producto skin = allProducts.get(i);
+//            if(skin.getDescripcion_prod_det().equals(s)) {
+//            	//filteredProducts.add(skin);
+//            	this.productoSelec = skin;           	
+//            	break;
+//            	
+//            }
+//        }
+		for(Producto p: this.listaProductos){
+			if(p.getDescripcion_prod_det().trim().toUpperCase().equalsIgnoreCase(this.productoEncontrado.getDescripcion_prod_det().trim().toUpperCase())){
+				this.productoSelec = p;    
+			}
+		}
 				
 		if(this.productoSelec.isValor_unit_incluye_impuestos()== Boolean.FALSE){			
 			  System.out.println("false : " + this.productoSelec.isValor_unit_incluye_impuestos());
@@ -293,7 +300,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		}
 		
 		
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Seleccionado", this.productoSelec.getDescripcion_prod_det()));
     }
 	
 	public List<Proveedores> consultarProveedor(String query) throws Exception {
@@ -319,26 +326,32 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		
 	}
 	
-	public void onItemSelectCod(SelectEvent event)  throws Exception{
+	public void onItemSelectCod()  throws Exception{
 		
-		String s = event.getObject().toString();
+//		String s = event.getObject().toString();
+//		
+//		
+//		
+//		List<Producto> allProducts = this.productoService.findAll();
+//        List<Producto> filteredProducts = new ArrayList<Producto>();
+//		
+//		
+//		for (int i = 0; i < allProducts.size(); i++) {
+//        	Producto skin = allProducts.get(i);
+//            if(skin.getCod_prod_det().equals(s)) {
+//            	//filteredProducts.add(skin);
+//            	this.productoSelec = skin;
+//            	
+//            	break;
+//            	
+//            }
+//        }
 		
-		
-		
-		List<Producto> allProducts = this.productoService.findAll();
-        List<Producto> filteredProducts = new ArrayList<Producto>();
-		
-		
-		for (int i = 0; i < allProducts.size(); i++) {
-        	Producto skin = allProducts.get(i);
-            if(skin.getCod_prod_det().equals(s)) {
-            	//filteredProducts.add(skin);
-            	this.productoSelec = skin;
-            	
-            	break;
-            	
-            }
-        }
+		for(Producto p: this.listaProductos){
+			if(p.getCod_prod_det().trim().toUpperCase().equalsIgnoreCase(this.productoEncontrado.getCod_prod_det().trim().toUpperCase())){
+				this.productoSelec=p;
+			}
+		}
 		
 		
 		if(this.productoSelec.isValor_unit_incluye_impuestos()== Boolean.FALSE){
@@ -413,7 +426,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		}
 		
 		
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Seleccionado", this.productoSelec.getCod_prod_det()));
     }
 	
 	public void calcularMonto(){
@@ -1285,6 +1298,30 @@ public void calcularMontoPrecio(){
 
 	public void setMovimientoProveedorService(MovimientoProveedorService movimientoProveedorService) {
 		this.movimientoProveedorService = movimientoProveedorService;
+	}
+
+	public Boolean getEstadoEditarProducto() {
+		return estadoEditarProducto;
+	}
+
+	public void setEstadoEditarProducto(Boolean estadoEditarProducto) {
+		this.estadoEditarProducto = estadoEditarProducto;
+	}
+
+	public int getPosicionEdicion() {
+		return posicionEdicion;
+	}
+
+	public void setPosicionEdicion(int posicionEdicion) {
+		this.posicionEdicion = posicionEdicion;
+	}
+
+	public List<Producto> getListaProductos() {
+		return listaProductos;
+	}
+
+	public void setListaProductos(List<Producto> listaProductos) {
+		this.listaProductos = listaProductos;
 	}
 	
 }

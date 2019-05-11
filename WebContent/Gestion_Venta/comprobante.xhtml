@@ -158,10 +158,10 @@
 						</p:column>
 						
 						<p:column headerText="Editar/Elim." style="width:5%;text-align: center">					
-									<p:commandButton title="Editar"  update=":dlgDetNuevoProducto" 
-													  oncomplete="PF('dlgNuevoProducto').show();"
-													  actionListener="#{comprobanteMB.editarProducto(p)}"
-													  icon="icon-edit">
+									<p:commandButton title="Editar"  update=":dlgDetNuevoProducto :formProducto:codigoProd" 
+													 actionListener="#{comprobanteMB.editarProducto(p)}"
+													
+													 icon="icon-edit">
 									</p:commandButton> 
 
 									<p:commandButton title="Eliminar"
@@ -240,25 +240,44 @@
 			</p:confirmDialog>
 			
 			<p:dialog header="Adicionar Producto" widgetVar="dlgNuevoProducto" appendTo="@(body)"
-					resizable="false" id="dlgDetNuevoProducto" modal="true">
+					resizable="false" id="dlgDetNuevoProducto" modal="true" closable="false">
 					
 					<h:form id="formProducto">
 					<p:messages showDetail="false" showSummary="true" id="msgNuevo" closable="true"/>
 					<p:panel border="0" header="Buscar producto:">			
 					<h:panelGrid columns="2" border="0">
 						<p:outputLabel value="Código Producto:"></p:outputLabel>
-						<p:autoComplete id="codigoProd" inputStyle="width:300px" scrollHeight="300" dropdown="true"
-							value="#{comprobanteMB.productoEncontrado.cod_prod_det}" completeMethod="#{comprobanteMB.consultarProductoCod}" 
-							var="codprd" itemLabel="#{codprd.cod_prod_det}" itemValue="#{codprd.cod_prod_det}" forceSelection="true">
-	                        <p:ajax event="itemSelect" listener="#{comprobanteMB.onItemSelectCod}" update=":formProducto:pnOtros productoPojo"/>
-	                    </p:autoComplete>
+
+						<p:selectOneMenu id="codigoProd" value="#{comprobanteMB.productoEncontrado.cod_prod_det}" panelStyle="width:500px"							
+                         	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
+				            <f:selectItems value="#{comprobanteMB.listaProductos}" 
+				            			   var="codprd" 
+				            			   itemLabel="#{codprd.cod_prod_det}" 
+				            			   itemValue="#{codprd.cod_prod_det}"  forceSelection="true"/>				            			   
+				            <p:column>
+				                <h:outputText value="#{t.cod_prod_det}" />				                
+				            </p:column>
+				            <p:ajax event="change" listener="#{comprobanteMB.onItemSelectCod}" update=":formProducto:pnOtros productoPojo 
+				            																			precio cantidad desttigv desttisc
+				            																			porcentaje_det monto_isc monto_igv
+				            																			precio_venta_unitario"/>			 				            				            
+				        </p:selectOneMenu>
 	                    
-						<p:outputLabel value="Producto:"></p:outputLabel>						        
-						<p:autoComplete id="productoPojo" inputStyle="width:300px" scrollHeight="300" dropdown="true"
-								value="#{comprobanteMB.productoEncontrado.descripcion_prod_det}" completeMethod="#{comprobanteMB.consultarProducto}" 
-						 var="prd" itemLabel="#{prd.descripcion_prod_det}" itemValue="#{prd.descripcion_prod_det}" forceSelection="true">
-	                        <p:ajax event="itemSelect" listener="#{comprobanteMB.onItemSelect}" update=":formProducto:pnOtros codigoProd"/>
-	                    </p:autoComplete>
+						<p:outputLabel value="Producto:"></p:outputLabel>
+						<p:selectOneMenu id="productoPojo" value="#{comprobanteMB.productoEncontrado.cod_prod_det}" panelStyle="width:500px"							
+                         	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
+				            <f:selectItems value="#{comprobanteMB.listaProductos}" 
+				            			   var="prd" 
+				            			   itemLabel="#{prd.descripcion_prod_det}" 
+				            			   itemValue="#{prd.descripcion_prod_det}"  forceSelection="true"/>				            			   
+				            <p:column>
+				                <h:outputText value="#{t.descripcion_prod_det}" />				                
+				            </p:column>
+				            <p:ajax event="change" listener="#{comprobanteMB.onItemSelect}" update=":formProducto:pnOtros codigoProd 
+				            																			precio cantidad desttigv desttisc
+				            																			porcentaje_det monto_isc monto_igv
+				            																			precio_venta_unitario"/>			 				            				            
+				        </p:selectOneMenu>												        	              
 	                 </h:panelGrid>
 	                 </p:panel>
 					
@@ -348,7 +367,9 @@
 					<p:commandButton value="Guardar" actionListener="#{comprobanteMB.adicionarCompra()}"
 						update=":formAccion msgNuevo" oncomplete="validarNuevoProducto(xhr, status, args)"/>
 					
-					<p:commandButton value="Cancelar" type="button" onclick="PF('dlgNuevoProducto').hide()" icon="icon-cancel" />
+					<p:commandButton value="Cancelar" actionListener="#{comprobanteMB.cancelarAdicion()}" 
+									 update=":formAccion msgNuevo" icon="icon-cancel" 
+									 />
 					</h:form>	
 			</p:dialog>
 			

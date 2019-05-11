@@ -81,6 +81,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 
 	private Comprobante comprobanteSelec;
 	private ComprobanteDetalle comprobanteDetalleSelec;
+	private ComprobanteDetalle auxSelec;
+	private List<ComprobanteDetalle> listaDetalleAux;
 	private List<ComprobanteDetalle> listaComprobanteDetalle;
 	private Cliente clienteEncontrado;
 	private Producto productoEncontrado;
@@ -114,6 +116,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
     private boolean adicionar; /*Jesus*/
     private boolean generarComprobante; /*Jesus*/
     private boolean ingresarCliente; /*Jesus*/
+    
+    private List<Producto>listaProductos;
     
     private MovimientoClienteService movimientoClienteService;
 	
@@ -164,6 +168,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		this.posicionEdicion=-1;
 		
 		this.movimientoClienteService= new MovimientoClienteService();
+		this.listaDetalleAux=new ArrayList<>();
+		this.auxSelec= new ComprobanteDetalle();
 
 		log = (Log)getSpringBean(Constante.SESSION_LOG);
 		logmb = new LogMB();	
@@ -179,6 +185,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			this.comprobanteSelec.setId_emisor(this.emisorSelec.getId_emisor());
 			Menu codMenu = menuServices.opcionMenuByPretty("pretty:comprobante");
 			log.setCod_menu(codMenu.getCod_menu().intValue());
+			this.listaProductos=this.productoService.findAll();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -363,27 +370,36 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		
 	}
 	
-	public void onItemSelectCod(SelectEvent event)  throws Exception{
+	public void onItemSelectCod()  throws Exception{
 		
-		String s = event.getObject().toString();
+//		String s = event.getObject().toString();
+//		
+//		
+//		
+//		List<Producto> allProducts = this.productoService.findAll();
+//        List<Producto> filteredProducts = new ArrayList<Producto>();
+//		
+//		
+//		for (int i = 0; i < allProducts.size(); i++) {
+//        	Producto skin = allProducts.get(i);
+//            if(skin.getCod_prod_det().equals(s)) {
+//            	//filteredProducts.add(skin);
+//            	this.productoSelec = skin;
+//            	
+//            	break;
+//            	
+//            }
+//        }
 		
+		for(Producto p : this.listaProductos){
+			if(p.getCod_prod_det().trim().equals(this.productoEncontrado.getCod_prod_det())){
+				this.productoSelec=p;
+				break;
+			}
+		}
 		
-		
-		List<Producto> allProducts = this.productoService.findAll();
-        List<Producto> filteredProducts = new ArrayList<Producto>();
-		
-		
-		for (int i = 0; i < allProducts.size(); i++) {
-        	Producto skin = allProducts.get(i);
-            if(skin.getCod_prod_det().equals(s)) {
-            	//filteredProducts.add(skin);
-            	this.productoSelec = skin;
-            	
-            	break;
-            	
-            }
-        }
-		
+//		System.out.println(" this.productoEncontrado "+this.productoEncontrado.getCod_prod_det());
+//		this.productoSelec=this.productoEncontrado;
 		
 		if(this.productoSelec.isValor_unit_incluye_impuestos()== Boolean.FALSE){
 			
@@ -415,9 +431,14 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 				this.comprobanteDetalleSelec.setTpOtros(tp);
 			}
 		}
+					System.out.println("this.productoSelec.getValor_unitario_prod_det() "+this.productoSelec.getValor_unitario_prod_det());
+					System.out.println("this.comprobanteDetalleSelec.getMontoIGV()"+this.comprobanteDetalleSelec.getMontoIGV());
 		
-		
-					this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det().add((this.comprobanteDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"):this.comprobanteDetalleSelec.getMontoIGV()).add((this.comprobanteDetalleSelec.getMontoISC() == null ? new BigDecimal("0.00"):this.comprobanteDetalleSelec.getMontoISC()))));					
+					this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(this.productoSelec.getValor_unitario_prod_det().
+							add((this.comprobanteDetalleSelec.getMontoIGV() == null? new BigDecimal("0.00"):
+								this.comprobanteDetalleSelec.getMontoIGV()).
+									add((this.comprobanteDetalleSelec.getMontoISC() == null ? new BigDecimal("0.00"):
+										this.comprobanteDetalleSelec.getMontoISC()))));					
 			
 		}else{
 			
@@ -457,29 +478,36 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		}
 		
 		
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item seleccionado", productoEncontrado.getCod_prod_det()));
     }
 	
-	public void onItemSelect(SelectEvent event)  throws Exception{
+	public void onItemSelect()  throws Exception{
 		
-		String s = event.getObject().toString();
+//		String s = event.getObject().toString();
+//		
+//		
+//		
+//		List<Producto> allProducts = this.productoService.findAll();
+//        List<Producto> filteredProducts = new ArrayList<Producto>();
+//		
+//		
+//		for (int i = 0; i < allProducts.size(); i++) {
+//        	Producto skin = allProducts.get(i);
+//            if(skin.getDescripcion_prod_det().equals(s)) {
+//            	//filteredProducts.add(skin);
+//            	this.productoSelec = skin;
+//            	
+//            	break;
+//            	
+//            }
+//        }
 		
-		
-		
-		List<Producto> allProducts = this.productoService.findAll();
-        List<Producto> filteredProducts = new ArrayList<Producto>();
-		
-		
-		for (int i = 0; i < allProducts.size(); i++) {
-        	Producto skin = allProducts.get(i);
-            if(skin.getDescripcion_prod_det().equals(s)) {
-            	//filteredProducts.add(skin);
-            	this.productoSelec = skin;
-            	
-            	break;
-            	
-            }
-        }
+		for(Producto p : this.listaProductos){
+			if(p.getDescripcion_prod_det().toUpperCase().trim().equalsIgnoreCase(this.productoEncontrado.getDescripcion_prod_det().toUpperCase().trim())){
+				this.productoSelec=p;
+				break;
+			}
+		}
 		
 		
 		if(this.productoSelec.isValor_unit_incluye_impuestos()== Boolean.FALSE){
@@ -554,21 +582,84 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		}
 		
 		
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Seleccionado", this.productoSelec.getDescripcion_prod_det()));
     }
 	
 	public void editarProducto(ComprobanteDetalle detalle){
+		
+		RequestContext context = RequestContext.getCurrentInstance();
+		this.auxSelec=detalle;
+		this.listaDetalleAux=this.listaComprobanteDetalle;
+		System.out.println("editarProducto ----> this.listaDetalleAux "+this.listaDetalleAux.size());
+		System.out.println(" editarProducto-------------->this.auxSelec.getCant_unidades_item_det()"+this.auxSelec.getCant_unidades_item_det());
 		this.comprobanteDetalleSelec=detalle;
-		this.productoEncontrado=this.comprobanteDetalleSelec.getProducto();
+		
+		for(Producto p : this.listaProductos){
+			if(p.getCod_prod_det().trim().toUpperCase().equals(this.comprobanteDetalleSelec.getProducto().getCod_prod_det().trim().toUpperCase())){
+				this.productoEncontrado=p;
+				break;
+			}
+		}
+		this.productoSelec=this.productoEncontrado;
+		this.comprobanteDetalleSelec.setProducto(this.productoEncontrado);
+		this.comprobanteDetalleSelec.setId_producto(this.productoEncontrado.getId_producto());
+		
 		this.estadoEditarProducto=Boolean.TRUE;
 		try {
-			consultarProductoCod(this.productoEncontrado.getCod_prod_det());
+			
 			for(int i=0;i<listaComprobanteDetalle.size(); i++){
 				if(this.comprobanteDetalleSelec.getId_producto()==listaComprobanteDetalle.get(i).getId_producto()){
 					this.posicionEdicion=i;
 					break;
 				}
 			}
+			RequestContext.getCurrentInstance().execute("PF('dlgNuevoProducto').show()");
+			context.update("msgNuevo");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		detalle=null;
+	}
+	
+	public void cancelarAdicion(){
+		RequestContext context = RequestContext.getCurrentInstance();
+		
+		System.out.println(" this.listaComprobanteDetalle.size() "+this.listaComprobanteDetalle.size());
+		
+		System.out.println(" cancelarAdicion: cantidad ----------->comprobanteDetalleSelec"+this.comprobanteDetalleSelec.getCant_unidades_item_det());
+		
+		for(int i=0; i<this.listaComprobanteDetalle.size();i++){
+			ComprobanteDetalle det= this.listaComprobanteDetalle.get(i);
+			if(det.getId_producto()==this.comprobanteDetalleSelec.getId_producto()){
+				System.out.println(" det.getProducto().getDescripcion_prod_det()"+det.getProducto().getDescripcion_prod_det());
+				this.listaComprobanteDetalle.remove(i);
+			}
+		}
+		
+//		for(ComprobanteDetalle det: this.listaComprobanteDetalle){
+//			if(det.getId_producto()==this.comprobanteDetalleSelec.getId_producto()){
+//				System.out.println(" det.getProducto().getDescripcion_prod_det()==========>"+det.getProducto().getDescripcion_prod_det());
+//				this.listaComprobanteDetalle.remove(det);
+//			}
+//		}
+		
+		
+		System.out.println(" cancelarAdicion : cantidad ----------->comprobanteDetalleSelecAux"+this.auxSelec.getCant_unidades_item_det());
+		this.listaComprobanteDetalle.add(this.auxSelec);
+		this.listaComprobanteDetalle=this.listaDetalleAux;
+
+		
+		this.auxSelec= new ComprobanteDetalle();
+		this.comprobanteDetalleSelec=new ComprobanteDetalle();
+		this.productoEncontrado=new Producto();
+		this.estadoEditarProducto=Boolean.FALSE;
+		this.productoSelec= new Producto();
+		try {			
+			this.posicionEdicion=-1;
+			RequestContext.getCurrentInstance().execute("PF('dlgNuevoProducto').hide()");
+			context.update("msgNuevo");
+			context.update("msgGeneral"); 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -627,16 +718,14 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			
 		}catch(Exception e){
 			e.getMessage(); 
-		}
-		
-		
+		}	
 	}
-	
-	
-	
+		
 	public void calcularMonto(){
 		Producto p=new Producto();
 		try {
+//			this.auxSelec=this.comprobanteDetalleSelec;
+			System.out.println("calcularMonto----------------ANTES :> this.auxSelec.getCant_unidades_item_det()"+this.auxSelec.getCant_unidades_item_det());
 			p = this.productoService.findById(this.comprobanteDetalleSelec.getId_producto());
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -652,7 +741,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 				}else{
 					this.comprobanteDetalleSelec.setValor_venta_item_det(this.productoSelec.getPrecio_final_editado_cliente()
 							.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
-					this.comprobanteDetalleSelec.setMontoISC(tp.getPorcentaje_det().multiply(this.comprobanteDetalleSelec.getValor_venta_item_det()));
+					this.comprobanteDetalleSelec.setMontoISC(tp.getPorcentaje_det()
+							.multiply(this.comprobanteDetalleSelec.getValor_venta_item_det()));
 				}
 				
 				this.comprobanteDetalleSelec.setMontoISC(this.comprobanteDetalleSelec.getMontoISC()
@@ -666,7 +756,8 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 							.multiply(this.comprobanteDetalleSelec.getCant_unidades_item_det()));
 					
 //					System.out.println("TOTAL:---->"+this.comprobanteDetalleSelec.getPrecio_venta_unitario_det());
-					BigDecimal per=(tp.getPorcentaje_det().add(new BigDecimal("100.00"))).divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
+					BigDecimal per=(tp.getPorcentaje_det().add(new BigDecimal("100.00")))
+									.divide(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
 							
 							
 					
@@ -702,6 +793,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			}
 			
 		}
+		System.out.println("calcularMonto----------------> DESPUES : this.auxSelec.getCant_unidades_item_det()"+this.auxSelec.getCant_unidades_item_det());
 		
 	}
 	
@@ -1809,6 +1901,46 @@ public void imprimirFactura(Map<String, Object> input,List<DetalleComprobanteRep
 
 	public void setListaVendedores(List<Vendedor> listaVendedores) {
 		this.listaVendedores = listaVendedores;
+	}
+
+	public int getPosicionEdicion() {
+		return posicionEdicion;
+	}
+
+	public void setPosicionEdicion(int posicionEdicion) {
+		this.posicionEdicion = posicionEdicion;
+	}
+
+	public List<Producto> getListaProductos() {
+		return listaProductos;
+	}
+
+	public void setListaProductos(List<Producto> listaProductos) {
+		this.listaProductos = listaProductos;
+	}
+
+	public MovimientoClienteService getMovimientoClienteService() {
+		return movimientoClienteService;
+	}
+
+	public void setMovimientoClienteService(MovimientoClienteService movimientoClienteService) {
+		this.movimientoClienteService = movimientoClienteService;
+	}
+
+	public Boolean getEstadoEditarProducto() {
+		return estadoEditarProducto;
+	}
+
+	public void setEstadoEditarProducto(Boolean estadoEditarProducto) {
+		this.estadoEditarProducto = estadoEditarProducto;
+	}
+
+	public ComprobanteDetalle getAuxSelec() {
+		return auxSelec;
+	}
+
+	public void setAuxSelec(ComprobanteDetalle auxSelec) {
+		this.auxSelec = auxSelec;
 	}
 
 	
