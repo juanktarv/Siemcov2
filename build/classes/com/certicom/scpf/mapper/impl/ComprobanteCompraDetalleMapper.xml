@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.certicom.scpf.mapper.ComprobanteCompraDetalleMapper">
+
+<resultMap id="comprobanteCompraDetalleResult" type="com.certicom.scpf.domain.ComprobanteCompraDetalle">
+	<id column="id_comprobante_compra" property="id_comprobante_compra"/>
+	<result column="tipo_comprobante" property="tipo_comprobante"/>
+	<result column="id_proveedor" property="id_proveedor"/>
+	<result column="id_producto" property="id_producto"/>
+	<result column="id_tipo_producto" property="id_tipo_producto"/>
+	<result column="id_almacen" property="id_almacen"/>
+	<result column="tipo_unidad_medida_det" property="tipo_unidad_medida_det"/>
+	<result column="cant_unidades_item_det" property="cant_unidades_item_det"/>
+	<result column="suma_tributos_det" property="suma_tributos_det"/>
+	<result column="descuento" property="descuento"/>
+	<result column="precio_venta_unitario_costo" property="precio_venta_unitario_costo"/>
+	<result column="valor_venta_item" property="valor_venta_item"/>
+	<result column="valor_referencial_unit" property="valor_referencial_unit"/>
+	<result column="monto_tributo_igv" property="monto_tributo_igv"/>
+	<result column="base_imponible_igv" property="base_imponible_igv"/>
+    <result column="base_imponible_isc" property="base_imponible_isc"/>
+    <result column="monto_tributo_otros" property="monto_tributo_otros"/>
+    <result column="base_imponible_otros" property="base_imponible_otros"/>
+	<association property="producto" column="id_producto" select="selectProducto"/>
+	
+</resultMap>
+
+	<select id="selectProducto" parameterType="int" resultType="com.certicom.scpf.domain.Producto">
+		 SELECT p.*, (select ttd.descripcion_largo from t_tabla_tablas_detalle ttd where ttd.codigo_catalogo = p.unidad_medida_det ) as desUnidadMedida
+		 FROM t_producto p WHERE p.id_producto=#{id_producto}
+	</select>
+	
+	<select id="findByIdComprobanteCompra" resultMap="comprobanteCompraDetalleResult">
+		select e.*, p.* 
+		from t_comprobante_compra_detalle e 
+		inner join t_producto p on p.id_producto=e.id_producto 
+		where e.id_comprobante = #{id_comprobante_compra}
+	</select>
+
+
+</mapper>	

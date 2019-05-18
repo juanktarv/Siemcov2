@@ -371,26 +371,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 	}
 	
 	public void onItemSelectCod()  throws Exception{
-		
-//		String s = event.getObject().toString();
-//		
-//		
-//		
-//		List<Producto> allProducts = this.productoService.findAll();
-//        List<Producto> filteredProducts = new ArrayList<Producto>();
-//		
-//		
-//		for (int i = 0; i < allProducts.size(); i++) {
-//        	Producto skin = allProducts.get(i);
-//            if(skin.getCod_prod_det().equals(s)) {
-//            	//filteredProducts.add(skin);
-//            	this.productoSelec = skin;
-//            	
-//            	break;
-//            	
-//            }
-//        }
-		
+
 		for(Producto p : this.listaProductos){
 			if(p.getCod_prod_det().trim().equals(this.productoEncontrado.getCod_prod_det())){
 				this.productoSelec=p;
@@ -398,17 +379,14 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			}
 		}
 		
-//		System.out.println(" this.productoEncontrado "+this.productoEncontrado.getCod_prod_det());
-//		this.productoSelec=this.productoEncontrado;
+		this.productoEncontrado=this.productoService.findById(this.productoSelec.getId_producto());
 		
 		if(this.productoSelec.isValor_unit_incluye_impuestos()== Boolean.FALSE){
 			
-			        System.out.println("Everd es  false : " + this.productoSelec.isValor_unit_incluye_impuestos());
-			        
-			        this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); /*Jesus*/
-			
-		this.comprobanteDetalleSelec.setId_producto(this.productoSelec.getId_producto());
-		this.comprobanteDetalleSelec.setProducto(this.productoSelec);
+			System.out.println("Producto incluye impuesto : " + this.productoSelec.isValor_unit_incluye_impuestos());			        
+			this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); /*Jesus*/			
+			this.comprobanteDetalleSelec.setId_producto(this.productoSelec.getId_producto());
+			this.comprobanteDetalleSelec.setProducto(this.productoSelec);
 		
 		
 		this.listTributoProductos = this.tributoProductoService.findByIdProducto(this.productoSelec.getId_producto());
@@ -442,7 +420,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			
 		}else{
 			
-			        System.out.println("Everd es  true : " + this.productoSelec.isValor_unit_incluye_impuestos());
+			        System.out.println("Producto incluye impuesto: " + this.productoSelec.isValor_unit_incluye_impuestos());
 			        this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); /*Jesus*/
 			
 					this.comprobanteDetalleSelec.setId_producto(this.productoSelec.getId_producto());
@@ -478,30 +456,10 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		}
 		
 		
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item seleccionado", productoEncontrado.getCod_prod_det()));
+//        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item seleccionado"+ this.productoEncontrado.getCod_prod_det()));
     }
 	
 	public void onItemSelect()  throws Exception{
-		
-//		String s = event.getObject().toString();
-//		
-//		
-//		
-//		List<Producto> allProducts = this.productoService.findAll();
-//        List<Producto> filteredProducts = new ArrayList<Producto>();
-//		
-//		
-//		for (int i = 0; i < allProducts.size(); i++) {
-//        	Producto skin = allProducts.get(i);
-//            if(skin.getDescripcion_prod_det().equals(s)) {
-//            	//filteredProducts.add(skin);
-//            	this.productoSelec = skin;
-//            	
-//            	break;
-//            	
-//            }
-//        }
-		
 		for(Producto p : this.listaProductos){
 			if(p.getDescripcion_prod_det().toUpperCase().trim().equalsIgnoreCase(this.productoEncontrado.getDescripcion_prod_det().toUpperCase().trim())){
 				this.productoSelec=p;
@@ -509,15 +467,14 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			}
 		}
 		
+		this.productoEncontrado=this.productoService.findById(this.productoSelec.getId_producto());
 		
 		if(this.productoSelec.isValor_unit_incluye_impuestos()== Boolean.FALSE){
 			
-			        System.out.println("Everd es  false : " + this.productoSelec.isValor_unit_incluye_impuestos());
-			        
-			        this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); /*Jesus*/
-			
-		this.comprobanteDetalleSelec.setId_producto(this.productoSelec.getId_producto());
-		this.comprobanteDetalleSelec.setProducto(this.productoSelec);
+			System.out.println("Producto incluye impuesto : " + this.productoSelec.isValor_unit_incluye_impuestos());
+			this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); /*Jesus*/			
+			this.comprobanteDetalleSelec.setId_producto(this.productoSelec.getId_producto());
+			this.comprobanteDetalleSelec.setProducto(this.productoSelec);
 		
 		
 		this.listTributoProductos = this.tributoProductoService.findByIdProducto(this.productoSelec.getId_producto());
@@ -546,7 +503,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			
 		}else{
 			
-			        System.out.println("Everd es  true : " + this.productoSelec.isValor_unit_incluye_impuestos());
+			        System.out.println("Producto incluye impuesto : " + this.productoSelec.isValor_unit_incluye_impuestos());
 			        this.productoSelec.setPrecio_final_editado_cliente(this.productoSelec.getValor_unitario_prod_det()); /*Jesus*/
 			
 					this.comprobanteDetalleSelec.setId_producto(this.productoSelec.getId_producto());
@@ -582,30 +539,40 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		}
 		
 		
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Seleccionado", this.productoSelec.getDescripcion_prod_det()));
+//        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Seleccionado"+this.productoSelec.getDescripcion_prod_det()));
     }
 	
 	public void editarProducto(ComprobanteDetalle detalle){
 		
 		RequestContext context = RequestContext.getCurrentInstance();
 		this.auxSelec=detalle;
+		
 		this.listaDetalleAux=this.listaComprobanteDetalle;
+		
 		System.out.println("editarProducto ----> this.listaDetalleAux "+this.listaDetalleAux.size());
 		System.out.println(" editarProducto-------------->this.auxSelec.getCant_unidades_item_det()"+this.auxSelec.getCant_unidades_item_det());
 		this.comprobanteDetalleSelec=detalle;
 		
-		for(Producto p : this.listaProductos){
-			if(p.getCod_prod_det().trim().toUpperCase().equals(this.comprobanteDetalleSelec.getProducto().getCod_prod_det().trim().toUpperCase())){
-				this.productoEncontrado=p;
-				break;
-			}
+		try {
+			this.productoEncontrado=this.productoService.findById(this.comprobanteDetalleSelec.getId_producto());
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		this.productoSelec=this.productoEncontrado;
+				
+		this.productoSelec=this.productoEncontrado;	
 		this.comprobanteDetalleSelec.setProducto(this.productoEncontrado);
 		this.comprobanteDetalleSelec.setId_producto(this.productoEncontrado.getId_producto());
-		
 		this.estadoEditarProducto=Boolean.TRUE;
-		try {
+		try {			
+			onItemSelectCod();
+			onItemSelect();		
+		
+			this.comprobanteDetalleSelec.setCant_unidades_item_det(detalle.getCant_unidades_item_det());
+			this.comprobanteDetalleSelec.setPrecio_venta_unitario_det(detalle.getValor_venta_item_det());
+			this.comprobanteDetalleSelec.setMontoIGV(detalle.getMontoIGV());
+			
+			calcularMonto();
 			
 			for(int i=0;i<listaComprobanteDetalle.size(); i++){
 				if(this.comprobanteDetalleSelec.getId_producto()==listaComprobanteDetalle.get(i).getId_producto()){
@@ -619,36 +586,19 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		detalle=null;
+		
 	}
 	
 	public void cancelarAdicion(){
-		RequestContext context = RequestContext.getCurrentInstance();
 		
-		System.out.println(" this.listaComprobanteDetalle.size() "+this.listaComprobanteDetalle.size());
-		
-		System.out.println(" cancelarAdicion: cantidad ----------->comprobanteDetalleSelec"+this.comprobanteDetalleSelec.getCant_unidades_item_det());
-		
-		for(int i=0; i<this.listaComprobanteDetalle.size();i++){
-			ComprobanteDetalle det= this.listaComprobanteDetalle.get(i);
-			if(det.getId_producto()==this.comprobanteDetalleSelec.getId_producto()){
-				System.out.println(" det.getProducto().getDescripcion_prod_det()"+det.getProducto().getDescripcion_prod_det());
-				this.listaComprobanteDetalle.remove(i);
-			}
+		System.out.println("cancelarAdicion--->");
+		if(this.estadoEditarProducto){
+			this.listaComprobanteDetalle=this.listaDetalleAux;		
+			System.out.println(" this.listaComprobanteDetalle.size() "+this.listaComprobanteDetalle.size());		
+			System.out.println(" cancelarAdicion: cantidad ----------->comprobanteDetalleSelec"+this.comprobanteDetalleSelec.getCant_unidades_item_det());		
+			System.out.println(" cancelarAdicion : cantidad ----------->comprobanteDetalleSelecAux"+this.auxSelec.getCant_unidades_item_det());
+//			this.listaComprobanteDetalle.add(this.auxSelec);
 		}
-		
-//		for(ComprobanteDetalle det: this.listaComprobanteDetalle){
-//			if(det.getId_producto()==this.comprobanteDetalleSelec.getId_producto()){
-//				System.out.println(" det.getProducto().getDescripcion_prod_det()==========>"+det.getProducto().getDescripcion_prod_det());
-//				this.listaComprobanteDetalle.remove(det);
-//			}
-//		}
-		
-		
-		System.out.println(" cancelarAdicion : cantidad ----------->comprobanteDetalleSelecAux"+this.auxSelec.getCant_unidades_item_det());
-		this.listaComprobanteDetalle.add(this.auxSelec);
-		this.listaComprobanteDetalle=this.listaDetalleAux;
-
 		
 		this.auxSelec= new ComprobanteDetalle();
 		this.comprobanteDetalleSelec=new ComprobanteDetalle();
@@ -656,10 +606,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		this.estadoEditarProducto=Boolean.FALSE;
 		this.productoSelec= new Producto();
 		try {			
-			this.posicionEdicion=-1;
-			RequestContext.getCurrentInstance().execute("PF('dlgNuevoProducto').hide()");
-			context.update("msgNuevo");
-			context.update("msgGeneral"); 
+			this.posicionEdicion=-1; 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -699,6 +646,25 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 	public void adicionarProducto(){
 		this.productoEncontrado = new Producto();
 		this.comprobanteDetalleSelec = new ComprobanteDetalle();
+		if(this.listaProductos.size()>0){
+			try {
+				this.productoEncontrado=this.productoService.findById(this.listaProductos.get(0).getId_producto());
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			this.productoSelec=this.productoEncontrado;
+			this.comprobanteDetalleSelec.setProducto(this.productoEncontrado);
+			this.comprobanteDetalleSelec.setId_producto(this.productoEncontrado.getId_producto());
+			try {
+				onItemSelectCod();
+				onItemSelect();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		
 	}
 	
@@ -725,7 +691,9 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		Producto p=new Producto();
 		try {
 //			this.auxSelec=this.comprobanteDetalleSelec;
-			System.out.println("calcularMonto----------------ANTES :> this.auxSelec.getCant_unidades_item_det()"+this.auxSelec.getCant_unidades_item_det());
+			if(this.estadoEditarProducto){
+				System.out.println("calcularMonto--ANTES :> this.auxSelec:"+this.auxSelec.getCant_unidades_item_det());
+			}
 			p = this.productoService.findById(this.comprobanteDetalleSelec.getId_producto());
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -793,8 +761,9 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 			}
 			
 		}
-		System.out.println("calcularMonto----------------> DESPUES : this.auxSelec.getCant_unidades_item_det()"+this.auxSelec.getCant_unidades_item_det());
-		
+		if(this.estadoEditarProducto){
+			System.out.println("calcularMonto--> DESPUES : this.auxSelec: "+this.auxSelec.getCant_unidades_item_det());
+		}
 	}
 	
 	/*Inicio Jesus*/
@@ -923,7 +892,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		   	    	System.out.println("Entra a adicionarCompra");
 		   	    	
 		   	    	if(this.comprobanteDetalleSelec.getProducto().getTipo_articulo().equals("Producto")){
-		   	    		if( this.comprobanteDetalleSelec.getProducto().getStock().compareTo(this.comprobanteDetalleSelec.getCant_unidades_item_det())==1){
+		   	    		if( this.comprobanteDetalleSelec.getProducto().getStock().compareTo(this.comprobanteDetalleSelec.getCant_unidades_item_det())>=0){
 		   	    		    
 		   	    		    valido=Boolean.TRUE;
 				   	 		RequestContext context = RequestContext.getCurrentInstance();  
@@ -1057,6 +1026,10 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 					this.comprobanteSelec.setEstado_comunicacion_baja(Boolean.FALSE);
 					this.comprobanteSelec.setCorrelativo(this.comprobanteService.getCorrelativoComprobante(this.comprobanteSelec.getTipo_comprobante()));
 					this.comprobanteSelec.setEstado_sunat(Constante.ESTADO_PENDIENTE);
+					
+					//REDONDEO DE LOS 3 ULTIMOS DECIMALES A 2 DECIMALES
+					this.comprobanteSelec.setImporte_total_venta_cab(Utils.redondeoImporteTotal(this.comprobanteSelec.getImporte_total_venta_cab()));
+					
 					this.comprobanteService.crearComprobanteSec(this.comprobanteSelec);
 					int id = this.comprobanteService.getSecIdComprobante();
 					System.out.println("ID: "+id);
@@ -1151,6 +1124,9 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 					this.comprobanteSelec.setEstado_comunicacion_baja(Boolean.FALSE);
 					this.comprobanteSelec.setCorrelativo(this.comprobanteService.getCorrelativoComprobante(this.comprobanteSelec.getTipo_comprobante()));
 					this.comprobanteSelec.setEstado_sunat(Constante.ESTADO_PENDIENTE);
+//					//REDONDEO DE LOS 3 ULTIMOS DECIMALES A 2 DECIMALES
+					this.comprobanteSelec.setImporte_total_venta_cab(Utils.redondeoImporteTotal(this.comprobanteSelec.getImporte_total_venta_cab()));
+					
 					this.comprobanteService.crearComprobanteSec(this.comprobanteSelec);
 					int id = this.comprobanteService.getSecIdComprobante();
 					System.out.println("ID: "+id);

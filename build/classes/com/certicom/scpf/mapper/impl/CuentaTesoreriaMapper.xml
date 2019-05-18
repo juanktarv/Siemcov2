@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Vega.com -->
+<mapper namespace="com.certicom.scpf.mapper.CuentaTesoreriaMapper">
+	
+<resultMap id="cuentaTesoseriaResult" type="com.certicom.scpf.domain.CuentaTesoreria">
+	<id column="id_cuenta_tesoreria" property="id_cuenta_tesoreria"/>
+	<result column="id_domicilio_fiscal_cab" property="id_domicilio_fiscal_cab"/> 
+	<result column="id_emisor" property="id_emisor"/> 
+	<result column="banco" property="banco"/> 
+	<result column="cuenta" property="cuenta"/> 
+	<result column="tipo_moneda" property="tipo_moneda"/> 
+	<result column="tipo_cuenta" property="tipo_cuenta"/> 
+	<result column="saldo" property="saldo"/> 
+	<result column="fecha_saldo" property="fecha_saldo"/> 
+	
+	<result column="deslargoBanco" property="deslargoBanco"/>
+	<result column="descortoBanco" property="descortoBanco"/>
+	<result column="descTipoCuenta" property="descTipoCuenta"/>
+</resultMap>
+
+<select id="findAll" resultMap="cuentaTesoseriaResult">
+	select c.*,tdi.descripcion_largo as deslargoBanco,tdi.descripcion_corto as descortoBanco, tc.descripcion_corto as descTipoCuenta
+	from t_cuenta_tesoreria c
+	inner join t_tabla_tablas_detalle tdi on  cast (c.banco as varchar) = tdi.codigo_catalogo  and tdi.id_maestra=61
+	inner join t_tabla_tablas_detalle tc on  cast (c.tipo_cuenta as varchar) = tc.codigo_catalogo  and tc.id_maestra=62
+	order by id_cuenta_tesoreria asc
+
+	</select>
+
+</mapper>	

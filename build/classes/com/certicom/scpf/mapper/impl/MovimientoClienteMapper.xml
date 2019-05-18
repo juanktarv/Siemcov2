@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.certicom.scpf.mapper.MovimientoClienteMapper">
+<resultMap id="movimientoClienteResult" type="com.certicom.scpf.domain.MovimientoClientes">
+	<id column="id_comprobante" property="id_comprobante"/>
+	<result column="id_cliente" property="id_cliente"/>
+	<result column="tipo_comprobante" property="tipo_comprobante"/>
+	<result column="id_modo_pago" property="id_modo_pago"/>
+	<result column="id_emisor" property="id_emisor"/>
+	<result column="fecha_movimiento" property="fecha_movimiento"/>
+	<result column="fecha_vencimiento" property="fecha_vencimiento"/>
+	<result column="tipo_documento" property="tipo_documento"/>
+	<result column="importe" property="importe"/>
+	<result column="nroserie_documento" property="nroserie_documento"/>
+	<result column="flag_regularizado" property="flag_regularizado"/>
+	<result column="formapago" property="formapago"/>
+	<result column="saldopagado" property="saldopagado"/>
+	
+	<association property="cliente" column="id_cliente" select="selectCliente"/>
+	<association property="comprobante" column="id_comprobante" select="selectComprobante"/>
+
+</resultMap>
+
+	<select id="selectCliente" parameterType="int" resultType="com.certicom.scpf.domain.Cliente">
+		SELECT * FROM t_cliente WHERE id_cliente=#{id_cliente}
+	</select>
+	
+	<select id="selectComprobante" parameterType="int" resultType="com.certicom.scpf.domain.Comprobante">
+		SELECT * FROM t_comprobante WHERE id_comprobante=#{id_comprobante}
+	</select>
+
+	<select id="listComprobantesByAnioMesTipoPAGINATOR" resultMap="movimientoClienteResult">
+		select m.*, com.* from t_movimiento_clientes m 
+	  	inner join t_comprobante com on com.id_comprobante=m.id_comprobante
+	  	where m.tipo_comprobante like ('%' || #{tipo_comprobante} || '%')
+	  	and to_char( m.fecha_movimiento, 'MM') like ('%' ||#{mes}|| '%')
+	  	and to_char( m.fecha_movimiento, 'yyyy') like ('%' ||#{anio}|| '%')
+	  	
+	  		 
+	</select>
+	
+	<select id="countCompByAnioMesTipoPAGINATOR"  resultType="java.lang.Integer">
+		select count(*) t_movimiento_clientes
+	</select>
+
+
+</mapper>	

@@ -40,9 +40,9 @@
 				
 				<p:panel>
 					<h:panelGrid id="idValoresCabecera">
-						<h:panelGrid columns="3">
+						<h:panelGrid columns="5" cellpadding="10">
 						
-							#{"Cliente:"}
+							<p:outputLabel value="Cliente"></p:outputLabel>
 							<p:autoComplete id="clientePojo" scrollHeight="300" dropdown="true"
 											value="#{comprobanteMB.clienteEncontrado.nombre_cab}" 
 											completeMethod="#{comprobanteMB.consultarCliente}"
@@ -54,10 +54,12 @@
 	                        
 	                        </p:autoComplete>
 	                        
-	                        <p:outputLabel value=" #{comprobanteMB.clienteEncontrado.desTipoDocumento}  #{comprobanteMB.clienteEncontrado.numero_docu_iden_cab}" id="id_nombre"
-								style="width:200px ;font-size:15px; color:blue" />	
+	                       
 							
 						</h:panelGrid>
+						 <p:outputLabel value="#{comprobanteMB.clienteEncontrado.desTipoDocumento} #{comprobanteMB.clienteEncontrado.numero_docu_iden_cab}" id="id_nombre"
+								style="width:500px ;font-size:15px; color:blue; text-align:left" />	
+								
 						<h:panelGrid columns="6" id="pnFields">
 						
 							#{"Numero del Documento:"} 
@@ -264,7 +266,7 @@
 				        </p:selectOneMenu>
 	                    
 						<p:outputLabel value="Producto:"></p:outputLabel>
-						<p:selectOneMenu id="productoPojo" value="#{comprobanteMB.productoEncontrado.cod_prod_det}" panelStyle="width:500px"							
+						<p:selectOneMenu id="productoPojo" value="#{comprobanteMB.productoEncontrado.descripcion_prod_det}" panelStyle="width:500px"							
                          	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
 				            <f:selectItems value="#{comprobanteMB.listaProductos}" 
 				            			   var="prd" 
@@ -299,7 +301,8 @@
 								required="true" label="precio" requiredMessage="Se necesita una precio"
 								style="width:200px;" >
 								<f:convertNumber pattern="#0.00" />
-								<p:ajax  listener="#{comprobanteMB.calcularMontoPrecio()}" update=":formProducto:pnOtros" />
+								<p:ajax  listener="#{comprobanteMB.calcularMontoPrecio()}" update="desttisc porcentaje_det monto_isc monto_igv
+				            																	  precio_venta_unitario" />
 							</p:inputText>	
 							
 							
@@ -307,7 +310,8 @@
 							<p:inputText value="#{comprobanteMB.comprobanteDetalleSelec.cant_unidades_item_det}" id="cantidad"
 								required="true" label="cantidad" requiredMessage="Se necesita una cantidad"
 								style="width:200px;" >
-								<p:ajax  listener="#{comprobanteMB.calcularMonto()}" update=":formProducto:pnOtros" />
+								<p:ajax  listener="#{comprobanteMB.calcularMonto()}"  update="desttisc porcentaje_det monto_isc monto_igv
+				            																			precio_venta_unitario"/>
 							</p:inputText>
 							
 							#{"Num Serie:"}
@@ -368,7 +372,8 @@
 						update=":formAccion msgNuevo" oncomplete="validarNuevoProducto(xhr, status, args)"/>
 					
 					<p:commandButton value="Cancelar" actionListener="#{comprobanteMB.cancelarAdicion()}" 
-									 update=":formAccion msgNuevo" icon="icon-cancel" 
+						 onclick="PF('dlgNuevoProducto').hide()"
+						 icon="icon-cancel"  process="@this"
 									 />
 					</h:form>	
 			</p:dialog>
