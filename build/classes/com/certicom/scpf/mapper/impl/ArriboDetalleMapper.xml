@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <!--Siemco v2.0-->
+
+<mapper namespace="com.certicom.scpf.mapper.ArriboDetalleMapper">
+
+	<resultMap id="arriboDetalleResult" type="com.certicom.scpf.domain.ArriboDetalle">
+		<result column="id_arribo" property="id_arribo"/>
+		<result column="id_comprobante_compra" property="id_comprobante_compra"/>
+		<result column="id_proveedor" property="id_proveedor"/>
+		<result column="tipo_comprobante" property="tipo_comprobante"/> 
+		<result column="id_producto" property="id_producto"/> 
+		<result column="id_almacen" property="id_almacen"/> 
+		<result column="id_emisor" property="id_emisor"/> 
+		<result column="id_domicilio_fiscal" property="id_domicilio_fiscal"/> 
+		<result column="id_tipo_producto" property="id_tipo_producto"/> 
+		<result column="fecha_movimiento" property="fecha_movimiento"/> 
+		<result column="cantidad_arribo" property="cantidad_arribo"/> 
+		<result column="documento_arribo" property="documento_arribo"/> 
+		<result column="numero_documento_arribo" property="numero_documento_arribo"/> 
+	</resultMap>
+		
+
+	
+</mapper>	

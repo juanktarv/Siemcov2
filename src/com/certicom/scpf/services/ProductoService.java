@@ -106,6 +106,13 @@ public class ProductoService implements ProductoMapper{
 		return this.productoMapper.buscarMovimientosPorProducto(producto);
 	}
 
+	/*Siemco v2.0*/
+	@Override
+	public void actualizarStockProductoPorCodigo(Integer id_producto, BigDecimal stock) throws Exception {
+		this.productoMapper.actualizarStockProductoPorCodigo(id_producto, stock);
+		
+	}
+
 
 	
 	

@@ -1,5 +1,6 @@
 package com.certicom.scpf.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Delete;
@@ -57,5 +58,10 @@ public interface ProductoMapper {
 			+ "union "
 			+ "select b.* from t_producto b where b.id_producto in (select distinct d.id_producto from t_comprobante_compra_detalle d where d.id_producto=#{id_producto})")
 	public List<Producto> buscarMovimientosPorProducto(Producto producto);
+	
+	/*Siemco v2.0*/
+	@Update("update t_producto set stock = #{stock} where id_producto= #{id_producto}")
+	@Options(flushCache=true,useCache=true)
+    public void actualizarStockProductoPorCodigo(@Param("id_producto") Integer id_producto, @Param("stock") BigDecimal stock) throws Exception;
 	
 }

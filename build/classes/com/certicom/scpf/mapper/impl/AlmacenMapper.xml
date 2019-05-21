@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <!--Siemco v2.0-->
+
+<mapper namespace="com.certicom.scpf.mapper.AlmacenMapper">
+
+	<resultMap id="almacenResult" type="com.certicom.scpf.domain.Almacen">
+		<id column="id_almacen" property="id_almacen"/>
+		<result column="id_emisor" property="id_emisor"/>
+		<result column="id_domicilio_fiscal" property="id_domicilio_fiscal_cab"/>
+		<result column="descripcion_almacen" property="descripcion_almacen"/> 
+		<result column="direccion_almacen" property="direccion_almacen"/> 
+		<result column="estado_almacen" property="estado_almacen"/> 
+	</resultMap>
+
+
+</mapper>	

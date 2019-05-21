@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <!--Siemco v2.0-->
+
+<mapper namespace="com.certicom.scpf.mapper.InventarioMapper">
+
+	<resultMap id="inventarioResult" type="com.certicom.scpf.domain.Inventario">
+		<result column="id_almacen" property="id_almacen"/>
+		<result column="id_producto" property="id_producto"/>
+		<result column="id_emisor" property="id_emisor"/>
+		<result column="id_domicilio_fiscal" property="id_domicilio_fiscal"/> 
+		<result column="id_tipo_producto" property="id_tipo_producto"/> 
+		<result column="cantidad" property="cantidad"/> 
+		<result column="costo_promedio" property="costo_promedio"/> 
+	</resultMap>
+	
+	<select id="selectProductoInv" parameterType="int" resultType="com.certicom.scpf.domain.Producto">
+		 SELECT p.*, (select ttd.descripcion_largo from t_tabla_tablas_detalle ttd where ttd.codigo_catalogo = p.unidad_medida_det ) as desUnidadMedida
+		 FROM t_producto p WHERE p.id_producto=#{id_producto}
+	</select>
+	
+</mapper>	

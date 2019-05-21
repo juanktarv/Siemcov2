@@ -40,6 +40,7 @@ import com.certicom.scpf.services.EmisorService;
 //import com.certicom.scpf.services.EmisorService;
 import com.certicom.scpf.services.MenuServices;
 import com.certicom.scpf.services.ModoPagoService;
+import com.certicom.scpf.services.MovimientoInventarioProveedorService;
 import com.certicom.scpf.services.MovimientoProveedorService;
 import com.certicom.scpf.services.ProductoService;
 import com.certicom.scpf.services.ProveedorService;
@@ -77,6 +78,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 	private ProductoService productoService;
 	private ComprobanteCompraDetalleService comprobanteCompraDetalleService;
 	private String nroserie_documento;
+	private MovimientoInventarioProveedorService movimientoInventarioProveedorService;
 	
 	private List<TablaTablasDetalle> listTablaTablasDetallesComprobante;
 	private List<TablaTablasDetalle> listTablaTablasDetallesOperacion;
@@ -133,6 +135,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 		this.editarCliente = Boolean.FALSE;
 		this.posicionEdicion=-1;
 		this.tributoProductoService= new TributoProductoService();
+		this.movimientoInventarioProveedorService= new MovimientoInventarioProveedorService();
 		this.listaComprobanteCompraDetalle= new ArrayList<ComprobanteCompraDetalle>();
 		log = (Log)getSpringBean(Constante.SESSION_LOG);
 		logmb = new LogMB();	
@@ -523,6 +526,7 @@ public class ComprobanteCompraMB extends GenericBeans implements Serializable{
 					System.out.println("ID: "+id);
 					
 					this.comprobanteCompraDetalleService.insertBatchComprobanteDetalle(this.listaComprobanteCompraDetalle, id-1);
+					this.movimientoInventarioProveedorService.insertBatchMovimientoInventarioProveedor(this.listaComprobanteCompraDetalle, id-1);					
 					this.comprobanteCompraSelec.setId_comprobante_compra(id-1);
 					registrarMovimentoProveedor(this.comprobanteCompraSelec);
 

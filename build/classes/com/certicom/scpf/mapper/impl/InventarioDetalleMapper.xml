@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <!--Siemco v2.0-->
+
+<mapper namespace="com.certicom.scpf.mapper.InventarioDetalleMapper">
+
+	<resultMap id="inventarioDetalleResult" type="com.certicom.scpf.domain.InventarioDetalle">
+		<result column="id_producto" property="id_producto"/>
+		<result column="id_almacen" property="id_almacen"/>
+		<result column="id_emisor" property="id_emisor"/>
+		<result column="id_domicilio_fiscal" property="id_domicilio_fiscal"/> 
+		<result column="id_despacho" property="id_despacho"/> 
+		<result column="id_arribo" property="id_arribo"/> 
+		<result column="id_tipo_producto" property="id_tipo_producto"/> 
+		<result column="fecha_movimiento" property="fecha_movimiento"/> 
+		<result column="cantidad_ingresa" property="cantidad_ingresa"/> 
+		<result column="cantidad_salida" property="cantidad_salida"/> 
+		<result column="tipo_movimiento" property="tipo_movimiento"/> 
+		<result column="id_almacen_transferencia" property="id_almacen_transferencia"/>
+	</resultMap>
+	
+	
+</mapper>	

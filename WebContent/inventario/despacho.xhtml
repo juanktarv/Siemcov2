@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+	
+	<!-- Siemco v2.0 -->
+
+<ui:composition template="/WEB-INF/plantillas/plantilla.xhtml">
+	<ui:define name="contenido">
+	
+		<p:panel>
+			
+			<h:form>
+				<p:breadCrumb>  
+    				<p:menuitem value="Home" url="#" />  
+    				<p:menuitem value="Inventario" url="#" />
+    				<p:menuitem value="Gestion de Despachos" url="despacho" />   
+				</p:breadCrumb>	
+			</h:form>
+			
+			
+			<br/>
+			<!-- growl general -->			
+			<p:messages  id="msgGeneral" showDetail="false" showSummary="true" closable="true" />		
+			
+			
+				<!-- listado de Planes -->
+			<h:form id="formLista">
+				<p:dataTable id="dataMovimientoInventarioClientes" var="p" value="#{despachoMB.listaMovimientoInventarioClientes}" widgetVar="dtMovimientoInventarioClientes" 
+					emptyMessage="No hay Movimientos Disponibles." rowIndexVar="nro" 
+					 style="FONT-SIZE: 10px; "	 paginator="true"
+					 rows="10" paginatorPosition="bottom" 
+					 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					 rowsPerPageTemplate="10,20,30" >
+					<f:facet name="header">Lista Movimientos de Clientes</f:facet>
+					
+										
+					<p:column headerText="Orden" width="25" style="width:3%" >
+						#{nro+1}
+					</p:column>	
+					
+					<p:column style="width:100px" headerText="Cod. Prod">
+						<h:outputText value="#{p.codigoProducto}"/>
+					</p:column>		
+					
+					<p:column style="width:100px" headerText="Producto" filterBy="#{p.descripcionProducto}"  filterStyle="width:95%;" filterMatchMode="contains">
+						<h:outputText value="#{p.descripcionProducto}"/>
+					</p:column>			
+			        
+					
+					<p:column style="width:100px" headerText="Cliente" filterBy="#{p.nombreCliente}"  filterStyle="width:95%;" filterMatchMode="contains">
+						<h:outputText value="#{p.nombreCliente}"/>
+					</p:column>
+					
+					<p:column style="width:100px" headerText="Tipo Comprobante" filterBy="#{p.nombreTipoComprobante}"  filterStyle="width:95%;" filterMatchMode="contains">
+						<h:outputText value="#{p.nombreTipoComprobante}"/>
+					</p:column>
+					
+										
+					<p:column style="width:100px" headerText="Nro Comprobante" filterBy="#{p.numeroSerieDocumento}"  filterStyle="width:95%;" filterMatchMode="contains">
+						<h:outputText value="#{p.numeroSerieDocumento}"/>
+					</p:column>
+					
+					<p:column style="width:50px" headerText="Unidad de Medida">
+						<h:outputText value="#{p.descripcionUnidadMedida}"/>
+					</p:column>
+					
+					<p:column style="width:70px" headerText="Cantidad">
+						<h:outputText value="#{p.cant_unidades_item}" converter="montoDefaultConverter"/>
+					</p:column>
+					
+					<p:column style="width:100px" headerText="Saldo">
+						<h:outputText value="#{p.saldo_despacho}" converter="montoDefaultConverter"/>
+					</p:column>
+					
+					<p:column style="width:60px" headerText="Regularizado">
+						<h:outputText value="#{p.flag_regularizado eq 'TRUE' ? 'Regularizado':'Pendiente'}"/>
+					</p:column>
+					
+					<p:column headerText="Despachar" style="width:15%;text-align: center">
+					
+						<p:commandButton title="Despachar"  update=":dlgDetNuevoDespacho" actionListener="#{despachoMB.editarDespacho(p)}"
+										  icon="icon-exit" disabled="#{p.flag_regularizado}">
+						</p:commandButton> 
+								
+					</p:column>
+					
+
+				</p:dataTable>
+			</h:form>
+			
+			<!-- #############    Dialogos      ################ -->
+			
+			<!-- #############    TABLA MAESTRA      ################ -->
+			
+			
+				<!-- dialogo nuevo/editar perfil -->
+			
+			<p:dialog header="DESPACHO A ALMACEN" widgetVar="dlgNuevoDespacho" appendTo="@(body)"
+					resizable="false" id="dlgDetNuevoDespacho" modal="true">
+					
+					<h:form id="formDespacho">
+					<p:messages showDetail="false" showSummary="true" id="msgNuevo" closable="true"/>
+					
+					<h:panelGrid columns="2">
+												
+						#{"Cod Prod:"} 
+						<p:outputLabel value="#{despachoMB.movimientoInventarioClienteSelec.codigoProducto}" id="id_producto"
+							required="true" label="nombre" 
+							style="width:200px;" />
+
+						#{"Producto:"} 
+						<p:outputLabel value="#{despachoMB.movimientoInventarioClienteSelec.descripcionProducto}" id="nombre_producto"
+							required="true" label="nombre" 
+							style="width:200px;" />
+							
+						#{"Cliente:"} 
+						<p:outputLabel value="#{despachoMB.movimientoInventarioClienteSelec.nombreCliente}" id="id_cliente"
+							required="true" label="nombre" 
+							style="width:200px;" />
+							
+						#{"Tipo Documento:"} 
+						<p:outputLabel value="#{despachoMB.movimientoInventarioClienteSelec.nombreTipoComprobante}" id="nombre_comprobante"
+							required="true" label="nombre" 
+							style="width:200px;" />
+																		
+							
+						#{"Nro Documento:"} 
+						<p:outputLabel value="#{despachoMB.movimientoInventarioClienteSelec.numeroSerieDocumento}" id="numero_documento"
+							required="true" label="nombre" 
+							style="width:200px;" />
+							
+						#{"Unidad Medida:"} 
+						<p:outputLabel value="#{despachoMB.movimientoInventarioClienteSelec.descripcionUnidadMedida}" id="unidad_medida"
+							required="true" label="nombre" 
+							style="width:200px;" />
+						
+						#{"Cantidad Venta:"} 
+						<p:outputLabel value="#{despachoMB.movimientoInventarioClienteSelec.cant_unidades_item}" id="cantidad_venta"
+							required="true" label="nombre" 
+							style="width:200px;" converter="montoDefaultConverter"/>
+							
+						#{"Saldo:"} 
+						<p:outputLabel value="#{despachoMB.movimientoInventarioClienteSelec.saldo_despacho}" id="saldo_despacho"
+							required="true" label="nombre" 
+							style="width:200px;" converter="montoDefaultConverter"/>
+							
+						#{"Fecha:"} 
+						<p:outputLabel value="#{despachoMB.fechaDespacho}" id="fecha_despacho"
+							required="true" label="nombre" 
+							style="width:200px;" >
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+						 </p:outputLabel>
+							
+						#{"Almacen:"}						        
+						<p:selectOneMenu style="width:200px" value="#{despachoMB.id_almacen}" 
+						required="true"  requiredMessage="Se necesita Almacen">
+								<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
+								<f:selectItems value="#{despachoMB.listAlmacenPorProducto}" var="p" itemLabel="#{p.descripcion_almacen}" itemValue="#{p.id_almacen}" />
+						</p:selectOneMenu>
+						
+						#{"Documento Despacho:"} 
+						<p:inputText value="#{despachoMB.documentoDespacho}" id="documento_despacho"
+							required="true" label="nombre" requiredMessage="Se necesita Documento Despacho"
+							style="width:200px;" />
+							
+						#{"Numero Documento Despacho:"} 
+						<p:inputText value="#{despachoMB.numeroDocumentoDespacho}" id="numero_documento_despacho"
+							required="true" label="nombre" requiredMessage="Se necesita Numero Documento Despacho"
+							style="width:200px;" />
+							
+	                    #{"Cantidad Despacho:"}         
+						<p:inputText value="#{despachoMB.cantidadDespacho}" id="cantidad_despacho"
+							required="true" label="nombre" requiredMessage="Se necesita Cantidad"
+							style="width:200px;" />
+							
+								
+							
+					</h:panelGrid>
+					<br/>
+					<p:commandButton value="Guardar" actionListener="#{despachoMB.guardarDespacho()}"
+						update=":formLista msgNuevo" oncomplete="validarDespacho(xhr, status, args)" icon="icon-disk" />
+					
+					<p:commandButton value="Cancelar" type="button" onclick="PF('dlgNuevoDespacho').hide()" icon="icon-cancel" />
+					</h:form>	
+			</p:dialog>
+			
+			
+			
+		</p:panel>
+		
+		<script>
+		
+		function validarDespacho(xhr, status, args) {
+			if (!args.esValido) {
+				jQuery('#dlgDetNuevoDespacho').effect("shake", {
+					times : 1
+				}, 100);
+			} else {
+				//limpiando
+				PF('dlgNuevoDespacho').hide();
+				console.log("cerro")
+			}
+		}
+			
+
+
+		</script>
+		
+	</ui:define>
+</ui:composition>
+</html>

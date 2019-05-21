@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+	
+	<!-- Siemco v2.0 -->
+
+<ui:composition template="/WEB-INF/plantillas/plantilla.xhtml">
+	<ui:define name="contenido">
+	
+		<p:panel>
+			
+			<h:form>
+				<p:breadCrumb>  
+    				<p:menuitem value="Home" url="#" />  
+    				<p:menuitem value="Inventario" url="#" />
+    				<p:menuitem value="Gestion de Stock" url="stock" />   
+				</p:breadCrumb>	
+			</h:form>
+			
+			
+			<br/>
+			<!-- growl general -->			
+			<p:messages  id="msgGeneral" showDetail="false" showSummary="true" closable="true" />		
+			
+			<!-- tootlbar -->
+			<h:form style="margin-bottom: 8px">
+				<h:panelGrid columns="4">						
+					<p:commandButton value="Nuevo Inventario" icon="icon-add" update=":dlgDetNuevoInventario" oncomplete="PF('dlgNuevoInventario').show();"
+						actionListener="#{inventarioMB.nuevoInventario()}"/>
+				</h:panelGrid>
+			</h:form>
+			
+				<!-- listado de Planes -->
+			<h:form id="formLista">
+				<p:dataTable id="dataInventario" var="p" value="#{inventarioMB.listaInventario}" widgetVar="dtInventario" 
+					emptyMessage="No hay Inventario Disponibles." rowIndexVar="nro" 
+					 style="FONT-SIZE: 10px; "
+					  paginator="true" filteredValue="#{inventarioMB.listaInventario}"
+					 rows="10" paginatorPosition="bottom" 
+					 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					 rowsPerPageTemplate="10,20,30">
+					 
+					<f:facet name="header">Lista Inventario</f:facet>
+										
+					<p:column headerText="Orden" width="25" style="width:3%" >
+						#{nro+1}
+					</p:column>		
+					
+					<p:column style="width:200px" headerText="Producto" filterBy="#{p.descripcionProducto}"  filterStyle="width:95%;" filterMatchMode="contains" >
+						<h:outputText value="#{p.descripcionProducto}"/>
+					</p:column>			
+			        
+			        <p:column style="width:100px" headerText="Almacen" filterBy="#{p.descripcionAlmacen}"  filterStyle="width:95%;" filterMatchMode="contains">
+						<h:outputText value="#{p.descripcionAlmacen}"/>
+					</p:column>
+										
+					<p:column style="width:200px" headerText="Unidad Medida">
+						<h:outputText value="#{p.desUnidadMedida}"/>
+					</p:column>
+										
+					<p:column style="width:50px" headerText="Cantidad">
+						<h:outputText value="#{p.cantidad}" converter="montoDefaultConverter" />
+					</p:column>
+					
+					<p:column style="width:50px" headerText="Costo Promedio">
+						<h:outputText value="#{p.costo_promedio}" converter="montoDefaultConverter" />
+					</p:column>
+							        
+			        <p:column headerText="Editar/Elim." style="width:15%;text-align: center">
+					
+						<p:commandButton title="Editar"  update=":dlgDetNuevoInventario" actionListener="#{inventarioMB.editarInventario(p)}"
+										  icon="icon-edit">
+						</p:commandButton> 
+
+						<p:commandButton title="Eliminar"  actionListener="#{inventarioMB.eliminarInventario(p)}" update=":dlgDetEliminarInventario" icon="icon-delete">
+	
+						</p:commandButton>
+								
+					</p:column>
+					
+					<p:column headerText="Detalle" style="width:15%;text-align: center">
+					
+						<p:commandButton title="Detalle"  update=":dlgDetDetalleInventario" actionListener="#{inventarioMB.detalleInventario(p)}"
+										 oncomplete="PF('dlgDetalleInventario').show();" icon="icon-indice">
+						</p:commandButton> 
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+			
+			<!-- #############    Dialogos      ################ -->
+			
+			
+			<!-- dialogo nuevo/editar perfil -->
+			
+			<p:dialog header="Editar Inventario" widgetVar="dlgNuevoInventario" appendTo="@(body)"
+					resizable="false" id="dlgDetNuevoInventario" modal="true">
+					
+					<h:form id="formInventario">
+					<p:messages showDetail="false" showSummary="true" id="msgNuevo" closable="true"/>
+					
+					<p:panel border="0" header="Buscar producto:">			
+					<h:panelGrid columns="2" border="0">
+						<p:outputLabel value="Código Producto:"></p:outputLabel>
+						
+						<p:selectOneMenu id="codigoProd" value="#{inventarioMB.productoEncontrado.cod_prod_det}" panelStyle="width:500px"							
+                         	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
+				            <f:selectItems value="#{inventarioMB.listaProductos}" 
+				            			   var="codprd" itemLabel="#{codprd.cod_prod_det}" itemValue="#{codprd.cod_prod_det}"  
+				            			   forceSelection="true"/>				            			   
+				            <p:column>
+				                <h:outputText value="#{t.cod_prod_det}" />				                
+				            </p:column>
+				            <p:ajax event="change" listener="#{inventarioMB.onItemSelectCod}" update="productoPojo"/>			 				            				            
+				        </p:selectOneMenu>
+	                    
+						<p:outputLabel value="Producto:"></p:outputLabel>			
+						<p:selectOneMenu id="productoPojo" value="#{inventarioMB.productoEncontrado.descripcion_prod_det}" panelStyle="width:500px"							
+                         	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
+				            <f:selectItems value="#{inventarioMB.listaProductos}" 
+				            			   var="prd" 
+				            			   itemLabel="#{prd.descripcion_prod_det}" 
+				            			   itemValue="#{prd.descripcion_prod_det}"  forceSelection="true"/>				            			   
+				            <p:column>
+				                <h:outputText value="#{t.descripcion_prod_det}" />				                
+				            </p:column>
+				            <p:ajax event="change" listener="#{inventarioMB.onItemSelect}" update="codigoProd"/>			 				            				            
+				        </p:selectOneMenu>			
+	                 </h:panelGrid>
+	                 </p:panel>
+					
+					<h:panelGrid columns="2">
+					
+					
+					    #{"Almacen:"}						        
+						<p:selectOneMenu style="width:200px" value="#{inventarioMB.inventarioSelec.id_almacen}" >
+								<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
+								<f:selectItems value="#{inventarioMB.listAlmacen}" var="p" itemLabel="#{p.descripcion_almacen}" itemValue="#{p.id_almacen}" />
+						</p:selectOneMenu>
+																											
+						#{"Cantidad:"} 
+						<p:inputText value="#{inventarioMB.inventarioSelec.cantidad}" id="cantidad"
+							required="true" label="nombre" requiredMessage="Se necesita una cantidad"
+							style="width:200px;" />
+						
+						#{"Costo:"} 
+						<p:inputText value="#{inventarioMB.inventarioSelec.costo_promedio}" id="costo_promedio"
+							required="true" label="nombre" requiredMessage="Se necesita un costo"
+							style="width:200px;" />
+														
+							
+					</h:panelGrid>
+					<br/>
+					<p:commandButton value="Guardar" actionListener="#{inventarioMB.guardarInventario()}"
+						update=":formLista msgNuevo" oncomplete="validarInventario(xhr, status, args)" icon="icon-disk" />
+					
+					<p:commandButton value="Cancelar" type="button" onclick="PF('dlgNuevoInventario').hide()" icon="icon-cancel" />
+					</h:form>	
+			</p:dialog>
+			
+			
+			<!-- dialogo detalle inventario -->
+			
+			<p:dialog header="DETALLE INVENTARIO" widgetVar="dlgDetalleInventario" appendTo="@(body)"
+					resizable="false" id="dlgDetDetalleInventario" modal="true" >
+					
+					<h:panelGrid columns="2">	
+						#{"Producto:"} 
+						<p:outputLabel value="#{inventarioMB.inventarioSelec.descripcionProducto}" />
+						#{"Almacen:"} 
+						<p:outputLabel value="#{inventarioMB.inventarioSelec.descripcionAlmacen}" />
+						#{"Unidad Medida:"} 
+						<p:outputLabel value="#{inventarioMB.inventarioSelec.desUnidadMedida}" />
+						#{"Cantidad Actual:"} 
+						<p:outputLabel value="#{inventarioMB.inventarioSelec.cantidad}" converter="montoDefaultConverter"  />
+						#{"Costo:"} 
+						<p:outputLabel value="#{inventarioMB.inventarioSelec.costo_promedio}" converter="montoDefaultConverter"  />
+					
+					</h:panelGrid>										
+
+					<br/>
+					<br/>
+					
+					<p:dataTable id="dataInventario" var="d" value="#{inventarioMB.listaInventarioDetalle}" widgetVar="dtInventario" 
+							emptyMessage="No hay Inventario Disponibles." rowIndexVar="nro" 
+							 style="FONT-SIZE: 10px; width:600px" 
+							  paginator="true"
+							 rows="10" paginatorPosition="bottom" 
+							 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							 rowsPerPageTemplate="10,20,30">
+							<f:facet name="header">Movimientos de Inventario</f:facet>
+												
+							<p:column headerText="Orden"  style="width:2%" >
+								#{nro+1}
+							</p:column>		
+							
+							<p:column style="width:10%" headerText="Fecha" >
+								<h:outputText value="#{d.fecha_movimiento}" pattern="dd/MM/yyyy" >
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" /> </h:outputText>
+							</p:column>			
+					        
+					        <p:column style="width:5%" headerText="Ingresa" >
+								<h:outputText value="#{d.cantidad_ingresa}" converter="montoDefaultConverter" />
+							</p:column>
+												
+							<p:column style="width:5%" headerText="Sale">
+								<h:outputText value="#{d.cantidad_salida}" converter="montoDefaultConverter" />
+							</p:column>
+												
+							<p:column style="width:10%" headerText="Movimiento">
+								<h:outputText value="#{d.tipo_movimiento}"/>
+							</p:column>
+					       
+		
+						</p:dataTable>
+					
+
+					<br/>
+				
+					<p:commandButton value="Cerrar" type="button" onclick="PF('dlgDetalleInventario').hide()" icon="icon-cancel" />
+						
+			</p:dialog>
+			
+
+			<!-- dialogo eliminar -->	
+			<p:confirmDialog id="dlgDetEliminarInventario" appendTo="@(body)"
+					message="¿Desea eliminar Inventario? " header="Eliminar Inventario?"
+					severity="alert" widgetVar="dlgEliminarInventario">
+				<h:form>
+					<p:commandButton value="Eliminar"
+						update=":formLista :msgGeneral" 
+						actionListener="#{inventarioMB.confirmaEliminarInventario}"
+						oncomplete="PF('dlgEliminarInventario').hide();" icon="icon-delete" />
+
+					<p:commandButton value="Cancelar" type="button"
+						onclick="PF('dlgEliminarInventario').hide()" icon="icon-cancel" />
+
+				</h:form>
+			</p:confirmDialog>
+		</p:panel>
+		
+		<script>
+			
+		function validarInventario(xhr, status, args) {
+			if (!args.esValido) {
+				jQuery('#dlgDetNuevoInventario').effect("shake", {
+					times : 1
+				}, 100);
+			} else {
+				//limpiando
+				PF('dlgNuevoInventario').hide();
+				console.log("cerro")
+			}
+		}
+		
+		
+		
+		function validarDetalleInventario(xhr, status, args) {
+			if (!args.esValido) {
+				jQuery('#dlgDetDetalleInventario').effect("shake", {
+					times : 1
+				}, 100);
+			} else {
+				//limpiando
+				PF('dlgDetalleInventario').hide();
+				console.log("cerro")
+			}
+		}
+
+		</script>
+		
+	</ui:define>
+</ui:composition>
+</html>

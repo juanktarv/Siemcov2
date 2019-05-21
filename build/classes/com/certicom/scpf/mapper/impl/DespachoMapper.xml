@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <!--Siemco v2.0-->
+
+<mapper namespace="com.certicom.scpf.mapper.DespachoMapper">
+
+	<resultMap id="despachoResult" type="com.certicom.scpf.domain.Despacho">
+		<id column="id_despacho" property="id_despacho"/>
+		<result column="id_producto" property="id_producto"/>
+		<result column="fecha_movimiento" property="fecha_movimiento"/>
+		<result column="cantidad_total_despacho" property="cantidad_total_despacho"/> 
+	</resultMap>
+	
+</mapper>	

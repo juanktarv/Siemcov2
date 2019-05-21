@@ -153,4 +153,29 @@
 		<view-id value="/faces/tesoreria/cuentaTesoreria.xhtml" />
 	</url-mapping>
 	
+	<url-mapping id="transferencia">
+		<pattern value="/transferencia" />
+		<view-id value="/faces/inventario/transferencia.xhtml" />
+	</url-mapping>
+	
+	<url-mapping id="inventario">
+		<pattern value="/inventario" />
+		<view-id value="/faces/inventario/inventario.xhtml" />
+	</url-mapping>
+	
+	<url-mapping id="despacho">
+		<pattern value="/despacho" />
+		<view-id value="/faces/inventario/despacho.xhtml" />
+	</url-mapping>
+	
+	<url-mapping id="arribo">
+		<pattern value="/arribo" />
+		<view-id value="/faces/inventario/arribo.xhtml" />
+	</url-mapping>
+	
+	<url-mapping id="almacen">
+		<pattern value="/almacen" />
+		<view-id value="/faces/inventario/almacen.xhtml" />
+	</url-mapping>
+	
 </pretty-config>

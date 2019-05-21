@@ -66,6 +66,7 @@ import com.certicom.scpf.services.EmisorService;
 import com.certicom.scpf.services.MenuServices;
 import com.certicom.scpf.services.ModoPagoService;
 import com.certicom.scpf.services.MovimientoClienteService;
+import com.certicom.scpf.services.MovimientoInventarioClienteService;
 import com.certicom.scpf.services.ProductoService;
 import com.certicom.scpf.services.TablaTablasDetalleService;
 import com.certicom.scpf.services.TributoProductoService;
@@ -120,6 +121,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
     private List<Producto>listaProductos;
     
     private MovimientoClienteService movimientoClienteService;
+    private MovimientoInventarioClienteService movimientoInventarioClienteService; 
 	
 	//datos Log
     private Log log;
@@ -144,6 +146,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 		this.tributoProductoService = new TributoProductoService();
 		this.comprobanteService = new ComprobanteService();
 		this.comprobanteDetalleService = new ComprobanteDetalleService();
+		this.movimientoInventarioClienteService= new MovimientoInventarioClienteService();
 		this.domicilioFiscalService = new DomicilioFiscalService();
 		this.modoPagoService = new ModoPagoService();
 		this.emisorService = new EmisorService();
@@ -1035,6 +1038,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 					System.out.println("ID: "+id);
 					
 					this.comprobanteDetalleService.insertBatchComprobanteDetalle(this.listaComprobanteDetalle, id-1);
+					this.movimientoInventarioClienteService.insertBatchMovimientoInventarioCliente(this.listaComprobanteDetalle, id-1);
 					this.productoService.actualizarBatchStockProducto(this.listaComprobanteDetalle); /*Actualizar stock*/
 					comprobanteSelec.setId_comprobante(id-1);
 					registrarMovimientoCliente(comprobanteSelec);
@@ -1133,6 +1137,7 @@ public class ComprobanteMB extends GenericBeans implements Serializable{
 					comprobanteSelec.setId_comprobante(id-1);
 					registrarMovimientoCliente(comprobanteSelec);
 					this.comprobanteDetalleService.insertBatchComprobanteDetalle(this.listaComprobanteDetalle, id-1);
+					this.movimientoInventarioClienteService.insertBatchMovimientoInventarioCliente(this.listaComprobanteDetalle, id-1);
 					imprimirTicket();
 					
 					context.update("msgGeneral");

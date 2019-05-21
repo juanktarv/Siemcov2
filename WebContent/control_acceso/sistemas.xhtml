@@ -100,13 +100,13 @@
 						
 						#{"Estado:"}
 						<p:selectOneMenu rendered="#{not sistemaMB.editar}" value="#{sistemaMB.sistema.ind_activo}" style="width:270px;" effect="fade" 
-							required="true" requiredMessage="Se necesita un indicador">
+							required="true" requiredMessage="Se necesita un estado">
 							<f:selectItem itemLabel="Activo" itemValue="1" />
 							<f:selectItem itemLabel="Inactivo" itemValue="0" />
 						</p:selectOneMenu>
 						
 						<p:selectOneMenu rendered="#{sistemaMB.editar}" value="#{sistemaMB.sistema.ind_activo}" style="width:270px;" effect="fade" 
-							required="true" requiredMessage="Se necesita un indicador">
+							required="true" requiredMessage="Se necesita un estado">
 							<f:selectItem itemLabel="Activo" itemValue="1" />
 							<f:selectItem itemLabel="Inactivo" itemValue="0" />
 						</p:selectOneMenu>	
