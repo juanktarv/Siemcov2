@@ -19,7 +19,7 @@ public class CuentaTesoreria {
 	private String descortoBanco;
 	private String descTipoCuenta;
 	
-	
+	private BigDecimal montoIngresado;
 	
 	public String getDescTipoCuenta() {
 		return descTipoCuenta;
@@ -115,6 +115,14 @@ public class CuentaTesoreria {
 	
 	public void setFecha_saldo(Date fecha_saldo) {
 		this.fecha_saldo = fecha_saldo;
+	}
+
+	public BigDecimal getMontoIngresado() {
+		return montoIngresado;
+	}
+
+	public void setMontoIngresado(BigDecimal montoIngresado) {
+		this.montoIngresado = montoIngresado;
 	}	
 	
 }

@@ -28,6 +28,18 @@ public class Utils {
 		System.out.println("RETORNO STRING-->"+r);
 		return new BigDecimal(r);
 	}
+	
+	public static BigDecimal redondeoImporteTotal(BigDecimal total, int nrocifras){
+		int cifras=(int) Math.pow(10, nrocifras);
+		System.out.println("NUMERO BIGDECIMAL-->"+total.toString());
+		double numero=Double.parseDouble(total.toString());
+		System.out.println("numero DOUBLE-->"+numero);
+		double res=Math.rint(numero*cifras)/cifras;
+		System.out.println("RESULTADO DOUBLE -->"+res);
+		String r=String.valueOf(res);
+		System.out.println("RETORNO STRING-->"+r);
+		return new BigDecimal(r);
+	}
 
 	public static boolean isNumeric(String string){
 		if(string.trim().isEmpty() || string==null)

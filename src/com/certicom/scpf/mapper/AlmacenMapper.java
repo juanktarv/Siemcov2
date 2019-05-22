@@ -43,6 +43,15 @@ public interface AlmacenMapper {
 											@Param("id_domicilio_fiscal") Integer id_domicilio_fiscal, 
 											@Param("id_almacen") Integer id_almacen) throws Exception;
 	
+	@Select(" select a.* from t_almacen a "
+			+ "where a.id_emisor = #{id_emisor} "
+			+ "and a.id_domicilio_fiscal = #{id_domicilio_fiscal} "
+			+ "and a.id_almacen not in (#{id_almacen}) "
+			+ "order by id_almacen asc")
+	public List<Almacen> listarAlmacenDestino(	@Param("id_emisor") Integer id_emisor, 
+												@Param("id_domicilio_fiscal") Integer id_domicilio_fiscal, 
+												@Param("id_almacen") Integer id_almacen);
+	
 	
 	@Insert("insert into t_almacen (id_emisor, id_domicilio_fiscal, descripcion_almacen, direccion_almacen, estado_almacen) "
 			+ "values (#{id_emisor}, #{id_domicilio_fiscal}, #{descripcion_almacen}, #{direccion_almacen}, #{estado_almacen})")

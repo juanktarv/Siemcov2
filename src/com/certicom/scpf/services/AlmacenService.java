@@ -53,4 +53,10 @@ public class AlmacenService implements AlmacenMapper{
 		return almacenMapper.listarPorProductoAnidado(id_producto, id_emisor, id_domicilio_fiscal, id_almacen);
 	}
 
+	@Override
+	public List<Almacen> listarAlmacenDestino(Integer id_emisor, Integer id_domicilio_fiscal, Integer id_almacen) {
+		// TODO Auto-generated method stub
+		return this.almacenMapper.listarAlmacenDestino(id_emisor, id_domicilio_fiscal, id_almacen);
+	}
+
 }

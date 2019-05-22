@@ -333,14 +333,15 @@ public class InventarioMB extends GenericBeans implements Serializable{
 	public void onItemSelect()  throws Exception{
 		
 		for(Producto p : this.listaProductos){
-			if(p.getCod_prod_det().trim().equals(this.productoEncontrado.getCod_prod_det())){
+			if(p.getDescripcion_prod_det().trim().equals(this.productoEncontrado.getDescripcion_prod_det().trim())){
 				this.productoSelec=p;
 				break;
 			}
 		}
 		this.productoEncontrado=this.productoService.findById(this.productoSelec.getId_producto());
+		this.inventarioSelec.setProducto(this.productoEncontrado);
 		this.inventarioSelec.setId_producto(this.productoSelec.getId_producto());
-		this.inventarioSelec.getProducto().setId_producto(this.productoSelec.getId_producto());
+		
 		
 	}
 	
@@ -355,8 +356,10 @@ public class InventarioMB extends GenericBeans implements Serializable{
 			}
 		}
 		this.productoEncontrado=this.productoService.findById(this.productoSelec.getId_producto());	
+		
 		this.inventarioSelec.setId_producto(this.productoSelec.getId_producto());
-		this.inventarioSelec.getProducto().setId_producto(this.productoSelec.getId_producto());
+		this.inventarioSelec.setProducto(this.productoEncontrado);
+		
 			
 	}
 			

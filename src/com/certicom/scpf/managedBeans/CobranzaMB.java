@@ -30,6 +30,8 @@ import com.certicom.scpf.services.TablaTablasDetalleService;
 import com.pe.certicom.scpf.commons.Constante;
 import com.pe.certicom.scpf.commons.GenericBeans;
 
+import src.com.certicom.scpf.utils.Utils;
+
 @ManagedBean(name="cobranzaMB")
 @ViewScoped
 public class CobranzaMB extends GenericBeans implements Serializable{
@@ -59,6 +61,7 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 	
 	private List<CuentaTesoreria> listaCuentas;
 	private CuentaTesoreriaService cuentaTesoreriaService;
+	private CuentaTesoreria cuentaSelec;
 	
 	public CobranzaMB(){}
 	
@@ -79,6 +82,7 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		this.clienteService= new ClienteService();
 		this.nroserie_documento="";
 		this.cuentaTesoreriaService= new CuentaTesoreriaService();
+		this.cuentaSelec= new CuentaTesoreria();
 		
 		try {
 			this.listTablaTablasDetallesComprobante = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_DOCUMENTOS);
@@ -92,6 +96,7 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 	
 	public void prepararCobro(){
 		this.cobro= new CobranzaCabecera();
+		this.cuentaSelec= new CuentaTesoreria();
 		this.listaDetalleCobro= new ArrayList<>();
 		if(this.clienteEncontrado!=null){
 			this.cobro.setId_cliente(this.clienteEncontrado.getId_cliente());
@@ -108,8 +113,8 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 				System.out.println("IMPORTE--->"+this.cobro.getTotal_importe_cobrado());
 				detalle.setId_cliente(mov.getId_cliente());
 				detalle.setId_comprobante(mov.getId_comprobante());
-				detalle.setImporte_cobrado(mov.getImporte());
-				detalle.setImporte_pendiente(mov.getImporte());
+				detalle.setImporte_cobrado(Utils.redondeoImporteTotal(mov.getImporte()));
+				detalle.setImporte_pendiente(Utils.redondeoImporteTotal(mov.getImporte(), 2));
 				detalle.setComprobante(mov.getComprobante());
 				this.listaDetalleCobro.add(detalle);
 			}
@@ -389,6 +394,14 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 
 	public void setCuentaTesoreriaService(CuentaTesoreriaService cuentaTesoreriaService) {
 		this.cuentaTesoreriaService = cuentaTesoreriaService;
+	}
+
+	public CuentaTesoreria getCuentaSelec() {
+		return cuentaSelec;
+	}
+
+	public void setCuentaSelec(CuentaTesoreria cuentaSelec) {
+		this.cuentaSelec = cuentaSelec;
 	}
 	
 	

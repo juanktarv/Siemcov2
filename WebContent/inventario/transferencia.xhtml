@@ -145,14 +145,16 @@
 						 #{"Almacen Origen:"}						        
 						<p:selectOneMenu style="width:200px" value="#{almacenTransferenciaMB.almacenOrigenSelec.id_almacen}" id="id_almacen_origen" >
 								<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
-								<f:selectItems value="#{almacenTransferenciaMB.listAlmacenOrigen}" var="p" itemLabel="#{p.descripcion_almacen}" itemValue="#{p.id_almacen}" />
+								<f:selectItems value="#{almacenTransferenciaMB.listAlmacenOrigen}" var="p" itemLabel="#{p.descripcion_almacen}" 
+												itemValue="#{p.id_almacen}" />
 						        <p:ajax event="change" listener="#{almacenTransferenciaMB.cargaListaDestino}" update="id_almacen_destino"/>
 						</p:selectOneMenu>
 													
 						#{"Almacen Destino:"} 
 						<p:selectOneMenu style="width:200px" value="#{almacenTransferenciaMB.almacenDestinoSelec.id_almacen}"   id="id_almacen_destino">
 								<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
-								<f:selectItems value="#{almacenTransferenciaMB.listAlmacenDestino}" var="p" itemLabel="#{p.descripcion_almacen}" itemValue="#{p.id_almacen}" />
+								<f:selectItems value="#{almacenTransferenciaMB.listAlmacenDestino}" var="p" itemLabel="#{p.descripcion_almacen}" 
+											   itemValue="#{p.id_almacen}" />
 						</p:selectOneMenu>
 							
 					    #{"Fecha Transferencia:"} 

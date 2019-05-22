@@ -147,10 +147,10 @@
 							<h:outputText value="#{p.nroserie_documento}"/>
 						</p:column>
 						<p:column style="width:70px" headerText="Importe">
-							<h:outputText value="#{p.importe}"/>
+							<h:outputText value="#{p.importe}" converter="montoDefaultConverter"/>
 						</p:column>
 						<p:column style="width:70px" headerText="Saldo">
-							<h:outputText value="#{p.saldopagado}"/>
+							<h:outputText value="#{p.saldopagado}" converter="montoDefaultConverter"/>
 						</p:column>
 						<p:column style="width:70px" headerText="Estado">
 							<h:outputText value="#{p.flag_regularizado}"/>
@@ -158,12 +158,9 @@
 				</p:dataTable>
 				
 				<p:dialog header="Registrar Cobro" widgetVar="dlgNuevoCobro" appendTo="@(body)" 
-					resizable="false" id="dlgDetNuevoCobro" modal="true">
+					resizable="false" id="dlgDetNuevoCobro" modal="true" position="top">
 					
-					<p:panel id="pnlCobro">
-					
-					
-										
+					<p:panel id="pnlCobro">			
 						<h:panelGrid columns="4" cellpadding="10">
 											
 							<p:outputLabel value="Cliente" 
@@ -175,7 +172,7 @@
 										   style="white-space: nowrap; font-weight:bold; color: #036fab">
 							</p:outputLabel>
 							
-							<p:outputLabel value="#{cobranzaMB.cobro.total_importe_cobrado}"></p:outputLabel>
+							<p:outputLabel value="#{cobranzaMB.cobro.total_importe_cobrado}" converter="montoDefaultConverter"></p:outputLabel>
 							
 							<p:outputLabel value="Fecha" 
 								style="white-space: nowrap; font-weight:bold; color: #036fab">
@@ -185,45 +182,79 @@
 							</p:outputLabel>
 							
 						</h:panelGrid>
-						
-						<p:outputLabel value="Ingresar valores a pagar :" 
+					<h:panelGrid columns="2">
+						<p:fieldset legend="Deuda" style="margin-bottom:20px">
+							<p:outputLabel value="Ingresar valores a pagar :" 
 									   style="white-space: nowrap; font-weight:bold; color: #036fab;">
-						</p:outputLabel>												
-						
-						<p:dataTable var="p" value="#{cobranzaMB.listaDetalleCobro}" id="dtlistCobro" style="width:50%">
-							<p:column headerText="Comprobante" style="width:60%">
-								<p:outputLabel value="#{p.comprobante.numero_serie_documento_cab}" style="width:90%"></p:outputLabel>
-							</p:column>
-							<p:column headerText="Pendiente" style="width:20%">
-								<p:outputLabel value="#{p.importe_pendiente}" style="width:90%"></p:outputLabel>
-							</p:column>					
-							<p:column headerText="Pago" style="width:20%">
-								<p:inputText value="#{p.importe_cobrado}" style="width:90%"></p:inputText>
-							</p:column>
-						</p:dataTable>
-						
-						<h:panelGrid columns="2" cellpadding="4">
-						
-							<p:outputLabel value="Saldo Deudor :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
-							</p:outputLabel>
+							</p:outputLabel>												
 							
-							<p:outputLabel value="#{cobranzaMB.cobro.saldo_deudor}" style="white-space: nowrap; font-weight:bold; color: #036fab;">
-							</p:outputLabel>
-							
-							<p:outputLabel value="Saldo a Pagar :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
-							</p:outputLabel>
-							
-							<p:outputLabel value="#{cobranzaMB.cobro.saldo_pagar}" style="white-space: nowrap; font-weight:bold; color: #036fab;">
-							</p:outputLabel>
-														
+							<p:dataTable var="p" value="#{cobranzaMB.listaDetalleCobro}" id="dtlistCobro" 
+										 style="width:100%" emptyMessage="No existen deudas" 
+										 rowIndexVar="nro"  paginator="true" 
+										 rows="10" paginatorPosition="bottom" 
+										 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} 
+										 					{LastPageLink} {RowsPerPageDropdown}"  
+										 rowsPerPageTemplate="10,20,30">
+								<f:facet name="header">Movimientos pendientes</f:facet>
+								
+								<p:column headerText="Orden"  style="width:10%" >
+									#{nro+1}
+								</p:column>			 
+								<p:column headerText="Comprobante" style="width:40%">
+									<p:outputLabel value="#{p.comprobante.numero_serie_documento_cab}" style="width:90%"></p:outputLabel>
+								</p:column>
+								<p:column headerText="Pendiente" style="width:30%">
+									<p:outputLabel value="#{p.importe_pendiente}" style="width:90%"></p:outputLabel>
+								</p:column>					
+								<p:column headerText="Pago" style="width:20%">
+									<p:inputText value="#{p.importe_cobrado}" style="width:90%"></p:inputText>
+								</p:column>
+							</p:dataTable>
+						</p:fieldset>
+						
+						<p:fieldset legend="Cobro" style="margin-bottom:20px">
+						
+								<h:panelGrid columns="2" cellpadding="4">
+								
+									<p:outputLabel value="Saldo Deudor :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+									</p:outputLabel>
+									
+									<p:outputLabel value="#{cobranzaMB.cobro.saldo_deudor}" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+									</p:outputLabel>
+									
+									<p:outputLabel value="Saldo a Pagar :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+									</p:outputLabel>
+									
+									<p:outputLabel value="#{cobranzaMB.cobro.saldo_pagar}" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+									</p:outputLabel>
+																
+								</h:panelGrid>
+						
+								<p:outputLabel value="Ingresar a las siguientes cuentas :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+								</p:outputLabel>
+						
+								<h:panelGrid columns="2" cellpadding="4">
+									<p:outputLabel value="Cuenta Tesoreria :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+									</p:outputLabel>
+									
+									<p:selectOneMenu style="width:400px" value="#{cobranzaMB.cuentaSelec.id_cuenta_tesoreria}"  >
+											<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
+											<f:selectItems 	value="#{cobranzaMB.listaCuentas}" 
+															var="p" itemLabel="#{p.cuenta}-#{p.tipo_moneda}" 
+															itemValue="#{p.id_cuenta_tesoreria}" />																		
+									</p:selectOneMenu>
+									
+									<p:outputLabel value="Monto a Ingresar:" style="white-space: nowrap; font-weight:bold; color: #036fab;">
+									</p:outputLabel>
+									
+									<p:outputLabel value="#{cobranzaMB.cuentaSelec.montoIngresado}" 
+												   style="white-space: nowrap; font-weight:bold; color: #036fab;">
+									</p:outputLabel>
+										
+								</h:panelGrid>
+						
+						 	</p:fieldset>
 						</h:panelGrid>
-						
-						<p:outputLabel value="Ingresar a las siguientes cuentas :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
-						</p:outputLabel>
-						
-						
-						
-						
 						
 					</p:panel>
 			</p:dialog>

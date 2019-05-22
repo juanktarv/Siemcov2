@@ -350,6 +350,9 @@ public void cargaListaDestino(AjaxBehaviorEvent ajaxBehaviorEvent)  throws Excep
 																				this.emisorSelec.getId_emisor(), 
 																				this.emisorSelec.getId_domicilio_fiscal_cab(), 
 																				this.almacenOrigenSelec.getId_almacen());
+//	   this.listAlmacenDestino = this.almacenService.listarAlmacenDestino(this.emisorSelec.getId_emisor(), 
+//			   															  this.emisorSelec.getId_domicilio_fiscal_cab(), 
+//			   															  this.almacenOrigenSelec.getId_almacen());
 		 
 		System.out.println("this.listAlmacenDestino " +  this.listAlmacenDestino.size());
 		
