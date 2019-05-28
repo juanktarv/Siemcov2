@@ -18,7 +18,8 @@ public class MovimientoClientes {
 	private String flag_regularizado;
 	private String formapago;
 	private BigDecimal saldopagado;
-	
+	private BigDecimal deuda;
+	private BigDecimal pago;
 	private Cliente cliente;
 	private Comprobante comprobante;
 	
@@ -140,6 +141,22 @@ public class MovimientoClientes {
 
 	public void setComprobante(Comprobante comprobante) {
 		this.comprobante = comprobante;
+	}
+
+	public BigDecimal getDeuda() {
+		return deuda;
+	}
+
+	public void setDeuda(BigDecimal deuda) {
+		this.deuda = deuda;
+	}
+
+	public BigDecimal getPago() {
+		return pago;
+	}
+
+	public void setPago(BigDecimal pago) {
+		this.pago = pago;
 	}	
 	
 }

@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
@@ -21,11 +22,17 @@ import com.certicom.scpf.domain.CobranzaCabecera;
 import com.certicom.scpf.domain.CobranzaDetalle;
 import com.certicom.scpf.domain.Comprobante;
 import com.certicom.scpf.domain.CuentaTesoreria;
+import com.certicom.scpf.domain.Emisor;
 import com.certicom.scpf.domain.MovimientoClientes;
+import com.certicom.scpf.domain.MovimientoCuentaTesoreria;
 import com.certicom.scpf.domain.TablaTablasDetalle;
 import com.certicom.scpf.services.ClienteService;
+import com.certicom.scpf.services.CobranzaCabeceraService;
+import com.certicom.scpf.services.CobranzaDetalleService;
 import com.certicom.scpf.services.CuentaTesoreriaService;
+import com.certicom.scpf.services.EmisorService;
 import com.certicom.scpf.services.MovimientoClienteService;
+import com.certicom.scpf.services.MovimientoTesoreriaService;
 import com.certicom.scpf.services.TablaTablasDetalleService;
 import com.pe.certicom.scpf.commons.Constante;
 import com.pe.certicom.scpf.commons.GenericBeans;
@@ -58,10 +65,15 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 	private List<MovimientoClientes>listaSelectedMovimientos;
 	private CobranzaCabecera cobro;
 	private List<CobranzaDetalle> listaDetalleCobro;
-	
+	private CobranzaCabeceraService cobranzaCabeceraService;
+	private CobranzaDetalleService cobranzaDetalleService;
+	private Emisor emisorSelec;
+	private EmisorService emisorService;
 	private List<CuentaTesoreria> listaCuentas;
 	private CuentaTesoreriaService cuentaTesoreriaService;
 	private CuentaTesoreria cuentaSelec;
+	private MovimientoTesoreriaService movimientoTesoreriaService;
+	private Integer id_cuenta_tesoreria;
 	
 	public CobranzaMB(){}
 	
@@ -72,7 +84,7 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		
 		this.mes=sdfm.format(new Date());
 		this.anio=sdfy.format(new Date());
-		
+		this.emisorService = new EmisorService();
 		this.movimientoClienteSelec= new MovimientoClientes();
 		this.movimientoClienteService= new MovimientoClienteService();
 		this.tablaTablasDetalleService = new TablaTablasDetalleService();
@@ -83,11 +95,20 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		this.nroserie_documento="";
 		this.cuentaTesoreriaService= new CuentaTesoreriaService();
 		this.cuentaSelec= new CuentaTesoreria();
-		
+		this.cobranzaCabeceraService= new CobranzaCabeceraService();
+		this.cobranzaDetalleService=new CobranzaDetalleService();
+		this.movimientoTesoreriaService= new MovimientoTesoreriaService();
+		this.cuentaSelec= new CuentaTesoreria();
 		try {
 			this.listTablaTablasDetallesComprobante = this.tablaTablasDetalleService.findByIdMaestra(Constante.COD_TIPOS_DOCUMENTOS);
+			this.id_cuenta_tesoreria=0;
 			this.listaClientes=this.clienteService.findAll();
+			if(!this.listaClientes.isEmpty()){
+				this.clienteEncontrado=this.listaClientes.get(0);
+			}
+			this.cuentaSelec= new CuentaTesoreria();
 			this.listaCuentas=this.cuentaTesoreriaService.findAll();
+			this.emisorSelec = this.emisorService.findAll().get(0);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -99,10 +120,14 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		this.cuentaSelec= new CuentaTesoreria();
 		this.listaDetalleCobro= new ArrayList<>();
 		if(this.clienteEncontrado!=null){
+			System.out.println("this.clienteEncontrado.getId_cliente()--------->"+this.clienteEncontrado.getId_cliente());
 			this.cobro.setId_cliente(this.clienteEncontrado.getId_cliente());
 			this.cobro.setCliente(this.clienteEncontrado);
 			this.cobro.setFecha_cobranza(new Date());
 			this.cobro.setTotal_importe_cobrado(new BigDecimal("0.00"));
+			this.cobro.setId_emisor(this.emisorSelec.getId_emisor());
+			this.cobro.setId_domicilio_fiscal_cab(this.emisorSelec.getId_domicilio_fiscal_cab());
+			
 			CobranzaDetalle detalle;
 			System.out.println("this.listaSelectedMovimientos--->"+listaSelectedMovimientos.size());
 			System.out.println("this.listaFiltroMovimientos--->"+listaFiltroMovimientos);
@@ -120,35 +145,105 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 			}
 			
 		}
-		System.out.println("this.cobro.getCliente().getNombre_cab()"+this.cobro.getCliente().getNombre_cab());
-		System.out.println("this.cobro.getTotal_importe_cobrado()"+this.cobro.getTotal_importe_cobrado());
-	}
-	public List<Cliente> consultarCliente(String query) throws Exception {
-		System.out.println("entrando autocomplete");
-        List<Cliente> allClients = this.clienteService.findAll();
-        List<Cliente> filteredClients = new ArrayList<Cliente>();
-         
-        for (int i = 0; i < allClients.size(); i++) {
-        	Cliente skin = allClients.get(i);
-            if(skin.getNombre_cab().toLowerCase().startsWith(query.toLowerCase())) {
-            	filteredClients.add(skin);
-            }
-        }
-        
-        System.out.println("Cantidad: "+filteredClients.size());
-         
-        return filteredClients;
-    }
+		this.cobro.setSaldo_deudor(this.cobro.getTotal_importe_cobrado());
+		this.cobro.setSaldo_pagar(this.cobro.getTotal_importe_cobrado());
+		this.cuentaSelec.setMontoIngresado(this.cobro.getTotal_importe_cobrado());
 	
-	public void onItemCliente(SelectEvent event)  throws Exception{
+	}
+
+	
+	public void guardarCobro(){
+		System.out.println(" guardarCobro ----------->"+this.id_cuenta_tesoreria);
+		RequestContext context = RequestContext.getCurrentInstance(); 
+		try {
+			System.out.println("this.id_cuenta_tesoreria ---------->"+this.id_cuenta_tesoreria);
+			this.cuentaSelec=this.cuentaTesoreriaService.findById(this.id_cuenta_tesoreria);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-				String s = event.getObject().toString();
+		int id_cobranza=0;
+		try {
+			this.cobro.setId_cuenta_tesoreria(this.cuentaSelec.getId_cuenta_tesoreria());
+			 id_cobranza=this.cobranzaCabeceraService.crearCobranzaCabecera(cobro);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		for(CobranzaDetalle det: this.listaDetalleCobro){
+			MovimientoClientes mov= new MovimientoClientes();
+			mov.setComprobante(det.getComprobante());
+			mov.setNroserie_documento(det.getComprobante().getNumero_serie_documento_cab());
+			mov.setPago(det.getImporte_cobrado());
+			this.movimientoClienteService.actualizarMovimiento(mov);			
+			
+			det.setId_cobranza(id_cobranza);
+			det.setId_emisor(this.emisorSelec.getId_emisor());
+			det.setId_domicilio_fiscal_cab(this.emisorSelec.getId_domicilio_fiscal_cab());
+			det.setId_cuenta_tesoreria(this.cuentaSelec.getId_cuenta_tesoreria());
+			det.setFecha_cobranza(new Date());
+			try {
+				this.cobranzaDetalleService.crearCobranzaDetalle(det);
+				
+				MovimientoCuentaTesoreria movt= new MovimientoCuentaTesoreria();
+				movt.setEntrada(det.getImporte_cobrado());
+				movt.setFecha_movimiento(new Date());
+				movt.setId_cliente(det.getId_cliente());
+				movt.setId_cobranza(id_cobranza);
+				movt.setId_cuenta_tesoreria(this.cobro.getId_cuenta_tesoreria());
+				movt.setId_domicilio_fiscal_cab(this.cobro.getId_domicilio_fiscal_cab());
+				movt.setId_emisor(this.cobro.getId_emisor());
+				movt.setTipomovimiento("COBRO");
+				
+				this.movimientoTesoreriaService.crearMovimientoTesoreria(movt);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		this.listaFiltroMovimientos=new ArrayList<>();
+		listarMovimientosFiltros();
+		context.update("msgGeneral");
+	}
+	
+	public void cancelarCobro(){
+		
+		
+	}
+	
+	public void cambiarTotalPagar(CobranzaDetalle detalle, BigDecimal monto){
+		List<CobranzaDetalle> listaAux=this.listaDetalleCobro;
+		this.listaDetalleCobro=new ArrayList<>();
+		this.cobro.setSaldo_pagar(new BigDecimal("0.00"));
+		System.out.println("CAMBIA ITEM TOTAL A PAGAR"+detalle.getImporte_cobrado()+" MONTO:"+monto);
+		for(int i=0;i<listaAux.size(); i++){
+			CobranzaDetalle c=listaAux.get(i);
+			if(c.getComprobante().getNumero_serie_documento_cab().equals(detalle.getComprobante().getNumero_serie_documento_cab())){
+				this.listaDetalleCobro.add(detalle);
+				this.cobro.setSaldo_pagar(detalle.getImporte_cobrado().add(this.cobro.getSaldo_pagar()));
+			}else{
+				this.listaDetalleCobro.add(c);
+				this.cobro.setSaldo_pagar(c.getImporte_cobrado().add(this.cobro.getSaldo_pagar()));
+			}
+		}	
+	}
+	
+	
+	
+	public void onItemCliente()  throws Exception{
+		
+		System.out.println("onItemCliente --->");
+				
 				List<Cliente> allProducts = this.clienteService.findAll();
 		        //List<Cliente> filteredProducts = new ArrayList<Cliente>();
 				
 				for (int i = 0; i < allProducts.size(); i++) {
 		        	Cliente skin = allProducts.get(i);
-		            if(skin.getNombre_cab().equals(s)) {
+		            if(skin.getNombre_cab().equalsIgnoreCase(this.clienteEncontrado.getNombre_cab())) {
 		            	//filteredProducts.add(skin);
 		            	//this.comprobanteSelec.setTipo_comprobante(skin.getDescripcion_prod_det());
 		            	this.clienteEncontrado = skin;
@@ -156,7 +251,8 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		            	
 		            }
 		        }		
-				
+			this.clienteEncontrado=this.clienteService.findById(this.clienteEncontrado.getId_cliente());
+			System.out.println("this.clienteEncontrado.getId_cliente() --->"+this.clienteEncontrado.getId_cliente());
 	}
 	
 	public void listarMovimientosFiltros(){
@@ -166,7 +262,7 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		 this.disableRespuesta = Boolean.FALSE; 
 		 
 		 if(this.clienteEncontrado!=null){
-			 
+			 System.out.println(" listarMovimientosFiltros --->"+this.clienteEncontrado.getId_cliente());
 		 }else{
 			 this.clienteEncontrado= new Cliente();
 		 }
@@ -402,6 +498,54 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 
 	public void setCuentaSelec(CuentaTesoreria cuentaSelec) {
 		this.cuentaSelec = cuentaSelec;
+	}
+
+	public CobranzaCabeceraService getCobranzaCabeceraService() {
+		return cobranzaCabeceraService;
+	}
+
+	public void setCobranzaCabeceraService(CobranzaCabeceraService cobranzaCabeceraService) {
+		this.cobranzaCabeceraService = cobranzaCabeceraService;
+	}
+
+	public CobranzaDetalleService getCobranzaDetalleService() {
+		return cobranzaDetalleService;
+	}
+
+	public void setCobranzaDetalleService(CobranzaDetalleService cobranzaDetalleService) {
+		this.cobranzaDetalleService = cobranzaDetalleService;
+	}
+
+	public Emisor getEmisorSelec() {
+		return emisorSelec;
+	}
+
+	public void setEmisorSelec(Emisor emisorSelec) {
+		this.emisorSelec = emisorSelec;
+	}
+
+	public EmisorService getEmisorService() {
+		return emisorService;
+	}
+
+	public void setEmisorService(EmisorService emisorService) {
+		this.emisorService = emisorService;
+	}
+
+	public MovimientoTesoreriaService getMovimientoTesoreriaService() {
+		return movimientoTesoreriaService;
+	}
+
+	public void setMovimientoTesoreriaService(MovimientoTesoreriaService movimientoTesoreriaService) {
+		this.movimientoTesoreriaService = movimientoTesoreriaService;
+	}
+
+	public Integer getId_cuenta_tesoreria() {
+		return id_cuenta_tesoreria;
+	}
+
+	public void setId_cuenta_tesoreria(Integer id_cuenta_tesoreria) {
+		this.id_cuenta_tesoreria = id_cuenta_tesoreria;
 	}
 	
 	

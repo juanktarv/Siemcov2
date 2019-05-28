@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.certicom.scpf.domain.MovimientoClientes;
 
@@ -33,5 +35,10 @@ public interface MovimientoClienteMapper {
 	public Integer countCompByAnioMesTipoPAGINATOR(@Param("anio") Integer annio, @Param("mes") Integer mes,
 			   @Param("tipo_comprobante") String tipo_comprobante, 
 			   @Param("filters") Map<String,Object> filters);
+
+	
+	@Update(" update t_movimiento_clientes  set saldopagado=((CASE WHEN saldopagado IS NULL THEN 0 ELSE saldopagado END)+#{pago}) where nroserie_documento=#{nroserie_documento}")
+	@Options(flushCache=true,useCache=true)
+	public void actualizarMovimiento(MovimientoClientes mov);
 
 }

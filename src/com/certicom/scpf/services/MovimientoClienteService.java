@@ -38,4 +38,10 @@ public class MovimientoClienteService implements MovimientoClienteMapper{
 		
 	}
 
+	public void actualizarMovimiento(MovimientoClientes mov) {
+		// TODO Auto-generated method stub
+		System.out.println("ACTUALIZAR MOVIMIENTO");
+		this.movimientoClienteMapper.actualizarMovimiento(mov);
+	}
+
 }

@@ -1,5 +1,6 @@
 package com.certicom.scpf.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class MovimientoCuentaTesoreria {
@@ -11,8 +12,8 @@ public class MovimientoCuentaTesoreria {
 	private Integer id_cobranza;
 	private Integer id_proveedor;
 	private Date fecha_movimiento;
-	private Date entrada;
-	private Date salida;
+	private BigDecimal entrada;
+	private BigDecimal salida;
 	private String tipomovimiento;
 	
 	public Integer getId_cuenta_tesoreria() {
@@ -71,19 +72,19 @@ public class MovimientoCuentaTesoreria {
 		this.fecha_movimiento = fecha_movimiento;
 	}
 	
-	public Date getEntrada() {
+	public BigDecimal getEntrada() {
 		return entrada;
 	}
 	
-	public void setEntrada(Date entrada) {
+	public void setEntrada(BigDecimal entrada) {
 		this.entrada = entrada;
 	}
 	
-	public Date getSalida() {
+	public BigDecimal getSalida() {
 		return salida;
 	}
 	
-	public void setSalida(Date salida) {
+	public void setSalida(BigDecimal salida) {
 		this.salida = salida;
 	}
 	

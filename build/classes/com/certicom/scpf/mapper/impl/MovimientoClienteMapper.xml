@@ -18,6 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<result column="flag_regularizado" property="flag_regularizado"/>
 	<result column="formapago" property="formapago"/>
 	<result column="saldopagado" property="saldopagado"/>
+	<result column="deuda" property="deuda" />
 	
 	<association property="cliente" column="id_cliente" select="selectCliente"/>
 	<association property="comprobante" column="id_comprobante" select="selectComprobante"/>
@@ -33,9 +34,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 	<select id="listComprobantesByAnioMesTipoPAGINATOR" resultMap="movimientoClienteResult">
-		select m.*, com.* from t_movimiento_clientes m 
+		select m.*, com.*, ((CASE WHEN m.importe IS NULL THEN 0 ELSE m.importe END)- (CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END) ) as deuda from t_movimiento_clientes m 
 	  	inner join t_comprobante com on com.id_comprobante=m.id_comprobante
 	  	where m.tipo_comprobante like ('%' || #{tipo_comprobante} || '%')
+	  	and m.importe > ((CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END))
 	  	and to_char( m.fecha_movimiento, 'MM') like ('%' ||#{mes}|| '%')
 	  	and to_char( m.fecha_movimiento, 'yyyy') like ('%' ||#{anio}|| '%')
 	  	

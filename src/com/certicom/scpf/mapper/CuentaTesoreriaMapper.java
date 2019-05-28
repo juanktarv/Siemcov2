@@ -13,7 +13,7 @@ import com.certicom.scpf.domain.CuentaTesoreria;
 
 public interface CuentaTesoreriaMapper {
 
-	@Select("select * from t_cuenta_tesoreria e where e. =id_cuenta_tesoreria #{p_id_cuenta_tesoreria}")
+	@Select("select * from t_cuenta_tesoreria e where e.id_cuenta_tesoreria = #{p_id_cuenta_tesoreria}")
 	public CuentaTesoreria findById(@Param("p_id_cuenta_tesoreria") Integer id_cuenta_tesoreria) throws Exception;
 	
 	

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.certicom.scpf.mapper.CobranzaCabeceraMapper">
+
+<resultMap id="cobranzaCabeceraResult" type="com.certicom.scpf.domain.CobranzaCabecera">  
+	<id column="id_cobranza" property="id_cobranza"/>
+	<result column="id_cliente" property="id_cliente"/>
+	<result column="id_cuenta_tesoreria" property="id_cuenta_tesoreria"/>
+	<result column="id_domicilio_fiscal_cab" property="id_domicilio_fiscal_cab"/>
+	<result column="id_emisor" property="id_emisor"/>
+	<result column="total_importe_cobrado" property="total_importe_cobrado"/>
+	<result column="fecha_cobranza" property="fecha_cobranza"/>
+
+</resultMap>
+
+
+</mapper>	
