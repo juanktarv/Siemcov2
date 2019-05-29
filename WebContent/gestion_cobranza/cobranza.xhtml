@@ -221,7 +221,7 @@
 								<p:column headerText="Pendiente" style="width:30%">
 									<p:outputLabel value="#{p.importe_pendiente}" style="width:90%"></p:outputLabel>
 								</p:column>					
-								<p:column headerText="Pago" style="width:20%">
+								<p:column headerText="Pago" style="width:30%">
 									<p:inputText value="#{p.importe_cobrado}" style="width:90%">
 										<p:ajax event="change" onsuccess="#{cobranzaMB.cambiarTotalPagar(p, p.importe_cobrado)}" 
 												update="@this"></p:ajax>
@@ -280,7 +280,7 @@
 					
 					<h:panelGrid columns="2" style="margin : 0 auto;" >
 							<p:commandButton value="Cobrar" onclick="PF('dlgNuevoCobro').hide()" 
-											update="@this" 
+											update="@this :frmListaDocumentos  @form" 
 		    				 				 actionListener="#{cobranzaMB.guardarCobro()}" 
 		    				 				 >
 		    				 </p:commandButton>

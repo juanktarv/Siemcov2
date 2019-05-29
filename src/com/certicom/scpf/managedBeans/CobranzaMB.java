@@ -134,20 +134,20 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 			
 			for(MovimientoClientes mov:listaSelectedMovimientos){
 				detalle= new CobranzaDetalle();
-				this.cobro.setTotal_importe_cobrado(this.cobro.getTotal_importe_cobrado().add(mov.getImporte()));
+				this.cobro.setTotal_importe_cobrado(this.cobro.getTotal_importe_cobrado().add(mov.getDeuda()));
 				System.out.println("IMPORTE--->"+this.cobro.getTotal_importe_cobrado());
 				detalle.setId_cliente(mov.getId_cliente());
 				detalle.setId_comprobante(mov.getId_comprobante());
-				detalle.setImporte_cobrado(Utils.redondeoImporteTotal(mov.getImporte()));
-				detalle.setImporte_pendiente(Utils.redondeoImporteTotal(mov.getImporte(), 2));
+				detalle.setImporte_cobrado(Utils.redondeoImporteTotal(mov.getDeuda(),2));
+				detalle.setImporte_pendiente(Utils.redondeoImporteTotal(mov.getDeuda(), 2));
 				detalle.setComprobante(mov.getComprobante());
 				this.listaDetalleCobro.add(detalle);
 			}
 			
 		}
-		this.cobro.setSaldo_deudor(this.cobro.getTotal_importe_cobrado());
-		this.cobro.setSaldo_pagar(this.cobro.getTotal_importe_cobrado());
-		this.cuentaSelec.setMontoIngresado(this.cobro.getTotal_importe_cobrado());
+		this.cobro.setSaldo_deudor(Utils.redondeoImporteTotal(this.cobro.getTotal_importe_cobrado(), 2));
+		this.cobro.setSaldo_pagar(Utils.redondeoImporteTotal(this.cobro.getTotal_importe_cobrado(),2));
+		this.cuentaSelec.setMontoIngresado(Utils.redondeoImporteTotal(this.cobro.getTotal_importe_cobrado(),2));
 	
 	}
 
