@@ -16,8 +16,8 @@
 			<h:form>
 				<p:breadCrumb>  
     				<p:menuitem value="Home" url="#" />  
-    				<p:menuitem value="Cobranza" url="#" />
-    				<p:menuitem value="Gestion de Cobranza" url="cobranza" />   
+    				<p:menuitem value="Pagos" url="#" />
+    				<p:menuitem value="Gestion de Pagos" url="pagos" />   
 				</p:breadCrumb>	
 			</h:form>
 			
@@ -32,7 +32,7 @@
 					<h:panelGroup columns="6">	
 						<h:panelGrid columns="6" cellpadding="10">
 							#{"Periodo:"}						 
-								<p:selectOneMenu style="width:120px" value="#{cobranzaMB.mes}">
+								<p:selectOneMenu style="width:120px" value="#{pagosMB.mes}">
 									<f:selectItem  itemLabel="Enero" itemValue="01" />
 									<f:selectItem  itemLabel="Febrero" itemValue="02" />
 									<f:selectItem  itemLabel="Marzo" itemValue="03" />
@@ -46,7 +46,7 @@
 									<f:selectItem  itemLabel="Noviembre" itemValue="11" />
 									<f:selectItem  itemLabel="Diciembre" itemValue="12" />
 								</p:selectOneMenu>
-								<p:selectOneMenu style="width:100px" value="#{cobranzaMB.anio}">
+								<p:selectOneMenu style="width:100px" value="#{pagosMB.anio}">
 									<f:selectItem  itemLabel="2019" itemValue="2019" />
 									<f:selectItem  itemLabel="2020" itemValue="2020" />
 									<f:selectItem  itemLabel="2021" itemValue="2021" />
@@ -57,12 +57,12 @@
 								</p:selectOneMenu>
 								
 								#{"Tipo de Documento:"}					        
-								<p:selectOneMenu style="width:400px" value="#{cobranzaMB.tipo_comprobante}"  >
+								<p:selectOneMenu style="width:400px" value="#{pagosMB.tipo_comprobante}"  >
 									<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
-									<f:selectItems 	value="#{cobranzaMB.listTablaTablasDetallesComprobante}" 
+									<f:selectItems 	value="#{pagosMB.listTablaTablasDetallesComprobante}" 
 													var="p" itemLabel="#{p.descripcion_largo}" 
 													itemValue="#{p.codigo_catalogo}" />									
-									<p:ajax event="change" listener="#{cobranzaMB.onItemDocumento()}" 
+									<p:ajax event="change" listener="#{pagosMB.onItemDocumento()}" 
 											update="buscarRespuesta"/>									
 								</p:selectOneMenu>
 								
@@ -70,34 +70,34 @@
 						</h:panelGrid>
 					</h:panelGroup>
 					<h:panelGrid columns="6" cellpadding="10">
-						<p:outputLabel value="Cliente "></p:outputLabel>
+						<p:outputLabel value="proveedor "></p:outputLabel>
 						
-						<p:selectOneMenu id="advanced" value="#{cobranzaMB.clienteEncontrado.nombre_cab}" panelStyle="width:500px"							
+						<p:selectOneMenu id="advanced" value="#{pagosMB.proveedorEncontrado.nombre_proveedor}" panelStyle="width:500px"							
                          	effect="fade" var="t" style="width:500px" filter="true" filterMatchMode="startsWith">
-				            <f:selectItems value="#{cobranzaMB.listaClientes}" 
-				            			   var="cliente" itemLabel="#{cliente.nombre_cab}" itemValue="#{cliente.nombre_cab}" />				            			   
+				            <f:selectItems value="#{pagosMB.listaproveedors}" 
+				            			   var="proveedor" itemLabel="#{proveedor.nombre_proveedor}" itemValue="#{proveedor.nombre_proveedor}" />				            			   
 				            <p:column>
-				                <h:outputText value="#{t.nombre_cab}" />				                
+				                <h:outputText value="#{t.nombre_proveedor}" />				                
 				            </p:column>
 				            <p:column>
-				            	<p:outputLabel value="#{t.desTipoDocumento} #{t.numero_docu_iden_cab}" 
+				            	<p:outputLabel value="#{t.desTipoDocumento} #{t.numero_documento}" 
 				            	style="width:400px ;font-size:15px; color:blue" />
 				            </p:column>	
-				            <p:ajax event="change" listener="#{cobranzaMB.onItemCliente}" process="@this"/>			 
+				            <p:ajax event="change" listener="#{pagosMB.onItemProveedor}" process="@this"/>			 
 				            				            
 				        </p:selectOneMenu>
 				
 						<p:outputLabel value="Nro Comprobante "></p:outputLabel>
-						<p:inputText value="#{cobranzaMB.nroserie_documento}"></p:inputText>
+						<p:inputText value="#{pagosMB.nroserie_documento}"></p:inputText>
 						
 					</h:panelGrid>
 					
 					<h:panelGrid columns="2" id="buscarRespuesta">	
 									<p:commandButton value="Buscar"  
-										actionListener="#{cobranzaMB.listarMovimientosFiltros()}" 
-										disabled="#{cobranzaMB.disableBuscar}"
-										update=":frmListaDocumentos" icon="icon-search" 
-										/>
+										actionListener="#{pagosMB.listarMovimientosFiltros()}" 
+										disabled="#{pagosMB.disableBuscar}"
+										update=":frmListaDocumentos :msgGeneral" icon="icon-search" 
+										onstart="PF('BlockUIWidget').block();" oncomplete="PF('BlockUIWidget').unblock();"/>
 					</h:panelGrid>
 													
 				</p:panel>
@@ -113,8 +113,8 @@
 				        <h:outputText value="Cambiando de página, espere por favor..." style="white-space: nowrap; font-weight:bold; color: #036fab"/> 
 				    </pe:blockUI>
 				    
-				    <p:commandButton value="Iniciar Cobro" onclick="PF('dlgNuevoCobro').show()"
-				    				 actionListener="#{cobranzaMB.prepararCobro()}" update=":formdlg :formdlg:dtlistCobro">
+				    <p:commandButton value="Cobrar" onclick="PF('dlgNuevopago').show()"
+				    				 actionListener="#{pagosMB.prepararPago()}" update=":formdlg :formdlg:dtlistpago">
 				    </p:commandButton>
 				    				 
 				    	<p:blockUI block="dataTableComprobantes" trigger="dataTableComprobantes">
@@ -124,16 +124,16 @@
 				        		style="white-space: nowrap; font-weight:bold; color: #036fab"/>
 					    </p:blockUI>
 					    					
-					<p:dataTable var="p" value="#{cobranzaMB.listamovimientos}" 
+					<p:dataTable var="p" value="#{pagosMB.listamovimientos}" 
 								emptyMessage="No se encontraron Comprobantes" 
 								lazy="true" paginatorPosition="bottom"  
-								filteredValue="#{cobranzaMB.listaFiltroMovimientos}" 
+								filteredValue="#{pagosMB.listaFiltroMovimientos}" 
 								paginator="true" rowIndexVar="nro" 
 								id="dataTableComprobantes"
 								rows="10" 
 								rowsPerPageTemplate="10, 15, 20, 50, 100"
-								selection="#{cobranzaMB.listaSelectedMovimientos}"
-								 style="FONT-SIZE: 10px;" rowKey="#{p.id_comprobante}" 
+								selection="#{pagosMB.listaSelectedMovimientos}"
+								 style="FONT-SIZE: 10px;" rowKey="#{p.id_comprobante_compra}" 
 								 widgetVar="dataTableComprobantes">
 								 
 						<f:facet name="header">Lista de Comprobantes Emitidos</f:facet>
@@ -142,8 +142,8 @@
 						<p:column selectionMode="multiple" style="width:16px;text-align:center" >
 						</p:column>	
 						<p:column style="width:16px;text-align:center" headerText="Orden">#{nro+1}</p:column>	
-						<p:column style="width:70px" headerText="Cliente">
-							<h:outputText value="#{p.cliente.nombre_cab}"/>
+						<p:column style="width:70px" headerText="proveedor">
+							<h:outputText value="#{p.proveedor.nombre_proveedor}"/>
 						</p:column>
 						<p:column style="width:70px" headerText="Nro Comprobante" sortBy="#{p.nroserie_documento}" 
 									filterBy="#{p.nroserie_documento}" filterMatchMode="contains" filterStyle="width: 95%">
@@ -161,38 +161,32 @@
 						<p:column style="width:70px" headerText="Estado">
 							<h:outputText value="#{p.flag_regularizado}"/>
 						</p:column>					
-				</p:dataTable>
-				
-				
-				
-				
-			</h:form>
-			
-
-			
+				</p:dataTable>	
+			</h:form>			
 		</p:panel>
 		
-					<p:dialog header="Registrar Cobro" widgetVar="dlgNuevoCobro" appendTo="@(body)" 
-					resizable="false" id="dlgDetNuevoCobro" modal="true" position="top">
+			<p:dialog header="Registrar Pago" widgetVar="dlgNuevopago" appendTo="@(body)" 
+					resizable="false" id="dlgDetNuevopago" modal="true" position="top">
+					
 					<h:form id="formdlg">
 							
 						<h:panelGrid columns="4" cellpadding="10">
 											
-							<p:outputLabel value="Cliente" 
+							<p:outputLabel value="proveedor" 
 								style="white-space: nowrap; font-weight:bold; color: #036fab">
 							</p:outputLabel>
-							<p:outputLabel value="#{cobranzaMB.cobro.cliente.nombre_cab}"></p:outputLabel>
+							<p:outputLabel value="#{pagosMB.pago.proveedor.nombre_proveedor}"></p:outputLabel>
 							
 							<p:outputLabel value="Total Deuda Seleccionada" 
 										   style="white-space: nowrap; font-weight:bold; color: #036fab">
 							</p:outputLabel>
 							
-							<p:outputLabel value="#{cobranzaMB.cobro.total_importe_cobrado}" converter="montoDefaultConverter"></p:outputLabel>
+							<p:outputLabel value="#{pagosMB.pago.total_importe_pagado}" converter="montoDefaultConverter"></p:outputLabel>
 							
 							<p:outputLabel value="Fecha" 
 								style="white-space: nowrap; font-weight:bold; color: #036fab">
 							</p:outputLabel>
-							<p:outputLabel value="#{cobranzaMB.cobro.fecha_cobranza}">
+							<p:outputLabel value="#{pagosMB.pago.fecha_pago}">
 								<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss"></f:convertDateTime>
 							</p:outputLabel>
 							
@@ -203,7 +197,7 @@
 									   style="white-space: nowrap; font-weight:bold; color: #036fab;">
 							</p:outputLabel>												
 							
-							<p:dataTable var="p" value="#{cobranzaMB.listaDetalleCobro}" id="dtlistCobro" 
+							<p:dataTable var="p" value="#{pagosMB.listaDetallePago}" id="dtlistpago" 
 										 style="width:100%" emptyMessage="No existen deudas" 
 										 rowIndexVar="nro"  paginator="true" 
 										 rows="10" paginatorPosition="bottom" 
@@ -216,33 +210,33 @@
 									#{nro+1}
 								</p:column>			 
 								<p:column headerText="Comprobante" style="width:40%">
-									<p:outputLabel value="#{p.comprobante.numero_serie_documento_cab}" style="width:90%"></p:outputLabel>
+									<p:outputLabel value="#{p.comprobanteCompra.nroserie_documento}" style="width:90%"></p:outputLabel>
 								</p:column>
 								<p:column headerText="Pendiente" style="width:30%">
 									<p:outputLabel value="#{p.importe_pendiente}" style="width:90%"></p:outputLabel>
 								</p:column>					
 								<p:column headerText="Pago" style="width:30%">
-									<p:inputText value="#{p.importe_cobrado}" style="width:90%">
+									<p:inputText value="#{p.importe_pagado}" style="width:90%">
 									</p:inputText>
 								</p:column>
 							</p:dataTable>
 						</p:fieldset>
 						
-						<p:fieldset legend="Cobro" style="margin-bottom:20px">
+						<p:fieldset legend="Pago" style="margin-bottom:20px">
 						
 								<h:panelGrid columns="2" cellpadding="4">
 								
 									<p:outputLabel value="Saldo Deudor :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
 									</p:outputLabel>									
-									<p:outputLabel value="#{cobranzaMB.cobro.saldo_deudor}" 
+									<p:outputLabel value="#{pagosMB.pago.saldo_deudor}" 
 													style="white-space: nowrap; font-weight:bold; color: #036fab;">
 									</p:outputLabel>
 									
 									<p:outputLabel value="Saldo a Pagar :" 
 													style="white-space: nowrap; font-weight:bold; color: #036fab;" 
-													id="cobroSaldoDeuda">
+													id="pagoSaldoDeuda">
 									</p:outputLabel>									
-									<p:outputLabel value="#{cobranzaMB.cobro.saldo_pagar}" 
+									<p:outputLabel value="#{pagosMB.pago.saldo_pagar}" 
 												   style="white-space: nowrap; font-weight:bold; color: #036fab;">
 									</p:outputLabel>
 																
@@ -255,17 +249,17 @@
 									<p:outputLabel value="Cuenta Tesoreria :" style="white-space: nowrap; font-weight:bold; color: #036fab;">
 									</p:outputLabel>
 									
-									<p:selectOneMenu style="width:400px" value="#{cobranzaMB.id_cuenta_tesoreria}"  >
+									<p:selectOneMenu style="width:400px" value="#{pagosMB.id_cuenta_tesoreria}"  >
 										<f:selectItem itemValue="" itemLabel="--Seleccione--"></f:selectItem>
-										<f:selectItems 	value="#{cobranzaMB.listaCuentas}" 
+										<f:selectItems 	value="#{pagosMB.listaCuentas}" 
 														var="p" itemLabel="#{p.cuenta}-#{p.tipo_moneda}" 
 														itemValue="#{p.id_cuenta_tesoreria}" />																												
 									</p:selectOneMenu>
 									
 									<p:outputLabel value="Monto a Ingresar:" style="white-space: nowrap; font-weight:bold; color: #036fab;">
 									</p:outputLabel>									
-									<p:outputLabel value="#{cobranzaMB.cuentaSelec.montoIngresado}" 
-												   id="cuentaMontoCobro"
+									<p:outputLabel value="#{pagosMB.cuentaSelec.montoIngresado}" 
+												   id="cuentaMontopago"
 												   style="white-space: nowrap; font-weight:bold; color: #036fab;">
 									</p:outputLabel>
 
@@ -277,13 +271,13 @@
 					
 					
 					<h:panelGrid columns="2" style="margin : 0 auto;" >
-							<p:commandButton value="Cobrar" onclick="PF('dlgNuevoCobro').hide()" 
-											update=":frmListaDocumentos  :frmListaDocumentos:dataTableComprobantes" 
-		    				 				 actionListener="#{cobranzaMB.guardarCobro()}" 
+							<p:commandButton value="Cobrar" onclick="PF('dlgNuevopago').hide()" 
+											update="@this :frmListaDocumentos  @form" 
+		    				 				 actionListener="#{pagosMB.guardarPago()}" 
 		    				 				 >
 		    				 </p:commandButton>
-		    				 <p:commandButton value="Cancelar" onclick="PF('dlgNuevoCobro').hide()"
-		    				 				 actionListener="#{cobranzaMB.cancelarCobro()}" 
+		    				 <p:commandButton value="Cancelar" onclick="PF('dlgNuevopago').hide()"
+		    				 				 actionListener="#{pagosMB.cancelarPago()}" 
 		    				 				 >
 		    				 </p:commandButton>
 					</h:panelGrid>

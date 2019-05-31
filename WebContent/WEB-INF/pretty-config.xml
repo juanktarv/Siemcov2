@@ -178,4 +178,9 @@
 		<view-id value="/faces/inventario/almacen.xhtml" />
 	</url-mapping>
 	
+	<url-mapping id="pagos">
+		<pattern value="/pagos" />
+		<view-id value="/faces/gestion_pago/pagos.xhtml" />
+	</url-mapping>
+	
 </pretty-config>

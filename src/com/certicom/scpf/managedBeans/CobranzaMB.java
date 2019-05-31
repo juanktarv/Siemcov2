@@ -120,7 +120,7 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		this.cuentaSelec= new CuentaTesoreria();
 		this.listaDetalleCobro= new ArrayList<>();
 		if(this.clienteEncontrado!=null){
-			System.out.println("this.clienteEncontrado.getId_cliente()--------->"+this.clienteEncontrado.getId_cliente());
+			System.out.println("PREPARAR: CLIENTE ID--------->"+this.clienteEncontrado.getId_cliente());
 			this.cobro.setId_cliente(this.clienteEncontrado.getId_cliente());
 			this.cobro.setCliente(this.clienteEncontrado);
 			this.cobro.setFecha_cobranza(new Date());
@@ -129,8 +129,8 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 			this.cobro.setId_domicilio_fiscal_cab(this.emisorSelec.getId_domicilio_fiscal_cab());
 			
 			CobranzaDetalle detalle;
-			System.out.println("this.listaSelectedMovimientos--->"+listaSelectedMovimientos.size());
-			System.out.println("this.listaFiltroMovimientos--->"+listaFiltroMovimientos);
+			System.out.println("LISTA SELECCIONADA--->"+listaSelectedMovimientos.size());
+			System.out.println("LISTA FILTRADA--->"+listaFiltroMovimientos);
 			
 			for(MovimientoClientes mov:listaSelectedMovimientos){
 				detalle= new CobranzaDetalle();
@@ -206,8 +206,14 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 			}
 		}
 		this.listaFiltroMovimientos=new ArrayList<>();
+		try {
+			onItemCliente();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		listarMovimientosFiltros();
-		context.update("msgGeneral");
+		
 	}
 	
 	public void cancelarCobro(){
@@ -262,8 +268,9 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		 this.disableRespuesta = Boolean.FALSE; 
 		 
 		 if(this.clienteEncontrado!=null){
-			 System.out.println(" listarMovimientosFiltros --->"+this.clienteEncontrado.getId_cliente());
+			 System.out.println(" listarMovimientosFiltros --->clienteEncontrado"+this.clienteEncontrado.getId_cliente());
 		 }else{
+			 System.out.println(" listarMovimientosFiltros --->clienteEncontrado NULL");
 			 this.clienteEncontrado= new Cliente();
 		 }
 		
@@ -301,9 +308,11 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 					try {
 							filters.put("id_cliente", clienteEncontrado!=null? clienteEncontrado.getId_cliente():"");
 							filters.put("nroserie_documento", nroserie_documento!=null? nroserie_documento :"");
-							totalRow = movimientoClienteService.countCompByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, filters);												
+							totalRow = movimientoClienteService.countCompByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, filters);																			
+							System.out.println("TOTAL-->totalRow :"+totalRow);
 							datasource = movimientoClienteService.listComprobantesByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, first, pageSize, filters, "m.nroserie_documento", "DESC");
-						 return datasource;
+							System.out.println("TOTAL-->datasource :"+datasource.size());
+							return datasource;
 					} catch (Exception e) {
 						System.out.println("NULL ");
 						// TODO Auto-generated catch block

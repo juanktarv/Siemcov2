@@ -1,6 +1,7 @@
 package com.certicom.scpf.domain;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class PagoDetalle {
 
@@ -11,6 +12,11 @@ public class PagoDetalle {
 	private Integer id_comprobante_compra;
 	private Integer tipo_comprobante;
 	private BigDecimal pago;
+	private BigDecimal importe_pagado;
+	private BigDecimal importe_pendiente;
+	private ComprobanteCompra comprobanteCompra;
+	private Integer id_pago;
+	private Date fecha_pago;
 	
 	public Integer getId_proveedor() {
 		return id_proveedor;
@@ -66,6 +72,46 @@ public class PagoDetalle {
 	
 	public void setPago(BigDecimal pago) {
 		this.pago = pago;
+	}
+
+	public BigDecimal getImporte_pagado() {
+		return importe_pagado;
+	}
+
+	public void setImporte_pagado(BigDecimal importe_pagado) {
+		this.importe_pagado = importe_pagado;
+	}
+
+	public BigDecimal getImporte_pendiente() {
+		return importe_pendiente;
+	}
+
+	public void setImporte_pendiente(BigDecimal importe_pendiente) {
+		this.importe_pendiente = importe_pendiente;
+	}
+
+	public ComprobanteCompra getComprobanteCompra() {
+		return comprobanteCompra;
+	}
+
+	public void setComprobanteCompra(ComprobanteCompra comprobanteCompra) {
+		this.comprobanteCompra = comprobanteCompra;
+	}
+
+	public Integer getId_pago() {
+		return id_pago;
+	}
+
+	public void setId_pago(Integer id_pago) {
+		this.id_pago = id_pago;
+	}
+
+	public Date getFecha_pago() {
+		return fecha_pago;
+	}
+
+	public void setFecha_pago(Date fecha_pago) {
+		this.fecha_pago = fecha_pago;
 	}	
 	
 }

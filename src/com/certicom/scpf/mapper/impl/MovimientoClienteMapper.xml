@@ -46,7 +46,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<select id="countCompByAnioMesTipoPAGINATOR"  resultType="java.lang.Integer">
-		select count(*) t_movimiento_clientes
+		select count(*) from (
+		select m.*, com.*, ((CASE WHEN m.importe IS NULL THEN 0 ELSE m.importe END)- (CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END) ) as deuda from t_movimiento_clientes m 
+	  	inner join t_comprobante com on com.id_comprobante=m.id_comprobante
+	  	where m.tipo_comprobante like ('%' || #{tipo_comprobante} || '%')
+	  	and m.importe > ((CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END))
+	  	and to_char( m.fecha_movimiento, 'MM') like ('%' ||#{mes}|| '%')
+	  	and to_char( m.fecha_movimiento, 'yyyy') like ('%' ||#{anio}|| '%')
+	  	) a where round(deuda::numeric, 2) >0
 	</select>
 
 

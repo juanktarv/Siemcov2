@@ -45,6 +45,12 @@ public class ProveedorService implements ProveedorMapper{
 		return proveedorMapper.buscarMovimientosPorProveedor(proveedor);
 	}
 
+	@Override
+	public Proveedores findById(Integer p_proveedor) throws Exception {
+		// TODO Auto-generated method stub
+		return this.proveedorMapper.findById(p_proveedor);
+	}
+
 	
 	
 }

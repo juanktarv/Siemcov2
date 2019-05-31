@@ -9,7 +9,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.certicom.scpf.domain.Cliente;
 import com.certicom.scpf.domain.Proveedores;
 
 public interface ProveedorMapper {
@@ -41,6 +40,9 @@ public interface ProveedorMapper {
 	@Select("select c.* from t_proveedores c where c.id_proveedor in (select distinct d.id_proveedor from t_comprobante_compra d where d.id_proveedor=#{id_proveedor})")
 	public List<Proveedores> buscarMovimientosPorProveedor(Proveedores proveedor);
 	
-
+	@Select("select e.* , (select d.descripcion_largo from t_tabla_tablas_detalle d where d.id_maestra = 6 "
+			+ "and d.codigo_catalogo = cast(e.tipo_docu_iden_cab as varchar) ) "
+			+ "as desTipoDocumento from t_proveedores e where e.id_proveedor = #{p_proveedor}")
+	public Proveedores findById(@Param("p_proveedor") Integer p_proveedor) throws Exception;
 	
 }

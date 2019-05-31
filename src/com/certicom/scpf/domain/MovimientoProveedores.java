@@ -14,6 +14,14 @@ public class MovimientoProveedores {
 	private BigDecimal importe;
 	private Integer forma_pago;
 	private String nroserie_documento;
+	private BigDecimal saldopagado;
+	private BigDecimal deuda;
+	private String flag_regularizado;
+	
+	private BigDecimal pago;
+	
+	private Proveedores proveedor;
+	private ComprobanteCompra comprobanteCompra;
 	
 	public Integer getId_comprobante_compra() {
 		return id_comprobante_compra;
@@ -85,6 +93,56 @@ public class MovimientoProveedores {
 	
 	public void setNroserie_documento(String nroserie_documento) {
 		this.nroserie_documento = nroserie_documento;
+	}
+
+	public Proveedores getProveedor() {
+		return proveedor;
+	}
+
+	public void setProveedor(Proveedores proveedor) {
+		this.proveedor = proveedor;
+	}
+
+	public ComprobanteCompra getComprobanteCompra() {
+		return comprobanteCompra;
+	}
+
+	public void setComprobanteCompra(ComprobanteCompra comprobanteCompra) {
+		this.comprobanteCompra = comprobanteCompra;
+	}
+
+	public BigDecimal getSaldopagado() {
+		return saldopagado;
+	}
+
+	public void setSaldopagado(BigDecimal saldopagado) {
+		this.saldopagado = saldopagado;
+	}
+
+	public BigDecimal getDeuda() {
+		return deuda;
+	}
+
+	public void setDeuda(BigDecimal deuda) {
+		this.deuda = deuda;
+	}
+
+	public BigDecimal getPago() {
+		return pago;
+	}
+
+	public void setPago(BigDecimal pago) {
+		this.pago = pago;
+	}
+
+	public String getFlag_regularizado() {
+		return flag_regularizado;
+	}
+
+	public void setFlag_regularizado(String flag_regularizado) {
+		this.flag_regularizado = flag_regularizado;
 	}	
+	
+	
 	
 }

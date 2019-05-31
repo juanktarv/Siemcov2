@@ -6,16 +6,59 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.certicom.scpf.mapper.MovimientoProveedorMapper">
 <resultMap id="movimientoProveedorResult" type="com.certicom.scpf.domain.MovimientoProveedores">
 	<id column="id_comprobante_compra" property="id_comprobante_compra"/>
-	<result column="tipo_comprobante" property="tipo_comprobante"/>
 	<result column="id_proveedor" property="id_proveedor"/>
+	<result column="tipo_comprobante" property="tipo_comprobante"/>	
 	<result column="fecha_movimiento" property="fecha_movimiento"/>
 	<result column="fecha_vencimiento" property="fecha_vencimiento"/>
 	<result column="tipo_documento" property="tipo_documento"/>
 	<result column="importe" property="importe"/>
 	<result column="forma_pago" property="forma_pago"/>
 	<result column="nroserie_documento" property="nroserie_documento"/>
+	<result column="saldopagado" property="saldopagado"/>
+	<result column="deuda" property="deuda" />
+	<result column="flag_regularizado" property="flag_regularizado" />
+	
+	<association property="proveedor" column="id_proveedor" select="selectProveedor"/>
+	<association property="comprobanteCompra" column="id_comprobante_compra" select="selectComprobanteCompra"/>
+	
 
 </resultMap>
 
+	<select id="selectProveedor" parameterType="int" resultType="com.certicom.scpf.domain.Proveedores">
+		SELECT * FROM t_proveedores WHERE id_proveedor=#{id_proveedor}
+	</select>
+	
+	<select id="selectComprobanteCompra" parameterType="int" resultType="com.certicom.scpf.domain.ComprobanteCompra">
+		SELECT * FROM t_comprobante_compra WHERE id_comprobante_compra=#{id_comprobante_compra}
+	</select>
+	
+	<select id="listComprobantesByAnioMesTipoPAGINATOR" resultMap="movimientoProveedorResult">
+	select * from (
+		select m.*, com.*, (
+			(CASE WHEN m.importe IS NULL THEN 0 ELSE m.importe END)- 
+			(CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END) 
+		) as deuda from t_movimiento_proveedores m 
+	  	inner join t_comprobante_compra com on com.id_comprobante_compra=m.id_comprobante_compra
+	  	where m.tipo_comprobante like ('%' || #{tipo_comprobante} || '%')
+	  	and m.importe > ((CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END))
+	  	and to_char( m.fecha_movimiento, 'MM') like ('%' ||#{mes}|| '%')
+	  	and to_char( m.fecha_movimiento, 'yyyy') like ('%' ||#{anio}|| '%')
+	  	) a where round(deuda::numeric, 2) >0
+	  		 
+	</select>
+	
+	<select id="countCompByAnioMesTipoPAGINATOR"  resultType="java.lang.Integer">
+		select count(*) from (
+		select m.*, com.*, (
+			(CASE WHEN m.importe IS NULL THEN 0 ELSE m.importe END)- 
+			(CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END) 
+		) as deuda from t_movimiento_proveedores m 
+	  	inner join t_comprobante_compra com on com.id_comprobante_compra=m.id_comprobante_compra
+	  	where m.tipo_comprobante like ('%' || #{tipo_comprobante} || '%')
+	  	and m.importe > ((CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END))
+	  	and to_char( m.fecha_movimiento, 'MM') like ('%' ||#{mes}|| '%')
+	  	and to_char( m.fecha_movimiento, 'yyyy') like ('%' ||#{anio}|| '%')
+	  	) a where round(deuda::numeric, 2) >0
+	</select>
 
 </mapper>	
