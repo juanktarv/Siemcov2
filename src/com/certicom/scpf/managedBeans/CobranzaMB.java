@@ -116,6 +116,7 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 	}
 	
 	public void prepararCobro(){
+		try{
 		this.cobro= new CobranzaCabecera();
 		this.cuentaSelec= new CuentaTesoreria();
 		this.listaDetalleCobro= new ArrayList<>();
@@ -148,6 +149,17 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		this.cobro.setSaldo_deudor(Utils.redondeoImporteTotal(this.cobro.getTotal_importe_cobrado(), 2));
 		this.cobro.setSaldo_pagar(Utils.redondeoImporteTotal(this.cobro.getTotal_importe_cobrado(),2));
 		this.cuentaSelec.setMontoIngresado(Utils.redondeoImporteTotal(this.cobro.getTotal_importe_cobrado(),2));
+		
+		RequestContext context = RequestContext.getCurrentInstance();
+		RequestContext.getCurrentInstance().execute("PF('dlgNuevoCobro').show()");
+		context.update("msgGeneral");
+		}catch(Exception e){
+			RequestContext context = RequestContext.getCurrentInstance();
+			RequestContext.getCurrentInstance().execute("PF('dlgNuevoCobro').hide()");
+			context.update("msgGeneral");
+			e.printStackTrace();
+		}
+		
 	
 	}
 
@@ -205,20 +217,27 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 				e.printStackTrace();
 			}
 		}
-		this.listaFiltroMovimientos=new ArrayList<>();
+//		this.listaFiltroMovimientos=new ArrayList<>();
+//		this.listaSelectedMovimientos= new ArrayList<>();
 		try {
 			onItemCliente();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		listarMovimientosFiltros();
+		
+		this.cuentaSelec= new CuentaTesoreria();
+		this.cobro= new CobranzaCabecera();
+		this.id_cuenta_tesoreria=0;
+		this.nroserie_documento="";
+//		listarMovimientosFiltros();
 		
 	}
 	
 	public void cancelarCobro(){
-		
-		
+		this.cuentaSelec= new CuentaTesoreria();
+		this.cobro= new CobranzaCabecera();
+		this.id_cuenta_tesoreria=0;		
 	}
 	
 	public void cambiarTotalPagar(CobranzaDetalle detalle, BigDecimal monto){
@@ -308,10 +327,13 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 					try {
 							filters.put("id_cliente", clienteEncontrado!=null? clienteEncontrado.getId_cliente():"");
 							filters.put("nroserie_documento", nroserie_documento!=null? nroserie_documento :"");
+							
 							totalRow = movimientoClienteService.countCompByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, filters);																			
 							System.out.println("TOTAL-->totalRow :"+totalRow);
-							datasource = movimientoClienteService.listComprobantesByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, first, pageSize, filters, "m.nroserie_documento", "DESC");
+							
+							datasource = movimientoClienteService.listComprobantesByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, first, pageSize, filters, "nroserie_documento", "ASC");
 							System.out.println("TOTAL-->datasource :"+datasource.size());
+							
 							return datasource;
 					} catch (Exception e) {
 						System.out.println("NULL ");

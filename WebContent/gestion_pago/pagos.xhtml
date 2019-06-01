@@ -96,7 +96,7 @@
 									<p:commandButton value="Buscar"  
 										actionListener="#{pagosMB.listarMovimientosFiltros()}" 
 										disabled="#{pagosMB.disableBuscar}"
-										update=":frmListaDocumentos :msgGeneral" icon="icon-search" 
+										update=":frmListaDocumentos" icon="icon-search" 
 										onstart="PF('BlockUIWidget').block();" oncomplete="PF('BlockUIWidget').unblock();"/>
 					</h:panelGrid>
 													
@@ -113,8 +113,9 @@
 				        <h:outputText value="Cambiando de página, espere por favor..." style="white-space: nowrap; font-weight:bold; color: #036fab"/> 
 				    </pe:blockUI>
 				    
-				    <p:commandButton value="Cobrar" onclick="PF('dlgNuevopago').show()"
-				    				 actionListener="#{pagosMB.prepararPago()}" update=":formdlg :formdlg:dtlistpago">
+				    <p:commandButton value="Iniciar Pago" 
+				    				 actionListener="#{pagosMB.prepararPago()}" 
+				    				 update=":dlgDetNuevopago :formdlg :formdlg:dtlistpago">
 				    </p:commandButton>
 				    				 
 				    	<p:blockUI block="dataTableComprobantes" trigger="dataTableComprobantes">

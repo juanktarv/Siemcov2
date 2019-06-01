@@ -188,11 +188,11 @@ public class PagosMB extends GenericBeans implements Serializable{
 	            public List<MovimientoProveedores> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String,Object> filters) {              
 					try {
 							filters.put("id_proveedor", proveedorEncontrado!=null? proveedorEncontrado.getId_proveedor():"");
-							filters.put("nroserie_documento", nroserie_documento!=null? nroserie_documento :"");
+							filters.put("m.nroserie_documento", nroserie_documento!=null? nroserie_documento :"");
 							totalRow = movimientoProveedorService.countCompByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, filters);												
 							
 							System.out.println("TOTAL-->totalRow:"+totalRow);
-							datasource = movimientoProveedorService.listComprobantesByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, first, pageSize, filters, "m.nroserie_documento", "DESC");
+							datasource = movimientoProveedorService.listComprobantesByAnioMesTipoPAGINATOR(Integer.parseInt(anio), Integer.parseInt(mes), tipo_comprobante, first, pageSize, filters, "m.nroserie_documento", "ASC");
 						 
 							System.out.println("TOTAL-->datasource:"+datasource.size());
 							
@@ -247,6 +247,10 @@ public class PagosMB extends GenericBeans implements Serializable{
 		this.pago.setSaldo_deudor(Utils.redondeoImporteTotal(this.pago.getTotal_importe_pagado(), 2));
 		this.pago.setSaldo_pagar(Utils.redondeoImporteTotal(this.pago.getTotal_importe_pagado(),2));
 		this.cuentaSelec.setMontoIngresado(Utils.redondeoImporteTotal(this.pago.getTotal_importe_pagado(),2));
+		
+		RequestContext context = RequestContext.getCurrentInstance();
+		RequestContext.getCurrentInstance().execute("PF('dlgNuevopago').show()");
+		context.update("msgGeneral");
 	
 	}
 	
@@ -305,8 +309,13 @@ public class PagosMB extends GenericBeans implements Serializable{
 				e.printStackTrace();
 			}
 		}
-		this.listaFiltroMovimientos=new ArrayList<>();
-		listarMovimientosFiltros();
+//		this.listaFiltroMovimientos=new ArrayList<>();
+//		listarMovimientosFiltros();
+		
+		this.cuentaSelec= new CuentaTesoreria();
+		this.pago=new PagoCabecera();
+		this.id_cuenta_tesoreria=0;
+		this.nroserie_documento="";
 		context.update("msgGeneral");
 	}
 	

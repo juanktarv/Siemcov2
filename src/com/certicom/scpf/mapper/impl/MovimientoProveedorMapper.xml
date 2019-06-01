@@ -37,19 +37,47 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select m.*, com.*, (
 			(CASE WHEN m.importe IS NULL THEN 0 ELSE m.importe END)- 
 			(CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END) 
-		) as deuda from t_movimiento_proveedores m 
-	  	inner join t_comprobante_compra com on com.id_comprobante_compra=m.id_comprobante_compra
-	  	where m.tipo_comprobante like ('%' || #{tipo_comprobante} || '%')
+		) as deuda from t_movimiento_proveedores m, 
+	  	t_comprobante_compra com  
+	  	where com.id_comprobante_compra=m.id_comprobante_compra 
+	  	and m.tipo_comprobante like ('%' || #{tipo_comprobante} || '%')
 	  	and m.importe > ((CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END))
 	  	and to_char( m.fecha_movimiento, 'MM') like ('%' ||#{mes}|| '%')
 	  	and to_char( m.fecha_movimiento, 'yyyy') like ('%' ||#{anio}|| '%')
+	  	
+	  	<if test="filters.entrySet() != null">
+	  		<foreach item="item" collection="filters.entrySet()" >
+	  			<choose>
+	  				<when test="item.key == 'id_proveedor'">
+	  					and ( m.id_proveedor = #{item.value} ) 
+	  				</when>
+	  				<otherwise>
+						and  ${item.key} like ('%' || replace( #{item.value}, ' ', '%')  || '%') 
+					</otherwise>
+	  			</choose>
+	  		</foreach>
+	  	
+	  	</if>
+	  	
+	  	<if test="sortField != null">
+			order by ${sortField} ${sortOrder}    
+		 </if>
+		    
+	    <if test="sortField == null">
+			order by m.nroserie_documento ASC 
+	    </if>  		
+	  	
+	  	OFFSET #{first} LIMIT #{pageSize}	
+	  	
 	  	) a where round(deuda::numeric, 2) >0
+	  	
+	  	
 	  		 
 	</select>
 	
 	<select id="countCompByAnioMesTipoPAGINATOR"  resultType="java.lang.Integer">
 		select count(*) from (
-		select m.*, com.*, (
+		select m.*, (
 			(CASE WHEN m.importe IS NULL THEN 0 ELSE m.importe END)- 
 			(CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END) 
 		) as deuda from t_movimiento_proveedores m 
@@ -58,7 +86,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	  	and m.importe > ((CASE WHEN m.saldopagado IS NULL THEN 0 ELSE m.saldopagado END))
 	  	and to_char( m.fecha_movimiento, 'MM') like ('%' ||#{mes}|| '%')
 	  	and to_char( m.fecha_movimiento, 'yyyy') like ('%' ||#{anio}|| '%')
+	  	
+	  	
+	  	<if test="filters.entrySet() != null">
+	  		<foreach item="item" collection="filters.entrySet()" >
+	  			<choose>
+	  				<when test="item.key == 'id_proveedor'">
+	  					and ( m.id_proveedor = #{item.value} ) 
+	  				</when>
+	  				<otherwise>
+						and  ${item.key} like ('%' || replace( #{item.value}, ' ', '%')  || '%') 
+					</otherwise>
+	  			</choose>
+	  		</foreach>	  	
+	  	</if>
+	  	
+	  	
 	  	) a where round(deuda::numeric, 2) >0
+	  	
 	</select>
 
 </mapper>	

@@ -27,7 +27,7 @@
 			<p:messages  id="msgGeneral" showDetail="false" showSummary="true" closable="true" />		
 			
 			<!-- tootlbar -->
-			<h:form style="margin-bottom: 8px" > 				
+			<h:form style="margin-bottom: 8px" id="form"> 				
 				<p:panel >				
 					<h:panelGroup columns="6">	
 						<h:panelGrid columns="6" cellpadding="10">
@@ -97,6 +97,7 @@
 										actionListener="#{cobranzaMB.listarMovimientosFiltros()}" 
 										disabled="#{cobranzaMB.disableBuscar}"
 										update=":frmListaDocumentos" icon="icon-search" 
+										onstart="PF('BlockUIWidget').block();" oncomplete="PF('BlockUIWidget').unblock();"
 										/>
 					</h:panelGrid>
 													
@@ -113,8 +114,8 @@
 				        <h:outputText value="Cambiando de página, espere por favor..." style="white-space: nowrap; font-weight:bold; color: #036fab"/> 
 				    </pe:blockUI>
 				    
-				    <p:commandButton value="Iniciar Cobro" onclick="PF('dlgNuevoCobro').show()"
-				    				 actionListener="#{cobranzaMB.prepararCobro()}" update=":formdlg :formdlg:dtlistCobro">
+				    <p:commandButton value="Iniciar Cobro" actionListener="#{cobranzaMB.prepararCobro()}" 
+				    				 update=":dlgDetNuevoCobro :formdlg :formdlg:dtlistCobro">
 				    </p:commandButton>
 				    				 
 				    	<p:blockUI block="dataTableComprobantes" trigger="dataTableComprobantes">
@@ -133,8 +134,8 @@
 								rows="10" 
 								rowsPerPageTemplate="10, 15, 20, 50, 100"
 								selection="#{cobranzaMB.listaSelectedMovimientos}"
-								 style="FONT-SIZE: 10px;" rowKey="#{p.id_comprobante}" 
-								 widgetVar="dataTableComprobantes">
+								style="FONT-SIZE: 10px;" rowKey="#{p.nroserie_documento}"  
+								widgetVar="dataTableComprobantes">
 								 
 						<f:facet name="header">Lista de Comprobantes Emitidos</f:facet>
 						<p:ajax event="page" onstart="PF('BlockUIWidgetPage').block();"  oncomplete="PF('BlockUIWidgetPage').unblock();"/>
@@ -278,7 +279,7 @@
 					
 					<h:panelGrid columns="2" style="margin : 0 auto;" >
 							<p:commandButton value="Cobrar" onclick="PF('dlgNuevoCobro').hide()" 
-											update=":frmListaDocumentos  :frmListaDocumentos:dataTableComprobantes" 
+											update=":frmListaDocumentos  :frmListaDocumentos:dataTableComprobantes :form" 
 		    				 				 actionListener="#{cobranzaMB.guardarCobro()}" 
 		    				 				 >
 		    				 </p:commandButton>
