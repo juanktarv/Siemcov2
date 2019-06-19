@@ -1,6 +1,7 @@
 package com.certicom.scpf.managedBeans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -12,6 +13,7 @@ import org.primefaces.context.RequestContext;
 import com.certicom.scpf.domain.CuentaTesoreria;
 import com.certicom.scpf.domain.Log;
 import com.certicom.scpf.domain.Menu;
+import com.certicom.scpf.domain.MovimientoCuentaTesoreria;
 import com.certicom.scpf.domain.TablaTablasDetalle;
 import com.certicom.scpf.domain.Vendedor;
 import com.certicom.scpf.services.CuentaTesoreriaService;
@@ -40,6 +42,8 @@ public class CuentaTesoreriaMB extends GenericBeans implements Serializable{
 	private List<TablaTablasDetalle> listaTipoCuenta;
 	private TablaTablasDetalleService tablaTablasDetalleService;
 	
+	private List<MovimientoCuentaTesoreria> listaMovimientoCuenta;
+	
 	//datos Log
     private Log log;
 	private LogMB logmb;
@@ -53,6 +57,7 @@ public class CuentaTesoreriaMB extends GenericBeans implements Serializable{
 		this.cuentaTesoreriaService = new CuentaTesoreriaService();
 		this.menuServices=new MenuServices();
 		this.tablaTablasDetalleService = new TablaTablasDetalleService();
+		this.listaMovimientoCuenta= new ArrayList<MovimientoCuentaTesoreria>();
 		
 		this.editarCuentaTesoreria = Boolean.FALSE;
 
@@ -72,6 +77,9 @@ public class CuentaTesoreriaMB extends GenericBeans implements Serializable{
 		
 	}	
 	
+	public void verMovimientos(CuentaTesoreria p){		
+//		this.listaMovimientoCuenta=this.
+	}
 	
 	/* para tabla maestra */
 	

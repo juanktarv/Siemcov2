@@ -230,6 +230,10 @@ public class CobranzaMB extends GenericBeans implements Serializable{
 		this.cobro= new CobranzaCabecera();
 		this.id_cuenta_tesoreria=0;
 		this.nroserie_documento="";
+		if(!this.listaClientes.isEmpty()){
+			this.clienteEncontrado=this.listaClientes.get(0);
+		}
+		
 //		listarMovimientosFiltros();
 		
 	}

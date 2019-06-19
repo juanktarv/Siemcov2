@@ -83,7 +83,7 @@
 				            	<p:outputLabel value="#{t.desTipoDocumento} #{t.numero_docu_iden_cab}" 
 				            	style="width:400px ;font-size:15px; color:blue" />
 				            </p:column>	
-				            <p:ajax event="change" listener="#{cobranzaMB.onItemCliente}" process="@this"/>			 
+				            <p:ajax event="change" listener="#{cobranzaMB.onItemCliente}" process="@this  advanced"/>			 
 				            				            
 				        </p:selectOneMenu>
 				
@@ -96,7 +96,7 @@
 									<p:commandButton value="Buscar"  
 										actionListener="#{cobranzaMB.listarMovimientosFiltros()}" 
 										disabled="#{cobranzaMB.disableBuscar}"
-										update=":frmListaDocumentos" icon="icon-search" 
+										update=":frmListaDocumentos advanced" icon="icon-search" 
 										onstart="PF('BlockUIWidget').block();" oncomplete="PF('BlockUIWidget').unblock();"
 										/>
 					</h:panelGrid>
@@ -279,7 +279,8 @@
 					
 					<h:panelGrid columns="2" style="margin : 0 auto;" >
 							<p:commandButton value="Cobrar" onclick="PF('dlgNuevoCobro').hide()" 
-											update=":frmListaDocumentos  :frmListaDocumentos:dataTableComprobantes :form" 
+											update=":frmListaDocumentos  :frmListaDocumentos:dataTableComprobantes 
+													:form " 
 		    				 				 actionListener="#{cobranzaMB.guardarCobro()}" 
 		    				 				 >
 		    				 </p:commandButton>

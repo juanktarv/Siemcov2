@@ -75,11 +75,24 @@
 						</p:commandButton>
 								
 					</p:column>
+					
+					<p:column headerText="Movimientos" style="width:15%;text-align: center">
+						<p:commandButton title="Editar"  update=":dlgDetMivimientos" 
+										 actionListener="#{cuentaTesoreriaMB.verMovimientos(p)}"
+										 oncomplete="PF('dlgMovimientos').show();" icon="icon-edit">
+						</p:commandButton> 
+					</p:column>
 
 				</p:dataTable>
 			</h:form>
 			
 			<!-- #############    Dialogos      ################ -->
+			<p:dialog header="Movimientos de Cuenta" widgetVar="dlgMovimientos" appendTo="@(body)"
+					resizable="false" id="dlgDetMivimientos" modal="true">
+					
+					
+			</p:dialog>
+			
 			
 			<!-- #############    TABLA MAESTRA      ################ -->
 			
